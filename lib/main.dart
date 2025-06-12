@@ -4,6 +4,7 @@ import 'package:shmr_finance/presentation/categories_page.dart';
 import 'package:shmr_finance/presentation/expenses_page.dart';
 import 'package:shmr_finance/presentation/income_page.dart';
 import 'package:shmr_finance/presentation/settings_page.dart';
+import 'package:shmr_finance/app_theme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,9 +19,18 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightGreenAccent),
+        useMaterial3: true,
+        colorScheme: ColorScheme.light(
+          primary: CustomAppTheme.figmaMainColor,
+        ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: CustomAppTheme.figmaMainColor,
+        ),
+        navigationBarTheme: NavigationBarThemeData(
+          indicatorColor: CustomAppTheme.figmaMainLightColor,
+          backgroundColor: CustomAppTheme.figmaNavBarColor,
+        )
       ),
-      //home: const HomePage(title: 'Расходы сегодня'),
       home: const BaseScreen(),
     );
   }
@@ -38,7 +48,6 @@ class _BaseScreenState extends State<BaseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
@@ -46,7 +55,6 @@ class _BaseScreenState extends State<BaseScreen> {
             currentPageIndex = index;
           });
         },
-        indicatorColor: Colors.lightGreen,
         selectedIndex: currentPageIndex,
         destinations: <Widget>[
           NavigationDestination(
