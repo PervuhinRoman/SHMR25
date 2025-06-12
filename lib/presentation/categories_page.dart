@@ -6,6 +6,11 @@ class CategoriesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Мои статьи"),
+        centerTitle: true,
+        toolbarHeight: 116,
+      ),
       body: Center(
         child: Text("Статьи"),
       ),
