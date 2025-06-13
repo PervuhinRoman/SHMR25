@@ -56,6 +56,7 @@ class _BaseScreenState extends State<BaseScreen> {
           });
         },
         selectedIndex: currentPageIndex,
+        // TODO: ?заменить на svg
         destinations: <Widget>[
           NavigationDestination(
             icon: Image.asset('assets/icons/downtrend.png', width: 32),
