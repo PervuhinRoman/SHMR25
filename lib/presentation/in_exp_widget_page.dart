@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shmr_finance/app_theme.dart';
-import 'package:shmr_finance/data/repositories/account_repo.dart';
 import 'package:shmr_finance/domain/models/transaction/transaction.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/data/repositories/transaction_repo_imp.dart';
 import 'package:shmr_finance/data/repositories/account_repo_imp.dart';
 import 'package:shmr_finance/data/repositories/category_repo_imp.dart';
+import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
 
 class InExpWidgetPage extends StatefulWidget {
   final bool isIncome;
@@ -17,7 +17,11 @@ class InExpWidgetPage extends StatefulWidget {
 }
 
 class _InExpWidgetPageState extends State<InExpWidgetPage> {
-  Future<void> _fetchAndPrintTransactions() async {
+  Future<List<TransactionResponse>> _fetchAndPrintTransactions(
+    bool isIncome,
+  ) async {
+    final responses = <TransactionResponse>[];
+
     final AccountRepoImp accountRepo = AccountRepoImp();
     final CategoryRepoImpl categoryRepo = CategoryRepoImpl();
     final TransactionRepoImp transactionRepo = TransactionRepoImp(
@@ -25,22 +29,22 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
       categoryRepo,
     );
 
-    final List<TransactionResponse> responses = await transactionRepo.getPeriodTransactionsByAccount(
-      1,
-      startDate: DateTime(2025, DateTime.june, 20),
-      endDate: DateTime(2025, DateTime.june, 21),
-    );
+    final List<TransactionResponse> rawResponses = await transactionRepo
+        .getPeriodTransactionsByAccount(
+          1,
+          startDate: DateTime(2025, DateTime.june, 20),
+          endDate: DateTime(2025, DateTime.june, 21),
+        );
 
-    for (final response in responses) {
-      print(response.toJson());
+    for (final response in rawResponses) {
+      if (response.category.isIncome && isIncome ||
+          !response.category.isIncome && !isIncome) {
+        // Если ДОХОД и ДОХОД или НЕДОХОД и НЕДОХОД
+        responses.add(response);
+      }
     }
-  }
 
-  @override
-  void initState() {
-    super.initState();
-    print("HIIIIIIIII");
-    _fetchAndPrintTransactions();
+    return responses;
   }
 
   @override
@@ -87,52 +91,41 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
             ),
           ),
           Expanded(
-            child: ListView(
-              children: [
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: CustomAppTheme.figmaBgGrayColor,
-                ),
-                ListTile(
-                  leading: Icon(Icons.shopping_cart),
-                  title: Row(
-                    children: [
-                      Expanded(
-                        child: Text("Продукты", textAlign: TextAlign.start),
-                      ),
-                      Expanded(
-                        child: Text("100 000 ₽", textAlign: TextAlign.end),
-                      ),
-                    ],
-                  ),
-                  trailing: Icon(Icons.arrow_forward_ios_rounded, size: 16),
-                ),
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: CustomAppTheme.figmaBgGrayColor,
-                ),
-                ListTile(
-                  leading: Icon(Icons.shopping_cart),
-                  title: Row(
-                    children: [
-                      Expanded(
-                        child: Text("Продукты", textAlign: TextAlign.start),
-                      ),
-                      Expanded(
-                        child: Text("100 000 ₽", textAlign: TextAlign.end),
-                      ),
-                    ],
-                  ),
-                  trailing: Icon(Icons.arrow_forward_ios_rounded, size: 16),
-                ),
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: CustomAppTheme.figmaBgGrayColor,
-                ),
-              ],
+            child: FutureBuilder<List<TransactionResponse>>(
+              future: _fetchAndPrintTransactions(widget.isIncome),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Ошибка: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('Нет данных'));
+                }
+                final responses = snapshot.data!;
+                return ListView.builder(
+                  itemCount:
+                      responses.length * 2 +
+                      1, // Для добавления Divider до, после и между item
+                  itemBuilder: (context, index) {
+                    if (index.isEven) {
+                      return const Divider(
+                        height: 1,
+                        thickness: 1,
+                        color: CustomAppTheme.figmaBgGrayColor,
+                      );
+                    } else {
+                      final itemIndex =
+                          index ~/ 2; // Т.к. теперь index учитывает и Divder()
+                      return InExpItem(
+                        category_title: responses[itemIndex].category.name,
+                        amount: responses[itemIndex].amount,
+                        icon: responses[itemIndex].category.emoji,
+                        comment: responses[itemIndex].comment,
+                      );
+                    }
+                  },
+                );
+              },
             ),
           ),
         ],
