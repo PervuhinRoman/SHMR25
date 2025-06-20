@@ -58,7 +58,7 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
             final total = responses.fold<num>(0, (sum, item) => sum + double.parse(item.amount));
             return Column(
               children: [
-                // "Всего"
+                // Начало
                 Container(
                   color: CustomAppTheme.figmaMainLightColor,
                   height: 56,
@@ -67,7 +67,7 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                       const Expanded(
                         child: Padding(
                           padding: EdgeInsets.only(left: 16),
-                          child: Text("Всего", textAlign: TextAlign.start),
+                          child: Text("Начало", textAlign: TextAlign.start),
                         ),
                       ),
                       Expanded(
@@ -82,7 +82,65 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                     ],
                   ),
                 ),
-                // Список с Divider
+                const Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: CustomAppTheme.figmaBgGrayColor,
+                ),
+                // Конец
+                Container(
+                  color: CustomAppTheme.figmaMainLightColor,
+                  height: 56,
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 16),
+                          child: Text("Конец", textAlign: TextAlign.start),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 16),
+                          child: Text(
+                            "$total ₽",
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: CustomAppTheme.figmaBgGrayColor,
+                ),
+                // Сумма
+                Container(
+                  color: CustomAppTheme.figmaMainLightColor,
+                  height: 56,
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 16),
+                          child: Text("Сумма", textAlign: TextAlign.start),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 16),
+                          child: Text(
+                            "$total ₽",
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Список транзакций
                 Expanded(
                   child: ListView.builder(
                     itemCount: responses.length * 2 + 1,
