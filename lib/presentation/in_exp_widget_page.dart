@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/domain/models/transaction/transaction.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
@@ -6,6 +7,8 @@ import 'package:shmr_finance/data/repositories/transaction_repo_imp.dart';
 import 'package:shmr_finance/data/repositories/account_repo_imp.dart';
 import 'package:shmr_finance/data/repositories/category_repo_imp.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
+
+import '../domain/bloc/transaction_bloc.dart';
 
 class InExpWidgetPage extends StatefulWidget {
   final bool isIncome;
@@ -41,6 +44,7 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
           !response.category.isIncome && !isIncome) {
         // Если ДОХОД и ДОХОД или НЕДОХОД и НЕДОХОД
         responses.add(response);
+        // print(response.toJson());
       }
     }
 
@@ -68,67 +72,70 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Container(
-            color: CustomAppTheme.figmaMainLightColor,
-            height: 56,
-            child: Row(
+      body: BlocBuilder<TransactionBloc, TransactionState>(
+        builder: (context, state) {
+          if (state is TransactionLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is TransactionError) {
+            return Center(child: Text('Ошибка: ${state.message}'));
+          } else if (state is TransactionLoaded) {
+            final responses = state.transactions;
+            final total = responses.fold<num>(0, (sum, item) => sum + double.parse(item.amount) ?? 0);
+            return Column(
               children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 16),
-                    child: Text("Всего", textAlign: TextAlign.start),
+                // "Всего"
+                Container(
+                  color: CustomAppTheme.figmaMainLightColor,
+                  height: 56,
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 16),
+                          child: Text("Всего", textAlign: TextAlign.start),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 16),
+                          child: Text(
+                            "$total ₽",
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+                // Список с Divider
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: Text("400 000 ₽", textAlign: TextAlign.end),
+                  child: ListView.builder(
+                    itemCount: responses.length * 2 + 1,
+                    itemBuilder: (context, index) {
+                      if (index.isEven) {
+                        return const Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: CustomAppTheme.figmaBgGrayColor,
+                        );
+                      } else {
+                        final itemIndex = index ~/ 2;
+                        final item = responses[itemIndex];
+                        return InExpItem(
+                          category_title: item.category.name,
+                          amount: item.amount,
+                          icon: item.category.emoji,
+                          comment: item.comment,
+                        );
+                      }
+                    },
                   ),
                 ),
               ],
-            ),
-          ),
-          Expanded(
-            child: FutureBuilder<List<TransactionResponse>>(
-              future: _fetchAndPrintTransactions(widget.isIncome),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Ошибка: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('Нет данных'));
-                }
-                final responses = snapshot.data!;
-                return ListView.builder(
-                  itemCount:
-                      responses.length * 2 +
-                      1, // Для добавления Divider до, после и между item
-                  itemBuilder: (context, index) {
-                    if (index.isEven) {
-                      return const Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: CustomAppTheme.figmaBgGrayColor,
-                      );
-                    } else {
-                      final itemIndex =
-                          index ~/ 2; // Т.к. теперь index учитывает и Divder()
-                      return InExpItem(
-                        category_title: responses[itemIndex].category.name,
-                        amount: responses[itemIndex].amount,
-                        icon: responses[itemIndex].category.emoji,
-                        comment: responses[itemIndex].comment,
-                      );
-                    }
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+            );
+          }
+          return const SizedBox.shrink();
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},

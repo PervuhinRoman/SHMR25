@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shmr_finance/presentation/account_page.dart';
 import 'package:shmr_finance/presentation/categories_page.dart';
 import 'package:shmr_finance/presentation/expenses_page.dart';
@@ -6,6 +7,8 @@ import 'package:shmr_finance/presentation/in_exp_widget_page.dart';
 import 'package:shmr_finance/presentation/income_page.dart';
 import 'package:shmr_finance/presentation/settings_page.dart';
 import 'package:shmr_finance/app_theme.dart';
+
+import 'domain/bloc/transaction_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,21 +24,15 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         useMaterial3: true,
-        textTheme: TextTheme(
-          bodyMedium: TextStyle(
-            fontSize: 16,
-          )
-        ),
-        colorScheme: ColorScheme.light(
-          primary: CustomAppTheme.figmaMainColor,
-        ),
+        textTheme: TextTheme(bodyMedium: TextStyle(fontSize: 16)),
+        colorScheme: ColorScheme.light(primary: CustomAppTheme.figmaMainColor),
         appBarTheme: AppBarTheme(
           backgroundColor: CustomAppTheme.figmaMainColor,
         ),
         navigationBarTheme: NavigationBarThemeData(
           indicatorColor: CustomAppTheme.figmaMainLightColor,
           backgroundColor: CustomAppTheme.figmaNavBarColor,
-        )
+        ),
       ),
       home: const BaseScreen(),
     );
@@ -87,7 +84,21 @@ class _BaseScreenState extends State<BaseScreen> {
         ],
       ),
       body:
-      [InExpWidgetPage(isIncome: false), InExpWidgetPage(isIncome: true), AccountPage(), CategoriesPage(), SettingsPage()][currentPageIndex],
+          [
+            BlocProvider(
+              create:
+                  (context) => TransactionBloc()..add(LoadTransactions(false)),
+              child: InExpWidgetPage(isIncome: false),
+            ),
+            BlocProvider(
+              create:
+                  (context) => TransactionBloc()..add(LoadTransactions(true)),
+              child: InExpWidgetPage(isIncome: true),
+            ),
+            AccountPage(),
+            CategoriesPage(),
+            SettingsPage(),
+          ][currentPageIndex],
     );
   }
 }
