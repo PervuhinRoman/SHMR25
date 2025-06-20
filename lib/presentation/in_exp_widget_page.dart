@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:shmr_finance/app_theme.dart';
-
-import 'history_page.dart';
+import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 
 class InExpWidgetPage extends StatelessWidget {
-  const InExpWidgetPage({super.key});
+  final bool isIncome;
+
+  const InExpWidgetPage({super.key, required this.isIncome});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Доходы сегодня"),
-        centerTitle: true,
-        toolbarHeight: 116,
+      appBar: CustomAppBar(
+        title: isIncome ? "Доходы сегодня" : "Расходы сегодня",
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.history),
@@ -21,7 +20,7 @@ class InExpWidgetPage extends StatelessWidget {
                 context,
                 MaterialPageRoute<void>(
                   builder: (BuildContext context) {
-                    return HistoryPage();
+                    return Placeholder(); // TODO: передавать с параметром isIncome
                   },
                 ),
               );

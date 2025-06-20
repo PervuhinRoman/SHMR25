@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shmr_finance/presentation/account_page.dart';
 import 'package:shmr_finance/presentation/categories_page.dart';
 import 'package:shmr_finance/presentation/expenses_page.dart';
+import 'package:shmr_finance/presentation/in_exp_widget_page.dart';
 import 'package:shmr_finance/presentation/income_page.dart';
 import 'package:shmr_finance/presentation/settings_page.dart';
 import 'package:shmr_finance/app_theme.dart';
@@ -20,6 +21,11 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         useMaterial3: true,
+        textTheme: TextTheme(
+          bodyMedium: TextStyle(
+            fontSize: 16,
+          )
+        ),
         colorScheme: ColorScheme.light(
           primary: CustomAppTheme.figmaMainColor,
         ),
@@ -81,7 +87,7 @@ class _BaseScreenState extends State<BaseScreen> {
         ],
       ),
       body:
-      [ExpensesPage(), IncomePage(), AccountPage(), CategoriesPage(), SettingsPage()][currentPageIndex],
+      [InExpWidgetPage(isIncome: false), InExpWidgetPage(isIncome: true), AccountPage(), CategoriesPage(), SettingsPage()][currentPageIndex],
     );
   }
 }
