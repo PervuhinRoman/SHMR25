@@ -1,17 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:shmr_finance/app_theme.dart';
+import 'package:shmr_finance/data/repositories/account_repo.dart';
+import 'package:shmr_finance/domain/models/transaction/transaction.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
+import 'package:shmr_finance/data/repositories/transaction_repo_imp.dart';
+import 'package:shmr_finance/data/repositories/account_repo_imp.dart';
+import 'package:shmr_finance/data/repositories/category_repo_imp.dart';
 
-class InExpWidgetPage extends StatelessWidget {
+class InExpWidgetPage extends StatefulWidget {
   final bool isIncome;
 
   const InExpWidgetPage({super.key, required this.isIncome});
 
   @override
+  State<InExpWidgetPage> createState() => _InExpWidgetPageState();
+}
+
+class _InExpWidgetPageState extends State<InExpWidgetPage> {
+  Future<void> _fetchAndPrintTransactions() async {
+    final AccountRepoImp accountRepo = AccountRepoImp();
+    final CategoryRepoImpl categoryRepo = CategoryRepoImpl();
+    final TransactionRepoImp transactionRepo = TransactionRepoImp(
+      accountRepo,
+      categoryRepo,
+    );
+
+    final List<TransactionResponse> responses = await transactionRepo.getPeriodTransactionsByAccount(
+      1,
+      startDate: DateTime(2025, DateTime.june, 20),
+      endDate: DateTime(2025, DateTime.june, 21),
+    );
+
+    for (final response in responses) {
+      print(response.toJson());
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    print("HIIIIIIIII");
+    _fetchAndPrintTransactions();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: isIncome ? "Доходы сегодня" : "Расходы сегодня",
+        title: widget.isIncome ? "Доходы сегодня" : "Расходы сегодня",
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.history),

@@ -32,7 +32,7 @@ class TransactionRepoImp implements TransactionRepository {
     ),
   ];
 
-  TransactionRepoImp(this._categoryRepo, this._accountRepo);
+  TransactionRepoImp(this._accountRepo, this._categoryRepo);
 
   // Метод для получения категории по ID
   Future<Category> _getCategoryById(int categoryId) async {
