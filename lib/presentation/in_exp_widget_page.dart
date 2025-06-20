@@ -3,9 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/domain/models/transaction/transaction.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
-import 'package:shmr_finance/data/repositories/transaction_repo_imp.dart';
-import 'package:shmr_finance/data/repositories/account_repo_imp.dart';
-import 'package:shmr_finance/data/repositories/category_repo_imp.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
 
 import '../domain/bloc/transaction_bloc.dart';
@@ -20,37 +17,6 @@ class InExpWidgetPage extends StatefulWidget {
 }
 
 class _InExpWidgetPageState extends State<InExpWidgetPage> {
-  Future<List<TransactionResponse>> _fetchAndPrintTransactions(
-    bool isIncome,
-  ) async {
-    final responses = <TransactionResponse>[];
-
-    final AccountRepoImp accountRepo = AccountRepoImp();
-    final CategoryRepoImpl categoryRepo = CategoryRepoImpl();
-    final TransactionRepoImp transactionRepo = TransactionRepoImp(
-      accountRepo,
-      categoryRepo,
-    );
-
-    final List<TransactionResponse> rawResponses = await transactionRepo
-        .getPeriodTransactionsByAccount(
-          1,
-          startDate: DateTime(2025, DateTime.june, 20),
-          endDate: DateTime(2025, DateTime.june, 21),
-        );
-
-    for (final response in rawResponses) {
-      if (response.category.isIncome && isIncome ||
-          !response.category.isIncome && !isIncome) {
-        // Если ДОХОД и ДОХОД или НЕДОХОД и НЕДОХОД
-        responses.add(response);
-        // print(response.toJson());
-      }
-    }
-
-    return responses;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,8 +45,17 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
           } else if (state is TransactionError) {
             return Center(child: Text('Ошибка: ${state.message}'));
           } else if (state is TransactionLoaded) {
-            final responses = state.transactions;
-            final total = responses.fold<num>(0, (sum, item) => sum + double.parse(item.amount) ?? 0);
+            final rawResponses = state.transactions;
+            final responses = <TransactionResponse>[];
+            for (final response in rawResponses) {
+              if (response.category.isIncome && widget.isIncome ||
+                  !response.category.isIncome && !widget.isIncome) {
+                // Если ДОХОД и ДОХОД или НЕДОХОД и НЕДОХОД
+                responses.add(response);
+                // print(response.toJson());
+              }
+            }
+            final total = responses.fold<num>(0, (sum, item) => sum + double.parse(item.amount));
             return Column(
               children: [
                 // "Всего"

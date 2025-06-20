@@ -34,11 +34,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
         endDate: DateTime(2025, DateTime.june, 21),
       );
 
-      final responses = rawResponses.where((response) =>
-      response.category.isIncome == event.isIncome
-      ).toList();
-
-      emit(TransactionLoaded(responses));
+      emit(TransactionLoaded(rawResponses));
     } catch (e) {
       emit(TransactionError(e.toString()));
     }

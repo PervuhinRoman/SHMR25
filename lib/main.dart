@@ -95,6 +95,7 @@ class _BaseScreenState extends State<BaseScreen> {
                   (context) => TransactionBloc()..add(LoadTransactions(true)),
               child: InExpWidgetPage(isIncome: true),
             ),
+            InExpWidgetPage(isIncome: true),
             AccountPage(),
             CategoriesPage(),
             SettingsPage(),
