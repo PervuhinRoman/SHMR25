@@ -4,7 +4,6 @@ import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/domain/models/transaction/transaction.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
-import 'package:intl/intl.dart';
 
 import '../domain/bloc/transaction_bloc.dart';
 
@@ -18,8 +17,8 @@ class InExpWidgetPage extends StatefulWidget {
 }
 
 class _InExpWidgetPageState extends State<InExpWidgetPage> {
-  late DateTime _startDate1;
-  late DateTime _endDate1;
+  DateTime? _startDate1;
+  DateTime? _endDate1;
 
   DateTime addMonth(DateTime summand, int step) {
     late DateTime result;
@@ -41,10 +40,30 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
     super.initState();
     // Устанавливаем период по умолчанию: месяц назад - сегодня
     _endDate1 = DateTime.now();
-    _startDate1 = DateTime(_endDate1.year, _endDate1.month - 1, _endDate1.day);
+    _startDate1 = DateTime(_endDate1!.year, _endDate1!.month - 1, _endDate1!.day);
     // Корректировка если текущий месяц январь
-    if (_startDate1.month == 0) {
-      _startDate1 = DateTime(_endDate1.year - 1, 12, _endDate1.day);
+    if (_startDate1!.month == 0) {
+      _startDate1 = DateTime(_endDate1!.year - 1, 12, _endDate1!.day);
+    }
+    
+    // Загружаем данные с начальными датами
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<TransactionBloc>().add(LoadTransactions(
+        widget.isIncome,
+        _startDate1!,
+        _endDate1!,
+      ));
+    });
+  }
+
+  // Функция для перезагрузки данных
+  void _reloadData() {
+    if (_startDate1 != null && _endDate1 != null) {
+      context.read<TransactionBloc>().add(LoadTransactions(
+        widget.isIncome,
+        _startDate1!,
+        _endDate1!,
+      ));
     }
   }
 
@@ -81,33 +100,35 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
             for (final response in rawResponses) {
               if (response.category.isIncome && widget.isIncome ||
                   !response.category.isIncome && !widget.isIncome) {
-                // Если ДОХОД и ДОХОД или НЕДОХОД и НЕДОХОД
                 responses.add(response);
-                // print(response.toJson());
               }
             }
             final total = responses.fold<num>(
               0,
               (sum, item) => sum + double.parse(item.amount),
             );
+            
             return Column(
               children: [
                 // Начало
                 GestureDetector(
-                  onTap: () {
-                    showDatePicker(
+                  onTap: () async {
+                    final DateTime? result = await showDatePicker(
                       context: context,
-                      initialDate: DateTime.now(),
+                      initialDate: _startDate1 ?? DateTime.now(),
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2100),
-                      helpText: 'Выберите дату',
+                      helpText: 'Выберите дату начала',
                       cancelText: 'Отмена',
                       confirmText: 'ОК',
-                    ).then((result) {
+                    );
+                    if (result != null) {
                       setState(() {
-                        _startDate1 = result!;
+                        _startDate1 = result;
                       });
-                    });
+                      // Перезагружаем данные с новой датой
+                      _reloadData();
+                    }
                   },
                   child: Container(
                     color: CustomAppTheme.figmaMainLightColor,
@@ -124,8 +145,9 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                           child: Padding(
                             padding: const EdgeInsets.only(right: 16),
                             child: Text(
-                              // "${addMonth(_endDate, -1).day}.${addMonth(_endDate, -1).month}.${addMonth(_endDate, -1).year}",
-                              "${_startDate1.day}.${_startDate1.month}.${_startDate1.year}",
+                              _startDate1 != null 
+                                ? "${_startDate1!.day}.${_startDate1!.month}.${_startDate1!.year}"
+                                : "Выберите дату",
                               textAlign: TextAlign.end,
                             ),
                           ),
@@ -141,20 +163,23 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                 ),
                 // Конец
                 GestureDetector(
-                  onTap: () {
-                    showDatePicker(
+                  onTap: () async {
+                    final DateTime? result = await showDatePicker(
                       context: context,
-                      initialDate: _endDate1,
+                      initialDate: _endDate1 ?? DateTime.now(),
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2100),
-                      helpText: 'Выберите дату',
+                      helpText: 'Выберите дату окончания',
                       cancelText: 'Отмена',
                       confirmText: 'ОК',
-                    ).then((result) {
+                    );
+                    if (result != null) {
                       setState(() {
-                        _endDate1 = result!;
+                        _endDate1 = result;
                       });
-                    });
+                      // Перезагружаем данные с новой датой
+                      _reloadData();
+                    }
                   },
                   child: Container(
                     color: CustomAppTheme.figmaMainLightColor,
@@ -171,7 +196,9 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                           child: Padding(
                             padding: const EdgeInsets.only(right: 16),
                             child: Text(
-                              "${_endDate1.day}.${_endDate1.month}.${_endDate1.year}",
+                              _endDate1 != null 
+                                ? "${_endDate1!.day}.${_endDate1!.month}.${_endDate1!.year}"
+                                : "Выберите дату",
                               textAlign: TextAlign.end,
                             ),
                           ),
@@ -208,27 +235,32 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                 ),
                 // Список транзакций
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: responses.length * 2 + 1,
-                    itemBuilder: (context, index) {
-                      if (index.isEven) {
-                        return const Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: CustomAppTheme.figmaBgGrayColor,
-                        );
-                      } else {
-                        final itemIndex = index ~/ 2;
-                        final item = responses[itemIndex];
-                        return InExpItem(
-                          category_title: item.category.name,
-                          amount: item.amount,
-                          icon: item.category.emoji,
-                          comment: item.comment,
-                        );
-                      }
-                    },
-                  ),
+                  child: responses.isEmpty 
+                    ? const Center(child: Text('Нет данных'))
+                    : ListView.builder(
+                        itemCount: responses.length * 2 + 1,
+                        itemBuilder: (context, index) {
+                          if (index.isEven) {
+                            return const Divider(
+                              height: 1,
+                              thickness: 1,
+                              color: CustomAppTheme.figmaBgGrayColor,
+                            );
+                          } else {
+                            final itemIndex = index ~/ 2;
+                            if (itemIndex >= responses.length) {
+                              return const SizedBox.shrink();
+                            }
+                            final item = responses[itemIndex];
+                            return InExpItem(
+                              category_title: item.category.name,
+                              amount: item.amount,
+                              icon: item.category.emoji,
+                              comment: item.comment,
+                            );
+                          }
+                        },
+                      ),
                 ),
               ],
             );

@@ -5,6 +5,8 @@ import '../../domain/models/account/account.dart';
 import '../../domain/models/category/category.dart';
 import '../../domain/models/transaction/transaction.dart';
 import 'account_repo.dart';
+import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
 
 class TransactionRepoImp implements TransactionRepository {
   final CategoryRepository _categoryRepo;
@@ -77,24 +79,61 @@ class TransactionRepoImp implements TransactionRepository {
         DateTime? startDate,
         DateTime? endDate,
       }) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    var transactions = _transactions.where((t) => t.accountId == accountId);
+    try {
+      final dio = Dio();
+      final response = await dio.get(
+        'https://shmr-finance.ru/api/v1/transactions/account/$accountId/period',
+        queryParameters: {
+          'startDate': DateFormat('yyyy-MM-dd').format(startDate!),
+          'endDate': DateFormat('yyyy-MM-dd').format(endDate!),
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer BpSpdGeoNdjhGmR79DByflxf',
+          },
+        ),
+      );
 
-    if (startDate != null) {
-      transactions = transactions.where((t) => t.transactionDate.isAfter(startDate));
+      // Используем Freezed для десериализации
+      final List<dynamic> rawData = response.data;
+      final List<TransactionResponse> responses = [];
+
+      for (final item in rawData) {
+        try {
+          if (item is Map<String, dynamic>) {
+            // Используем автоматически сгенерированный fromJson
+            final transactionResponse = TransactionResponse.fromJson(item);
+            
+            // Проверяем, что транзакция принадлежит нужному аккаунту
+            if (transactionResponse.account.id == accountId) {
+              responses.add(transactionResponse);
+            }
+          }
+        } catch (e) {
+          print('Error parsing transaction: $e');
+          continue;
+        }
+      }
+
+      // Фильтрация по датам
+      var filteredResponses = responses;
+      if (startDate != null) {
+        filteredResponses = filteredResponses
+            .where((t) => t.transactionDate.isAfter(startDate))
+            .toList();
+      }
+      if (endDate != null) {
+        filteredResponses = filteredResponses
+            .where((t) => t.transactionDate.isBefore(endDate))
+            .toList();
+      }
+
+      return filteredResponses;
+    } catch (e) {
+      print('Error in getPeriodTransactionsByAccount: $e');
+      // Возвращаем пустой список в случае ошибки
+      return [];
     }
-    if (endDate != null) {
-      transactions = transactions.where((t) => t.transactionDate.isBefore(endDate));
-    }
-
-    final responses = <TransactionResponse>[];
-
-    for (final t in transactions) {
-      final response = await _toTransactionResponse(t);
-      responses.add(response);
-    }
-
-    return responses;
   }
 
   @override

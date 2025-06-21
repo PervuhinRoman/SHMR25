@@ -13,10 +13,17 @@ class TransactionLoading extends TransactionState {}
 
 class TransactionLoaded extends TransactionState {
   final List<TransactionResponse> transactions;
-  const TransactionLoaded(this.transactions);
+  final DateTime startDate;
+  final DateTime endDate;
+  
+  const TransactionLoaded(
+    this.transactions,
+    this.startDate,
+    this.endDate,
+  );
 
   @override
-  List<Object?> get props => [transactions];
+  List<Object?> get props => [transactions, startDate, endDate];
 }
 
 class TransactionError extends TransactionState {

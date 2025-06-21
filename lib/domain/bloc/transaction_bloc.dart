@@ -12,6 +12,8 @@ part 'transaction_event.dart';
 class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   TransactionBloc() : super(TransactionInitial()) {
     on<LoadTransactions>(_onLoadTransactions);
+    on<SelectStartDate>(_onSelectStartDate);
+    on<SelectEndDate>(_onSelectEndDate);
   }
 
   Future<void> _onLoadTransactions(
@@ -30,13 +32,49 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       final List<TransactionResponse> rawResponses = await transactionRepo
           .getPeriodTransactionsByAccount(
         1,
-        startDate: DateTime(2025, DateTime.june, 20),
-        endDate: DateTime(2025, DateTime.june, 21),
+        startDate: event.startDate,
+        endDate: event.endDate,
       );
 
-      emit(TransactionLoaded(rawResponses));
+      final responses = rawResponses.where((response) =>
+      response.category.isIncome == event.isIncome
+      ).toList();
+
+      emit(TransactionLoaded(
+        responses,
+        event.startDate,
+        event.endDate,
+      ));
     } catch (e) {
       emit(TransactionError(e.toString()));
+    }
+  }
+
+  Future<void> _onSelectStartDate(
+    SelectStartDate event,
+    Emitter<TransactionState> emit,
+  ) async {
+    if (state is TransactionLoaded) {
+      final currentState = state as TransactionLoaded;
+      emit(TransactionLoaded(
+        currentState.transactions,
+        event.date,
+        currentState.endDate,
+      ));
+    }
+  }
+
+  Future<void> _onSelectEndDate(
+    SelectEndDate event,
+    Emitter<TransactionState> emit,
+  ) async {
+    if (state is TransactionLoaded) {
+      final currentState = state as TransactionLoaded;
+      emit(TransactionLoaded(
+        currentState.transactions,
+        currentState.startDate,
+        event.date,
+      ));
     }
   }
 }

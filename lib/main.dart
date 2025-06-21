@@ -83,23 +83,27 @@ class _BaseScreenState extends State<BaseScreen> {
           ),
         ],
       ),
-      body:
-          [
-            BlocProvider(
-              create:
-                  (context) => TransactionBloc()..add(LoadTransactions(false)),
-              child: InExpWidgetPage(isIncome: false),
-            ),
-            BlocProvider(
-              create:
-                  (context) => TransactionBloc()..add(LoadTransactions(true)),
-              child: InExpWidgetPage(isIncome: true),
-            ),
-            InExpWidgetPage(isIncome: true),
-            AccountPage(),
-            CategoriesPage(),
-            SettingsPage(),
-          ][currentPageIndex],
+      body: [
+        BlocProvider(
+          create: (context) {
+            final now = DateTime.now();
+            final startDate = DateTime(now.year, now.month - 1, now.day);
+            return TransactionBloc()..add(LoadTransactions(false, startDate, now));
+          },
+          child: InExpWidgetPage(isIncome: false),
+        ),
+        BlocProvider(
+          create: (context) {
+            final now = DateTime.now();
+            final startDate = DateTime(now.year, now.month - 1, now.day);
+            return TransactionBloc()..add(LoadTransactions(true, startDate, now));
+          },
+          child: InExpWidgetPage(isIncome: true),
+        ),
+        AccountPage(),
+        CategoriesPage(),
+        SettingsPage(),
+      ][currentPageIndex],
     );
   }
 }
