@@ -1,7 +1,7 @@
 import '../../domain/models/category/category.dart';
 import 'category_repo.dart';
 
-class MockCategoryRepository implements CategoryRepository {
+class CategoryRepoImpl implements CategoryRepository {
   final List<Category> _categories = [
     Category(
       id: 1,
