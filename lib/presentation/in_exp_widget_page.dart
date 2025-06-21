@@ -18,19 +18,34 @@ class InExpWidgetPage extends StatefulWidget {
 }
 
 class _InExpWidgetPageState extends State<InExpWidgetPage> {
-  final _nowDate = DateTime(2025, 1, 1);
-  DateTime _startDate = DateTime.now();
-  DateTime _endDate = DateTime.now();
+  late DateTime _startDate1;
+  late DateTime _endDate1;
 
   DateTime addMonth(DateTime summand, int step) {
     late DateTime result;
     if (step.abs() >= summand.month) {
-      result = DateTime(summand.year - 1, summand.month + step + 12, summand.day);
+      result = DateTime(
+        summand.year - 1,
+        summand.month + step + 12,
+        summand.day,
+      );
     } else {
       result = DateTime(summand.year, summand.month + step, summand.day);
     }
 
     return result;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Устанавливаем период по умолчанию: месяц назад - сегодня
+    _endDate1 = DateTime.now();
+    _startDate1 = DateTime(_endDate1.year, _endDate1.month - 1, _endDate1.day);
+    // Корректировка если текущий месяц январь
+    if (_startDate1.month == 0) {
+      _startDate1 = DateTime(_endDate1.year - 1, 12, _endDate1.day);
+    }
   }
 
   @override
@@ -90,7 +105,7 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                       confirmText: 'ОК',
                     ).then((result) {
                       setState(() {
-                        _startDate = result!;
+                        _startDate1 = result!;
                       });
                     });
                   },
@@ -109,7 +124,8 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                           child: Padding(
                             padding: const EdgeInsets.only(right: 16),
                             child: Text(
-                              "${addMonth(_endDate, -1).day}.${addMonth(_endDate, -1).month}.${addMonth(_endDate, -1).year}",
+                              // "${addMonth(_endDate, -1).day}.${addMonth(_endDate, -1).month}.${addMonth(_endDate, -1).year}",
+                              "${_startDate1.day}.${_startDate1.month}.${_startDate1.year}",
                               textAlign: TextAlign.end,
                             ),
                           ),
@@ -124,24 +140,44 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                   color: CustomAppTheme.figmaBgGrayColor,
                 ),
                 // Конец
-                Container(
-                  color: CustomAppTheme.figmaMainLightColor,
-                  height: 56,
-                  child: Row(
-                    children: [
-                      const Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 16),
-                          child: Text("Конец", textAlign: TextAlign.start),
+                GestureDetector(
+                  onTap: () {
+                    showDatePicker(
+                      context: context,
+                      initialDate: _endDate1,
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                      helpText: 'Выберите дату',
+                      cancelText: 'Отмена',
+                      confirmText: 'ОК',
+                    ).then((result) {
+                      setState(() {
+                        _endDate1 = result!;
+                      });
+                    });
+                  },
+                  child: Container(
+                    color: CustomAppTheme.figmaMainLightColor,
+                    height: 56,
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 16),
+                            child: Text("Конец", textAlign: TextAlign.start),
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 16),
-                          child: Text("${_endDate.day}.${_endDate.month}.${_endDate.year}", textAlign: TextAlign.end),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: Text(
+                              "${_endDate1.day}.${_endDate1.month}.${_endDate1.year}",
+                              textAlign: TextAlign.end,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 const Divider(
