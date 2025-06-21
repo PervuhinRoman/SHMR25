@@ -4,6 +4,7 @@ import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/domain/models/transaction/transaction.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
+import 'package:intl/intl.dart';
 
 import '../domain/bloc/transaction_bloc.dart';
 
@@ -17,6 +18,21 @@ class InExpWidgetPage extends StatefulWidget {
 }
 
 class _InExpWidgetPageState extends State<InExpWidgetPage> {
+  final _nowDate = DateTime(2025, 1, 1);
+  DateTime _startDate = DateTime.now();
+  DateTime _endDate = DateTime.now();
+
+  DateTime addMonth(DateTime summand, int step) {
+    late DateTime result;
+    if (step.abs() >= summand.month) {
+      result = DateTime(summand.year - 1, summand.month + step + 12, summand.day);
+    } else {
+      result = DateTime(summand.year, summand.month + step, summand.day);
+    }
+
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,31 +71,51 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                 // print(response.toJson());
               }
             }
-            final total = responses.fold<num>(0, (sum, item) => sum + double.parse(item.amount));
+            final total = responses.fold<num>(
+              0,
+              (sum, item) => sum + double.parse(item.amount),
+            );
             return Column(
               children: [
                 // Начало
-                Container(
-                  color: CustomAppTheme.figmaMainLightColor,
-                  height: 56,
-                  child: Row(
-                    children: [
-                      const Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 16),
-                          child: Text("Начало", textAlign: TextAlign.start),
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 16),
-                          child: Text(
-                            "$total ₽",
-                            textAlign: TextAlign.end,
+                GestureDetector(
+                  onTap: () {
+                    showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                      helpText: 'Выберите дату',
+                      cancelText: 'Отмена',
+                      confirmText: 'ОК',
+                    ).then((result) {
+                      setState(() {
+                        _startDate = result!;
+                      });
+                    });
+                  },
+                  child: Container(
+                    color: CustomAppTheme.figmaMainLightColor,
+                    height: 56,
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 16),
+                            child: Text("Начало", textAlign: TextAlign.start),
                           ),
                         ),
-                      ),
-                    ],
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: Text(
+                              "${addMonth(_endDate, -1).day}.${addMonth(_endDate, -1).month}.${addMonth(_endDate, -1).year}",
+                              textAlign: TextAlign.end,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const Divider(
@@ -102,10 +138,7 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.only(right: 16),
-                          child: Text(
-                            "$total ₽",
-                            textAlign: TextAlign.end,
-                          ),
+                          child: Text("${_endDate.day}.${_endDate.month}.${_endDate.year}", textAlign: TextAlign.end),
                         ),
                       ),
                     ],
@@ -131,10 +164,7 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.only(right: 16),
-                          child: Text(
-                            "$total ₽",
-                            textAlign: TextAlign.end,
-                          ),
+                          child: Text("$total ₽", textAlign: TextAlign.end),
                         ),
                       ),
                     ],
