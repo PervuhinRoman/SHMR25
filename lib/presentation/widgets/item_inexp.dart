@@ -34,7 +34,7 @@ class InExpItem extends StatelessWidget {
       subtitle: Row(
         children: [
           Expanded(child: Text(comment ?? "", textAlign: TextAlign.start)),
-          Expanded(child: Text(DateFormat("hh:mm").format(time), textAlign: TextAlign.end,)),
+          Expanded(child: Text(DateFormat("dd.MM hh:mm").format(time), textAlign: TextAlign.end,)),
         ],
       ),
       subtitleTextStyle: TextStyle(

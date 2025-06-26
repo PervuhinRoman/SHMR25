@@ -1,6 +1,7 @@
 
 
 import 'package:flutter_bloc/flutter_bloc.dart' show Cubit;
+import 'package:shmr_finance/domain/cubit/sort_type_cubit.dart';
 
 import '../../data/repositories/account_repo_imp.dart';
 import '../../data/repositories/category_repo_imp.dart';
@@ -47,5 +48,22 @@ class TransactionCubit extends Cubit<TransactionState> {
     } catch (e) {
       emit(state.copyWith(error: e.toString(), status: TransactionStatus.error));
     }
+  }
+
+  void sort(SortType sortType) {
+    final sortedTransactions = List<TransactionResponse>.from(state.transactions);
+
+    sortedTransactions.sort((a, b) {
+      switch (sortType) {
+        case SortType.date:
+          return b.transactionDate.compareTo(a.transactionDate);
+        case SortType.amount:
+          return double.parse(b.amount).compareTo(double.parse(a.amount));
+      }
+    });
+
+    emit(state.copyWith(
+      transactions: sortedTransactions,
+    ));
   }
 }

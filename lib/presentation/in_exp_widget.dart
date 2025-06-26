@@ -6,6 +6,7 @@ import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
 
 import '../app_theme.dart';
 import '../domain/cubit/datepicker_cubit.dart';
+import '../domain/cubit/sort_type_cubit.dart';
 import '../domain/cubit/transaction_cubit.dart';
 import 'in_exp_history_widget.dart';
 
@@ -40,6 +41,9 @@ class _InExpWidgetState extends State<InExpWidget> {
                         ),
                         BlocProvider<TransactionCubit>(
                           create: (context) => TransactionCubit(),
+                        ),
+                        BlocProvider<SortTypeCubit>(
+                          create: (context) => SortTypeCubit(),
                         ),
                       ],
                       child: InExpHistoryWidget(isIncome: widget.isIncome),
