@@ -3,11 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shmr_finance/domain/cubit/transaction_cubit.dart';
 import 'package:shmr_finance/presentation/account_page.dart';
 import 'package:shmr_finance/presentation/categories_page.dart';
-import 'package:shmr_finance/presentation/in_exp_widget_page.dart';
+import 'package:shmr_finance/presentation/in_exp_widget.dart';
 import 'package:shmr_finance/presentation/settings_page.dart';
 import 'package:shmr_finance/app_theme.dart';
-
-import 'domain/cubit/datepicker_cubit.dart';
 
 void main() {
   runApp(const MyApp());
@@ -82,34 +80,20 @@ class _BaseScreenState extends State<BaseScreen> {
           ),
         ],
       ),
-      body: [
-        MultiBlocProvider(
-          providers: [
-            BlocProvider<DatePickerCubit>(
-              create: (context) => DatePickerCubit(),
-            ),
-            BlocProvider<TransactionCubit>(
+      body:
+          [
+            BlocProvider(
               create: (context) => TransactionCubit(),
+              child: InExpWidget(isIncome: false),
             ),
-          ],
-          child: InExpWidgetPage(isIncome: false),
-        ),
-
-        MultiBlocProvider(
-          providers: [
-            BlocProvider<DatePickerCubit>(
-              create: (context) => DatePickerCubit(),
-            ),
-            BlocProvider<TransactionCubit>(
+            BlocProvider(
               create: (context) => TransactionCubit(),
+              child: InExpWidget(isIncome: true),
             ),
-          ],
-          child: InExpWidgetPage(isIncome: true),
-        ),
-        AccountPage(),
-        CategoriesPage(),
-        SettingsPage(),
-      ][currentPageIndex],
+            AccountPage(),
+            CategoriesPage(),
+            SettingsPage(),
+          ][currentPageIndex],
     );
   }
 }
