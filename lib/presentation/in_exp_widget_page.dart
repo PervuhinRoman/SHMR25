@@ -4,10 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/domain/cubit/datepicker_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transaction_cubit.dart';
+import 'package:shmr_finance/presentation/in_exp_history_widget.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
-
-// import '../domain/bloc/transaction_bloc.dart';
 
 class InExpWidgetPage extends StatefulWidget {
   final bool isIncome;
@@ -62,7 +61,10 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                 context,
                 MaterialPageRoute<void>(
                   builder: (BuildContext context) {
-                    return Placeholder(); // TODO: передавать с параметром isIncome
+                    return BlocProvider(
+                      create: (context) => TransactionCubit(),
+                      child: InExpHistoryWidget(isIncome: widget.isIncome),
+                    ); // TODO: передавать с параметром isIncome
                   },
                 ),
               );
@@ -227,8 +229,7 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                         );
                       } else {
                         return ListView.builder(
-                          itemCount:
-                              transactions.length * 2 + 1,
+                          itemCount: transactions.length * 2 + 1,
                           itemBuilder: (context, index) {
                             if (index.isEven) {
                               return const Divider(
@@ -238,12 +239,10 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                               );
                             } else {
                               final itemIndex = index ~/ 2;
-                              if (itemIndex >=
-                                  transactions.length) {
+                              if (itemIndex >= transactions.length) {
                                 return const SizedBox.shrink();
                               }
-                              final item =
-                                  transactions[itemIndex];
+                              final item = transactions[itemIndex];
                               return InExpItem(
                                 categoryTitle: item.category.name,
                                 amount: item.amount,
