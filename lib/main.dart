@@ -9,6 +9,7 @@ import 'package:shmr_finance/presentation/settings_page.dart';
 import 'package:shmr_finance/app_theme.dart';
 
 import 'domain/bloc/transaction_bloc.dart';
+import 'domain/cubit/datepicker_cubit.dart';
 
 void main() {
   runApp(const MyApp());
@@ -84,20 +85,28 @@ class _BaseScreenState extends State<BaseScreen> {
         ],
       ),
       body: [
+        // BlocProvider(
+        //   create: (context) {
+        //     final now = DateTime.now();
+        //     final startDate = DateTime(now.year, now.month - 1, now.day);
+        //     return TransactionBloc()..add(LoadTransactions(false, startDate, now));
+        //   },
+        //   child: InExpWidgetPage(isIncome: false),
+        // ),
         BlocProvider(
-          create: (context) {
-            final now = DateTime.now();
-            final startDate = DateTime(now.year, now.month - 1, now.day);
-            return TransactionBloc()..add(LoadTransactions(false, startDate, now));
-          },
+          create: (context) => DatePickerCubit(),
           child: InExpWidgetPage(isIncome: false),
         ),
+        // BlocProvider(
+        //   create: (context) {
+        //     final now = DateTime.now();
+        //     final startDate = DateTime(now.year, now.month - 1, now.day);
+        //     return TransactionBloc()..add(LoadTransactions(true, startDate, now));
+        //   },
+        //   child: InExpWidgetPage(isIncome: true),
+        // ),
         BlocProvider(
-          create: (context) {
-            final now = DateTime.now();
-            final startDate = DateTime(now.year, now.month - 1, now.day);
-            return TransactionBloc()..add(LoadTransactions(true, startDate, now));
-          },
+          create: (context) => DatePickerCubit(),
           child: InExpWidgetPage(isIncome: true),
         ),
         AccountPage(),
