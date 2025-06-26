@@ -80,6 +80,7 @@ class TransactionRepoImp implements TransactionRepository {
         DateTime? endDate,
       }) async {
     try {
+      // TODO: Перенести работу DIO в Service
       final dio = Dio();
       final response = await dio.get(
         'https://shmr-finance.ru/api/v1/transactions/account/$accountId/period',

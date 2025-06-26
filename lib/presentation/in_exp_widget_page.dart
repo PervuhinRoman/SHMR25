@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/domain/cubit/datepicker_cubit.dart';
-import 'package:shmr_finance/domain/models/transaction/transaction.dart';
+import 'package:shmr_finance/domain/cubit/transaction_cubit.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
 
-import '../domain/bloc/transaction_bloc.dart';
+// import '../domain/bloc/transaction_bloc.dart';
 
 class InExpWidgetPage extends StatefulWidget {
   final bool isIncome;
@@ -18,64 +19,38 @@ class InExpWidgetPage extends StatefulWidget {
 }
 
 class _InExpWidgetPageState extends State<InExpWidgetPage> {
-  DateTime? _startDate1;
-  DateTime? _endDate1;
-
-  DateTime addMonth(DateTime summand, int step) {
-    late DateTime result;
-    if (step.abs() >= summand.month) {
-      result = DateTime(
-        summand.year - 1,
-        summand.month + step + 12,
-        summand.day,
-      );
-    } else {
-      result = DateTime(summand.year, summand.month + step, summand.day);
-    }
-
-    return result;
-  }
-
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final datePickerState = context.read<DatePickerCubit>().state;
+      context.read<TransactionCubit>().fetchTransactions(
+        startDate: datePickerState.startDate!,
+        endDate: datePickerState.endDate!,
+        isIncome: widget.isIncome,
+      );
+    });
   }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   // Устанавливаем период по умолчанию: месяц назад - сегодня
-  //   _endDate1 = DateTime.now();
-  //   _startDate1 = DateTime(
-  //     _endDate1!.year,
-  //     _endDate1!.month - 1,
-  //     _endDate1!.day,
-  //   );
-  //   // Корректировка если текущий месяц январь
-  //   if (_startDate1!.month == 0) {
-  //     _startDate1 = DateTime(_endDate1!.year - 1, 12, _endDate1!.day);
-  //   }
-  //
-  //   // Загружаем данные с начальными датами
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     context.read<TransactionBloc>().add(
-  //       LoadTransactions(widget.isIncome, _startDate1!, _endDate1!),
-  //     );
-  //   });
-  // }
-  //
-  // // Функция для перезагрузки данных
-  // void _reloadData() {
-  //   if (_startDate1 != null && _endDate1 != null) {
-  //     context.read<TransactionBloc>().add(
-  //       LoadTransactions(widget.isIncome, _startDate1!, _endDate1!),
-  //     );
-  //   }
-  // }
+  @override
+  void didUpdateWidget(covariant InExpWidgetPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isIncome != widget.isIncome) {
+      final datePickerState = context.read<DatePickerCubit>().state;
+      context.read<TransactionCubit>().fetchTransactions(
+        startDate: datePickerState.startDate!,
+        endDate: datePickerState.endDate!,
+        isIncome: widget.isIncome,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    var cubit = context.read<DatePickerCubit>();
+    DatePickerCubit datePickerCubit = context.read<DatePickerCubit>();
+    TransactionCubit transactionCubit = context.read<TransactionCubit>();
+
     return Scaffold(
       appBar: CustomAppBar(
         title: widget.isIncome ? "Доходы сегодня" : "Расходы сегодня",
@@ -95,339 +70,196 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
           ),
         ],
       ),
-      // body: BlocBuilder<TransactionBloc, TransactionState>(
-      //   builder: (context, state) {
-      //     if (state is TransactionLoading) {
-      //       return const Center(child: CircularProgressIndicator());
-      //     } else if (state is TransactionError) {
-      //       return Center(child: Text('Ошибка: ${state.message}'));
-      //     } else if (state is TransactionLoaded) {
-      //       final rawResponses = state.transactions;
-      //       final responses = <TransactionResponse>[];
-      //       for (final response in rawResponses) {
-      //         if (response.category.isIncome && widget.isIncome ||
-      //             !response.category.isIncome && !widget.isIncome) {
-      //           responses.add(response);
-      //         }
-      //       }
-      //       final total = responses.fold<num>(
-      //         0,
-      //         (sum, item) => sum + double.parse(item.amount),
-      //       );
-      //
-      //       return Column(
-      //         children: [
-      //           // Начало
-      //           GestureDetector(
-      //             onTap: () async {
-      //               final DateTime? result = await showDatePicker(
-      //                 context: context,
-      //                 initialDate: _startDate1 ?? DateTime.now(),
-      //                 firstDate: DateTime(2000),
-      //                 lastDate: DateTime(2100),
-      //                 helpText: 'Выберите дату начала',
-      //                 cancelText: 'Отмена',
-      //                 confirmText: 'ОК',
-      //               );
-      //               if (result != null) {
-      //                 setState(() {
-      //                   _startDate1 = result;
-      //                 });
-      //                 // Перезагружаем данные с новой датой
-      //                 _reloadData();
-      //               }
-      //             },
-      //             child: Container(
-      //               color: CustomAppTheme.figmaMainLightColor,
-      //               height: 56,
-      //               child: Row(
-      //                 children: [
-      //                   const Expanded(
-      //                     child: Padding(
-      //                       padding: EdgeInsets.only(left: 16),
-      //                       child: Text("Начало", textAlign: TextAlign.start),
-      //                     ),
-      //                   ),
-      //                   Expanded(
-      //                     child: Padding(
-      //                       padding: const EdgeInsets.only(right: 16),
-      //                       child: Text(
-      //                         _startDate1 != null
-      //                           ? "${_startDate1!.day}.${_startDate1!.month}.${_startDate1!.year}"
-      //                           : "Выберите дату",
-      //                         textAlign: TextAlign.end,
-      //                       ),
-      //                     ),
-      //                   ),
-      //                 ],
-      //               ),
-      //             ),
-      //           ),
-      //           const Divider(
-      //             height: 1,
-      //             thickness: 1,
-      //             color: CustomAppTheme.figmaBgGrayColor,
-      //           ),
-      //           // Конец
-      //           GestureDetector(
-      //             onTap: () async {
-      //               final DateTime? result = await showDatePicker(
-      //                 context: context,
-      //                 initialDate: _endDate1 ?? DateTime.now(),
-      //                 firstDate: DateTime(2000),
-      //                 lastDate: DateTime(2100),
-      //                 helpText: 'Выберите дату окончания',
-      //                 cancelText: 'Отмена',
-      //                 confirmText: 'ОК',
-      //               );
-      //               if (result != null) {
-      //                 setState(() {
-      //                   _endDate1 = result;
-      //                 });
-      //                 // Перезагружаем данные с новой датой
-      //                 _reloadData();
-      //               }
-      //             },
-      //             child: Container(
-      //               color: CustomAppTheme.figmaMainLightColor,
-      //               height: 56,
-      //               child: Row(
-      //                 children: [
-      //                   const Expanded(
-      //                     child: Padding(
-      //                       padding: EdgeInsets.only(left: 16),
-      //                       child: Text("Конец", textAlign: TextAlign.start),
-      //                     ),
-      //                   ),
-      //                   Expanded(
-      //                     child: Padding(
-      //                       padding: const EdgeInsets.only(right: 16),
-      //                       child: Text(
-      //                         _endDate1 != null
-      //                           ? "${_endDate1!.day}.${_endDate1!.month}.${_endDate1!.year}"
-      //                           : "Выберите дату",
-      //                         textAlign: TextAlign.end,
-      //                       ),
-      //                     ),
-      //                   ),
-      //                 ],
-      //               ),
-      //             ),
-      //           ),
-      //           const Divider(
-      //             height: 1,
-      //             thickness: 1,
-      //             color: CustomAppTheme.figmaBgGrayColor,
-      //           ),
-      //           // Сумма
-      //           Container(
-      //             color: CustomAppTheme.figmaMainLightColor,
-      //             height: 56,
-      //             child: Row(
-      //               children: [
-      //                 const Expanded(
-      //                   child: Padding(
-      //                     padding: EdgeInsets.only(left: 16),
-      //                     child: Text("Сумма", textAlign: TextAlign.start),
-      //                   ),
-      //                 ),
-      //                 Expanded(
-      //                   child: Padding(
-      //                     padding: const EdgeInsets.only(right: 16),
-      //                     child: Text("$total ₽", textAlign: TextAlign.end),
-      //                   ),
-      //                 ),
-      //               ],
-      //             ),
-      //           ),
-      //           // Список транзакций
-      //           Expanded(
-      //             child: responses.isEmpty
-      //               ? const Center(child: Text('Нет данных'))
-      //               : ListView.builder(
-      //                   itemCount: responses.length * 2 + 1,
-      //                   itemBuilder: (context, index) {
-      //                     if (index.isEven) {
-      //                       return const Divider(
-      //                         height: 1,
-      //                         thickness: 1,
-      //                         color: CustomAppTheme.figmaBgGrayColor,
-      //                       );
-      //                     } else {
-      //                       final itemIndex = index ~/ 2;
-      //                       if (itemIndex >= responses.length) {
-      //                         return const SizedBox.shrink();
-      //                       }
-      //                       final item = responses[itemIndex];
-      //                       return InExpItem(
-      //                         category_title: item.category.name,
-      //                         amount: item.amount,
-      //                         icon: item.category.emoji,
-      //                         comment: item.comment,
-      //                       );
-      //                     }
-      //                   },
-      //                 ),
-      //           ),
-      //         ],
-      //       );
-      //     }
-      //     return const SizedBox.shrink();
-      //   },
-      // ),
       body: BlocBuilder<DatePickerCubit, DatePickerState>(
-        builder: (context, state) {
-          return Column(
-            children: [
-              // Начало
-              GestureDetector(
-                onTap: () async {
-                  final DateTime? resultStartDate = await showDatePicker(
-                    context: context,
-                    initialDate: state.startDate ?? DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2100),
-                    helpText: 'Выберите дату начала',
-                    cancelText: 'Отмена',
-                    confirmText: 'ОК',
-                  );
-                  if (resultStartDate != null) {
-                    cubit.setStartDate(resultStartDate);
-                  }
-                },
-                child: Container(
-                  color: CustomAppTheme.figmaMainLightColor,
-                  height: 56,
-                  child: Row(
-                    children: [
-                      const Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 16),
-                          child: Text("Начало", textAlign: TextAlign.start),
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 16),
-                          child: Text(
-                            state.startDate != null
-                                ? "${state.startDate}"
-                                : "Выберите дату",
-                            textAlign: TextAlign.end,
+        builder: (context, datePickerState) {
+          return BlocBuilder<TransactionCubit, TransactionState>(
+            builder: (context, transactionState) {
+              final transactions = transactionState.transactions;
+              final totalSum = transactions.fold<num>(
+                0,
+                (sum, item) => sum + double.parse(item.amount),
+              );
+              return Column(
+                children: [
+                  // Начало
+                  GestureDetector(
+                    onTap: () async {
+                      final DateTime? resultStartDate = await showDatePicker(
+                        context: context,
+                        initialDate:
+                            datePickerState.startDate ?? DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2100),
+                        helpText: 'Выберите дату начала',
+                        cancelText: 'Отмена',
+                        confirmText: 'ОК',
+                      );
+                      if (resultStartDate != null) {
+                        datePickerCubit.setStartDate(resultStartDate);
+                        transactionCubit.fetchTransactions(
+                          startDate: resultStartDate,
+                          endDate: datePickerState.endDate,
+                          isIncome: widget.isIncome,
+                        );
+                      }
+                    },
+                    child: Container(
+                      color: CustomAppTheme.figmaMainLightColor,
+                      height: 56,
+                      child: Row(
+                        children: [
+                          const Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 16),
+                              child: Text("Начало", textAlign: TextAlign.start),
+                            ),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const Divider(
-                height: 1,
-                thickness: 1,
-                color: CustomAppTheme.figmaBgGrayColor,
-              ),
-              // Конец
-              GestureDetector(
-                onTap: () async {
-                  final DateTime? resultEndDate = await showDatePicker(
-                    context: context,
-                    initialDate: state.endDate ?? DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2100),
-                    helpText: 'Выберите дату конца',
-                    cancelText: 'Отмена',
-                    confirmText: 'ОК',
-                  );
-                  if (resultEndDate != null) {
-                    cubit.setEndDate(resultEndDate);
-                  }
-                },
-                child: Container(
-                  color: CustomAppTheme.figmaMainLightColor,
-                  height: 56,
-                  child: Row(
-                    children: [
-                      const Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 16),
-                          child: Text("Конец", textAlign: TextAlign.start),
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 16),
-                          child: Text(
-                            state.endDate != null
-                                ? "${state.endDate}"
-                                : "Выберите дату",
-                            textAlign: TextAlign.end,
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 16),
+                              child: Text(
+                                datePickerState.startDate != null
+                                    ? DateFormat(
+                                      'dd.MM.yyyy',
+                                    ).format(datePickerState.startDate!)
+                                    : "Выберите дату",
+                                textAlign: TextAlign.end,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const Divider(
-                height: 1,
-                thickness: 1,
-                color: CustomAppTheme.figmaBgGrayColor,
-              ),
-              // Сумма
-              Container(
-                color: CustomAppTheme.figmaMainLightColor,
-                height: 56,
-                child: Row(
-                  children: [
-                    const Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 16),
-                        child: Text("Сумма", textAlign: TextAlign.start),
+                        ],
                       ),
                     ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: Text("dwdwdwdwde ₽", textAlign: TextAlign.end),
+                  ),
+                  const Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: CustomAppTheme.figmaBgGrayColor,
+                  ),
+                  // Конец
+                  GestureDetector(
+                    onTap: () async {
+                      final DateTime? resultEndDate = await showDatePicker(
+                        context: context,
+                        initialDate: datePickerState.endDate ?? DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2100),
+                        helpText: 'Выберите дату конца',
+                        cancelText: 'Отмена',
+                        confirmText: 'ОК',
+                      );
+                      if (resultEndDate != null) {
+                        datePickerCubit.setEndDate(resultEndDate);
+                      }
+                    },
+                    child: Container(
+                      color: CustomAppTheme.figmaMainLightColor,
+                      height: 56,
+                      child: Row(
+                        children: [
+                          const Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 16),
+                              child: Text("Конец", textAlign: TextAlign.start),
+                            ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 16),
+                              child: Text(
+                                datePickerState.endDate != null
+                                    ? DateFormat(
+                                      'dd.MM.yyyy',
+                                    ).format(datePickerState.endDate!)
+                                    : "Выберите дату",
+                                textAlign: TextAlign.end,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-              // Список транзакций
-              // Expanded(
-              //   child:
-              //       responses.isEmpty
-              //           ? const Center(child: Text('Нет данных'))
-              //           : ListView.builder(
-              //             itemCount: responses.length * 2 + 1,
-              //             itemBuilder: (context, index) {
-              //               if (index.isEven) {
-              //                 return const Divider(
-              //                   height: 1,
-              //                   thickness: 1,
-              //                   color: CustomAppTheme.figmaBgGrayColor,
-              //                 );
-              //               } else {
-              //                 final itemIndex = index ~/ 2;
-              //                 if (itemIndex >= responses.length) {
-              //                   return const SizedBox.shrink();
-              //                 }
-              //                 final item = responses[itemIndex];
-              //                 return InExpItem(
-              //                   category_title: item.category.name,
-              //                   amount: item.amount,
-              //                   icon: item.category.emoji,
-              //                   comment: item.comment,
-              //                 );
-              //               }
-              //             },
-              //           ),
-              // ),
-            ],
+                  ),
+                  const Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: CustomAppTheme.figmaBgGrayColor,
+                  ),
+                  // Сумма
+                  Container(
+                    color: CustomAppTheme.figmaMainLightColor,
+                    height: 56,
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 16),
+                            child: Text("Сумма", textAlign: TextAlign.start),
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: Text(
+                              "$totalSum ₽", // TODO: добавить форматирование вывода суммы по разрядам и кол-во символов после точки
+                              textAlign: TextAlign.end,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Список транзакций
+                  Expanded(
+                    child: () {
+                      if (transactionState.status ==
+                          TransactionStatus.loading) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (transactionState.status == TransactionStatus.error) {
+                        return Center(
+                          child: Text('Ошибка: ${transactionState.error}'),
+                        );
+                      }
+                      if (transactions.isEmpty) {
+                        return const Center(
+                          child: Text('Нет данных за период'),
+                        );
+                      } else {
+                        return ListView.builder(
+                          itemCount:
+                              transactions.length * 2 + 1,
+                          itemBuilder: (context, index) {
+                            if (index.isEven) {
+                              return const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: CustomAppTheme.figmaBgGrayColor,
+                              );
+                            } else {
+                              final itemIndex = index ~/ 2;
+                              if (itemIndex >=
+                                  transactions.length) {
+                                return const SizedBox.shrink();
+                              }
+                              final item =
+                                  transactions[itemIndex];
+                              return InExpItem(
+                                category_title: item.category.name,
+                                amount: item.amount,
+                                icon: item.category.emoji,
+                                comment: item.comment,
+                              );
+                            }
+                          },
+                        );
+                      }
+                    }(),
+                  ),
+                ],
+              );
+            },
           );
-
-          return const SizedBox.shrink();
         },
       ),
       floatingActionButton: FloatingActionButton(
