@@ -245,9 +245,10 @@ class _InExpWidgetPageState extends State<InExpWidgetPage> {
                               final item =
                                   transactions[itemIndex];
                               return InExpItem(
-                                category_title: item.category.name,
+                                categoryTitle: item.category.name,
                                 amount: item.amount,
                                 icon: item.category.emoji,
+                                time: item.transactionDate,
                                 comment: item.comment,
                               );
                             }
