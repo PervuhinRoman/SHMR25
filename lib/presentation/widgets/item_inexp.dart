@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:shmr_finance/app_theme.dart';
 
 class InExpItem extends StatelessWidget {
-  final String category_title;
+  final String categoryTitle;
   final String amount;
   final String icon;
+  final DateTime time;
   final String? comment;
   const InExpItem({
     super.key,
-    required this.category_title,
+    required this.categoryTitle,
     required this.amount,
     required this.icon,
+    required this.time,
     this.comment,
   });
 
@@ -20,12 +24,23 @@ class InExpItem extends StatelessWidget {
       title: Row(
         children: [
           Expanded(
-            child: Text(category_title, textAlign: TextAlign.start),
+            child: Text(categoryTitle, textAlign: TextAlign.start),
           ),
           Expanded(
             child: Text(amount, textAlign: TextAlign.end),
           ),
         ],
+      ),
+      subtitle: Row(
+        children: [
+          Expanded(child: Text(comment ?? "", textAlign: TextAlign.start)),
+          Expanded(child: Text(DateFormat("dd.MM hh:mm").format(time), textAlign: TextAlign.end,)),
+        ],
+      ),
+      subtitleTextStyle: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
+        color: CustomAppTheme.figmaDarkGrayColor
       ),
       trailing: Icon(Icons.arrow_forward_ios_rounded, size: 16),
     );

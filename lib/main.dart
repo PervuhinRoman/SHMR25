@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shmr_finance/domain/cubit/transaction_cubit.dart';
 import 'package:shmr_finance/presentation/account_page.dart';
 import 'package:shmr_finance/presentation/categories_page.dart';
-import 'package:shmr_finance/presentation/expenses_page.dart';
-import 'package:shmr_finance/presentation/in_exp_widget_page.dart';
-import 'package:shmr_finance/presentation/income_page.dart';
+import 'package:shmr_finance/presentation/in_exp_widget.dart';
 import 'package:shmr_finance/presentation/settings_page.dart';
 import 'package:shmr_finance/app_theme.dart';
-
-import 'domain/bloc/transaction_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -83,27 +80,20 @@ class _BaseScreenState extends State<BaseScreen> {
           ),
         ],
       ),
-      body: [
-        BlocProvider(
-          create: (context) {
-            final now = DateTime.now();
-            final startDate = DateTime(now.year, now.month - 1, now.day);
-            return TransactionBloc()..add(LoadTransactions(false, startDate, now));
-          },
-          child: InExpWidgetPage(isIncome: false),
-        ),
-        BlocProvider(
-          create: (context) {
-            final now = DateTime.now();
-            final startDate = DateTime(now.year, now.month - 1, now.day);
-            return TransactionBloc()..add(LoadTransactions(true, startDate, now));
-          },
-          child: InExpWidgetPage(isIncome: true),
-        ),
-        AccountPage(),
-        CategoriesPage(),
-        SettingsPage(),
-      ][currentPageIndex],
+      body:
+          [
+            BlocProvider(
+              create: (context) => TransactionCubit(),
+              child: InExpWidget(isIncome: false),
+            ),
+            BlocProvider(
+              create: (context) => TransactionCubit(),
+              child: InExpWidget(isIncome: true),
+            ),
+            AccountPage(),
+            CategoriesPage(),
+            SettingsPage(),
+          ][currentPageIndex],
     );
   }
 }
