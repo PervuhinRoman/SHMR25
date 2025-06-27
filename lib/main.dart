@@ -48,52 +48,49 @@ class _BaseScreenState extends State<BaseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {
-          setState(() {
-            currentPageIndex = index;
-          });
-        },
-        selectedIndex: currentPageIndex,
-        // TODO: ?заменить на svg
-        destinations: <Widget>[
-          NavigationDestination(
-            icon: Image.asset('assets/icons/downtrend.png', width: 32),
-            label: 'Расходы',
-          ),
-          NavigationDestination(
-            icon: Image.asset('assets/icons/uptrend.png', width: 32),
-            label: 'Доходы',
-          ),
-          NavigationDestination(
-            icon: Image.asset('assets/icons/calc.png', width: 32),
-            label: 'Счет',
-          ),
-          NavigationDestination(
-            icon: Image.asset('assets/icons/linear_chart.png', width: 32),
-            label: 'Статьи',
-          ),
-          NavigationDestination(
-            icon: Image.asset('assets/icons/settings.png', width: 32),
-            label: 'Настройки',
-          ),
-        ],
+    return BlocProvider(
+      create: (context) => TransactionCubit(),
+      child: Scaffold(
+        bottomNavigationBar: NavigationBar(
+          onDestinationSelected: (int index) {
+            setState(() {
+              currentPageIndex = index;
+            });
+          },
+          selectedIndex: currentPageIndex,
+          // TODO: ?заменить на svg
+          destinations: <Widget>[
+            NavigationDestination(
+              icon: Image.asset('assets/icons/downtrend.png', width: 32),
+              label: 'Расходы',
+            ),
+            NavigationDestination(
+              icon: Image.asset('assets/icons/uptrend.png', width: 32),
+              label: 'Доходы',
+            ),
+            NavigationDestination(
+              icon: Image.asset('assets/icons/calc.png', width: 32),
+              label: 'Счет',
+            ),
+            NavigationDestination(
+              icon: Image.asset('assets/icons/linear_chart.png', width: 32),
+              label: 'Статьи',
+            ),
+            NavigationDestination(
+              icon: Image.asset('assets/icons/settings.png', width: 32),
+              label: 'Настройки',
+            ),
+          ],
+        ),
+        body:
+            [
+              InExpWidget(isIncome: false),
+              InExpWidget(isIncome: true),
+              AccountPage(),
+              CategoriesPage(),
+              SettingsPage(),
+            ][currentPageIndex],
       ),
-      body:
-          [
-            BlocProvider(
-              create: (context) => TransactionCubit(),
-              child: InExpWidget(isIncome: false),
-            ),
-            BlocProvider(
-              create: (context) => TransactionCubit(),
-              child: InExpWidget(isIncome: true),
-            ),
-            AccountPage(),
-            CategoriesPage(),
-            SettingsPage(),
-          ][currentPageIndex],
     );
   }
 }
