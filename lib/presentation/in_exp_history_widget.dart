@@ -202,7 +202,7 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          final result = await showModalBottomSheet(
+                          await showModalBottomSheet(
                             context: context,
                             builder:
                                 (ctx) => Column(
