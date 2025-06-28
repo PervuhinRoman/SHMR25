@@ -1,20 +1,24 @@
-part of 'currency_cubit.dart';
+part of 'account_cubit.dart';
 
-class CurrencyState {
+class MyAccountState {
   final Currency selectedCurrency;
+  final String accountName;
   final bool isLoading;
 
-  const CurrencyState({
+  const MyAccountState({
     required this.selectedCurrency,
+    this.accountName = '',
     this.isLoading = false,
   });
 
-  CurrencyState copyWith({
+  MyAccountState copyWith({
     Currency? selectedCurrency,
+    String? accountName,
     bool? isLoading,
   }) {
-    return CurrencyState(
+    return MyAccountState(
       selectedCurrency: selectedCurrency ?? this.selectedCurrency,
+      accountName: accountName ?? this.accountName,
       isLoading: isLoading ?? this.isLoading,
     );
   }

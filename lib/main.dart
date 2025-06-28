@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shmr_finance/data/services/balance_visibility_service.dart';
+import 'package:shmr_finance/domain/cubit/account_cubit.dart';
 import 'package:shmr_finance/domain/cubit/blur_cubit.dart';
 import 'package:shmr_finance/domain/cubit/category_cubit.dart';
-import 'package:shmr_finance/domain/cubit/currency_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transaction_cubit.dart';
 import 'package:shmr_finance/presentation/account_page.dart';
 import 'package:shmr_finance/presentation/categories_page.dart';
@@ -29,7 +29,7 @@ void main() async {
     MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => TransactionCubit()),
-        BlocProvider(create: (_) => CurrencyCubit()),
+        BlocProvider(create: (_) => MyAccountCubit()),
         BlocProvider(create: (_) => BlurCubit()),
         BlocProvider(create: (_) => CategoryCubit()),
       ],

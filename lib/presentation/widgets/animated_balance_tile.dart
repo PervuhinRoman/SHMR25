@@ -38,20 +38,16 @@ class _AnimatedBalanceTileState extends State<AnimatedBalanceTile>
       vsync: this,
     );
 
-    _blurAnimation = Tween<double>(
-      begin: 0.0,
-      end: 8.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _blurAnimation = Tween<double>(begin: 0.0, end: 8.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final blurCubit = context.read<BlurCubit>();
-    
+
     // Устанавливаем начальное состояние
     if (!blurCubit.state.isBalanceVisible) {
       _animationController.value = 1.0;
@@ -87,34 +83,26 @@ class _AnimatedBalanceTileState extends State<AnimatedBalanceTile>
                 children: [
                   Text(widget.icon, style: const TextStyle(fontSize: 24)),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      widget.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                      ),
+                  Expanded(child: Text(widget.title)),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: AnimatedBuilder(
+                      animation: _animationController,
+                      builder: (context, child) {
+                        return ImageFiltered(
+                          imageFilter: ImageFilter.blur(
+                            sigmaX: _blurAnimation.value,
+                            sigmaY: _blurAnimation.value,
+                          ),
+                          child: Text(widget.value),
+                        );
+                      },
                     ),
                   ),
-                  AnimatedBuilder(
-                    animation: _animationController,
-                    builder: (context, child) {
-                      return ImageFiltered(
-                        imageFilter: ImageFilter.blur(
-                          sigmaX: _blurAnimation.value,
-                          sigmaY: _blurAnimation.value,
-                        ),
-                        child: Text(
-                          widget.value,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      );
-                    },
+                  const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 16,
+                    color: Colors.grey,
                   ),
                 ],
               ),
@@ -124,4 +112,4 @@ class _AnimatedBalanceTileState extends State<AnimatedBalanceTile>
       },
     );
   }
-} 
+}

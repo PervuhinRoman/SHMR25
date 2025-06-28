@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/data/repositories/account_repo_imp.dart';
-import 'package:shmr_finance/domain/cubit/blur_cubit.dart';
-import 'package:shmr_finance/domain/cubit/currency_cubit.dart';
+import 'package:shmr_finance/domain/cubit/account_cubit.dart';
 import 'package:shmr_finance/domain/models/account/account.dart';
 import 'package:shmr_finance/domain/models/currency/currency.dart';
 import 'package:shmr_finance/presentation/account_delete_page.dart';
+import 'package:shmr_finance/presentation/edit_account_page.dart';
 import 'package:shmr_finance/presentation/widgets/animated_balance_tile.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 
@@ -36,10 +36,10 @@ class _AccountPageState extends State<AccountPage> {
         _isLoading = true;
         _error = null;
       });
-      
+
       // Загружаем данные основного счета (ID = 1)
       final accountData = await _accountRepo.getAccountById(1);
-      
+
       setState(() {
         _accountData = accountData;
         _isLoading = false;
@@ -64,7 +64,7 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Widget _buildCurrencySelector() {
-    return BlocBuilder<CurrencyCubit, CurrencyState>(
+    return BlocBuilder<MyAccountCubit, MyAccountState>(
       builder: (context, state) {
         return Container(
           padding: const EdgeInsets.all(20),
@@ -82,10 +82,7 @@ class _AccountPageState extends State<AccountPage> {
               const SizedBox(height: 20),
               const Text(
                 'Выберите валюту',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 20),
               Flexible(
@@ -94,8 +91,9 @@ class _AccountPageState extends State<AccountPage> {
                   itemCount: Currencies.available.length,
                   itemBuilder: (context, index) {
                     final currency = Currencies.available[index];
-                    final isSelected = currency.code == state.selectedCurrency.code;
-                    
+                    final isSelected =
+                        currency.code == state.selectedCurrency.code;
+
                     return ListTile(
                       leading: Text(
                         currency.icon,
@@ -103,11 +101,15 @@ class _AccountPageState extends State<AccountPage> {
                       ),
                       title: Text(currency.name),
                       subtitle: Text('${currency.code} ${currency.symbol}'),
-                      trailing: isSelected 
-                        ? Icon(Icons.check, color: CustomAppTheme.figmaMainColor)
-                        : null,
+                      trailing:
+                          isSelected
+                              ? Icon(
+                                Icons.check,
+                                color: CustomAppTheme.figmaMainColor,
+                              )
+                              : null,
                       onTap: () {
-                        context.read<CurrencyCubit>().setCurrency(currency);
+                        context.read<MyAccountCubit>().setCurrency(currency);
                         Navigator.pop(context);
                       },
                     );
@@ -124,43 +126,47 @@ class _AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(
-        title: "Мой счёт",
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.mode_edit_outlined),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (BuildContext context) {
-                    return Scaffold(
-                      appBar: AppBar(title: Text("Редактировать счёт")),
-                      body: Center(child: Text("Форма редактирования")),
-                    );
-                  },
-                ),
-              );
-            },
+    return BlocBuilder<MyAccountCubit, MyAccountState>(
+      builder: (context, accountState) {
+        return Scaffold(
+          appBar: CustomAppBar(
+            title: accountState.accountName.isNotEmpty 
+                ? accountState.accountName 
+                : "Мой счёт",
+            actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.mode_edit_outlined),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (BuildContext context) {
+                        return AccountDeletePage(account: _accountData!);
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _error != null
-              ? Center(child: Text('Ошибка: $_error'))
-              : _accountData == null
-                  ? const Center(child: Text('Нет данных'))
-                  : _buildAccountContent(),
+          body:
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _error != null
+                      ? Center(child: Text('Ошибка: $_error'))
+                      : _accountData == null
+                          ? const Center(child: Text('Нет данных'))
+                          : _buildAccountContent(),
+        );
+      },
     );
   }
 
   Widget _buildAccountContent() {
     final account = _accountData!;
     final balance = double.tryParse(account.balance) ?? 0.0;
-    
-    return BlocBuilder<CurrencyCubit, CurrencyState>(
+
+    return BlocBuilder<MyAccountCubit, MyAccountState>(
       builder: (context, currencyState) {
         if (currencyState.isLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -174,8 +180,9 @@ class _AccountPageState extends State<AccountPage> {
                   AnimatedBalanceTile(
                     icon: '💰',
                     title: 'Баланс',
-                    value: "${NumberFormat("0.00").format(balance)} ${currencyState.selectedCurrency.symbol}",
-                    onTap: _navigateToDeletePage,
+                    value:
+                        "${NumberFormat("0.00").format(balance)} ${currencyState.selectedCurrency.symbol}",
+                    onTap: _navigateToEditPage,
                   ),
                   const Divider(
                     height: 1,
@@ -198,12 +205,10 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 
-  void _navigateToDeletePage() {
+  void _navigateToEditPage() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => AccountDeletePage(account: _accountData!),
-      ),
+      MaterialPageRoute(builder: (context) => const EditAccountPage()),
     );
   }
 }
@@ -234,26 +239,14 @@ class _AccountListTile extends StatelessWidget {
             children: [
               Text(icon, style: const TextStyle(fontSize: 24)),
               const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
+              Expanded(child: Text(title)),
+              Text(value),
               const SizedBox(width: 8),
-              const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 16,
+                color: Colors.grey,
+              ),
             ],
           ),
         ),
@@ -261,4 +254,3 @@ class _AccountListTile extends StatelessWidget {
     );
   }
 }
-
