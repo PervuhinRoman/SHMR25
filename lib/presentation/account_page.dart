@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/data/repositories/account_repo_imp.dart';
+import 'package:shmr_finance/domain/cubit/blur_cubit.dart';
 import 'package:shmr_finance/domain/cubit/currency_cubit.dart';
 import 'package:shmr_finance/domain/models/account/account.dart';
 import 'package:shmr_finance/domain/models/currency/currency.dart';
 import 'package:shmr_finance/presentation/account_delete_page.dart';
+import 'package:shmr_finance/presentation/widgets/animated_balance_tile.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 
 class AccountPage extends StatefulWidget {
@@ -168,8 +170,8 @@ class _AccountPageState extends State<AccountPage> {
             children: [
               Column(
                 children: [
-                  // Баланс
-                  _AccountListTile(
+                  // Баланс с анимацией скрытия
+                  AnimatedBalanceTile(
                     icon: '💰',
                     title: 'Баланс',
                     value: "${NumberFormat("0.00").format(balance)} ${currencyState.selectedCurrency.symbol}",
@@ -235,10 +237,20 @@ class _AccountListTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black,
+                  ),
                 ),
               ),
               Text(
                 value,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
               const SizedBox(width: 8),
               const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
