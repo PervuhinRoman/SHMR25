@@ -6,4 +6,5 @@ class CustomAppTheme {
   static const Color figmaDarkGrayColor = Color(0xff49454F);
   static const Color figmaNavBarColor = Color(0xffF3EDF7);
   static const Color figmaBgGrayColor = Color(0xffCAC4D0);
+  static const Color figmaRedColor = Color(0xffE46962);
 }

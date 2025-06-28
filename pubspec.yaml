@@ -39,6 +39,13 @@ dependencies:
   flutter_bloc: ^9.1.1
   intl: ^0.20.2
   dio: ^5.8.0+1
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  connectivity_plus: ^5.0.2
+  shared_preferences: ^2.2.2
+  sensors_plus: ^4.0.2
+  device_info_plus: ^10.1.0
+  fuzzywuzzy: ^1.2.0
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shmr_finance/data/services/balance_visibility_service.dart';
+import 'package:shmr_finance/domain/cubit/account_cubit.dart';
+import 'package:shmr_finance/domain/cubit/blur_cubit.dart';
+import 'package:shmr_finance/domain/cubit/category_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transaction_cubit.dart';
 import 'package:shmr_finance/presentation/account_page.dart';
 import 'package:shmr_finance/presentation/categories_page.dart';
@@ -7,8 +12,30 @@ import 'package:shmr_finance/presentation/in_exp_widget.dart';
 import 'package:shmr_finance/presentation/settings_page.dart';
 import 'package:shmr_finance/app_theme.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Небольшая задержка для стабильности инициализации
+  await Future.delayed(const Duration(milliseconds: 100));
+  
+  try {
+    await SharedPreferences.getInstance(); // Инициализируем SharedPreferences
+    print('✅ SharedPreferences успешно инициализирован');
+  } catch (e) {
+    print('❌ Ошибка инициализации SharedPreferences: $e');
+  }
+  
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => TransactionCubit()),
+        BlocProvider(create: (_) => MyAccountCubit()),
+        BlocProvider(create: (_) => BlurCubit()),
+        BlocProvider(create: (_) => CategoryCubit()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -45,6 +72,28 @@ class BaseScreen extends StatefulWidget {
 
 class _BaseScreenState extends State<BaseScreen> {
   int currentPageIndex = 0;
+  final BalanceVisibilityService _balanceVisibilityService = BalanceVisibilityService();
+  bool _isServiceInitialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isServiceInitialized) {
+      _initializeBalanceVisibilityService();
+      _isServiceInitialized = true;
+    }
+  }
+
+  Future<void> _initializeBalanceVisibilityService() async {
+    final blurCubit = context.read<BlurCubit>();
+    await _balanceVisibilityService.initialize(blurCubit);
+  }
+
+  @override
+  void dispose() {
+    _balanceVisibilityService.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,14 +131,8 @@ class _BaseScreenState extends State<BaseScreen> {
       ),
       body:
           [
-            BlocProvider(
-              create: (context) => TransactionCubit(),
-              child: InExpWidget(isIncome: false),
-            ),
-            BlocProvider(
-              create: (context) => TransactionCubit(),
-              child: InExpWidget(isIncome: true),
-            ),
+            InExpWidget(isIncome: false),
+            InExpWidget(isIncome: true),
             AccountPage(),
             CategoriesPage(),
             SettingsPage(),

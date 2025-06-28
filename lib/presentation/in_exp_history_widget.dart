@@ -157,6 +157,11 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                           );
                           if (resultEndDate != null) {
                             datePickerCubit.setEndDate(resultEndDate);
+                            transactionCubit.fetchTransactions(
+                              startDate: datePickerState.startDate,
+                              endDate: resultEndDate,
+                              isIncome: widget.isIncome,
+                            );
                           }
                         },
                         child: Container(
@@ -197,7 +202,7 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          final result = await showModalBottomSheet(
+                          await showModalBottomSheet(
                             context: context,
                             builder:
                                 (ctx) => Column(
@@ -290,6 +295,39 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                           ],
                         ),
                       ),
+                      // Индикатор источника данных
+                      if (transactionState.dataSource != null)
+                        Container(
+                          color: transactionState.dataSource == DataSource.cache 
+                              ? Colors.orange.withValues(alpha: 0.1) 
+                              : Colors.green.withValues(alpha: 0.1),
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                          child: Row(
+                            children: [
+                              Icon(
+                                transactionState.dataSource == DataSource.cache 
+                                    ? Icons.storage 
+                                    : Icons.cloud_download,
+                                size: 16,
+                                color: transactionState.dataSource == DataSource.cache 
+                                    ? Colors.orange 
+                                    : Colors.green,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                transactionState.dataSource == DataSource.cache 
+                                    ? "Данные из кэша" 
+                                    : "Данные из сети",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: transactionState.dataSource == DataSource.cache 
+                                      ? Colors.orange 
+                                      : Colors.green,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       // Список транзакций
                       Expanded(
                         child: () {
