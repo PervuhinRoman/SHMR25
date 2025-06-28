@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shmr_finance/domain/cubit/currency_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transaction_cubit.dart';
 import 'package:shmr_finance/presentation/account_page.dart';
 import 'package:shmr_finance/presentation/categories_page.dart';
@@ -7,8 +9,28 @@ import 'package:shmr_finance/presentation/in_exp_widget.dart';
 import 'package:shmr_finance/presentation/settings_page.dart';
 import 'package:shmr_finance/app_theme.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Небольшая задержка для стабильности инициализации
+  await Future.delayed(const Duration(milliseconds: 100));
+  
+  try {
+    await SharedPreferences.getInstance(); // Инициализируем SharedPreferences
+    print('✅ SharedPreferences успешно инициализирован');
+  } catch (e) {
+    print('❌ Ошибка инициализации SharedPreferences: $e');
+  }
+  
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => TransactionCubit()),
+        BlocProvider(create: (_) => CurrencyCubit()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -48,49 +70,46 @@ class _BaseScreenState extends State<BaseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => TransactionCubit(),
-      child: Scaffold(
-        bottomNavigationBar: NavigationBar(
-          onDestinationSelected: (int index) {
-            setState(() {
-              currentPageIndex = index;
-            });
-          },
-          selectedIndex: currentPageIndex,
-          // TODO: ?заменить на svg
-          destinations: <Widget>[
-            NavigationDestination(
-              icon: Image.asset('assets/icons/downtrend.png', width: 32),
-              label: 'Расходы',
-            ),
-            NavigationDestination(
-              icon: Image.asset('assets/icons/uptrend.png', width: 32),
-              label: 'Доходы',
-            ),
-            NavigationDestination(
-              icon: Image.asset('assets/icons/calc.png', width: 32),
-              label: 'Счет',
-            ),
-            NavigationDestination(
-              icon: Image.asset('assets/icons/linear_chart.png', width: 32),
-              label: 'Статьи',
-            ),
-            NavigationDestination(
-              icon: Image.asset('assets/icons/settings.png', width: 32),
-              label: 'Настройки',
-            ),
-          ],
-        ),
-        body:
-            [
-              InExpWidget(isIncome: false),
-              InExpWidget(isIncome: true),
-              AccountPage(),
-              CategoriesPage(),
-              SettingsPage(),
-            ][currentPageIndex],
+    return Scaffold(
+      bottomNavigationBar: NavigationBar(
+        onDestinationSelected: (int index) {
+          setState(() {
+            currentPageIndex = index;
+          });
+        },
+        selectedIndex: currentPageIndex,
+        // TODO: ?заменить на svg
+        destinations: <Widget>[
+          NavigationDestination(
+            icon: Image.asset('assets/icons/downtrend.png', width: 32),
+            label: 'Расходы',
+          ),
+          NavigationDestination(
+            icon: Image.asset('assets/icons/uptrend.png', width: 32),
+            label: 'Доходы',
+          ),
+          NavigationDestination(
+            icon: Image.asset('assets/icons/calc.png', width: 32),
+            label: 'Счет',
+          ),
+          NavigationDestination(
+            icon: Image.asset('assets/icons/linear_chart.png', width: 32),
+            label: 'Статьи',
+          ),
+          NavigationDestination(
+            icon: Image.asset('assets/icons/settings.png', width: 32),
+            label: 'Настройки',
+          ),
+        ],
       ),
+      body:
+          [
+            InExpWidget(isIncome: false),
+            InExpWidget(isIncome: true),
+            AccountPage(),
+            CategoriesPage(),
+            SettingsPage(),
+          ][currentPageIndex],
     );
   }
 }

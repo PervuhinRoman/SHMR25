@@ -5,7 +5,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import '../../data/repositories/account_repo_imp.dart';
 import '../../data/repositories/category_repo_imp.dart';
 import '../../data/repositories/transaction_repo_imp.dart';
-import '../models/account/account.dart';
 import '../models/transaction/transaction.dart';
 
 part 'transaction_state.dart';
