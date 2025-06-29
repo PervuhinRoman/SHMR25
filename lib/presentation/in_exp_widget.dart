@@ -35,6 +35,22 @@ class _InExpWidgetState extends State<InExpWidget> {
   }
 
   @override
+  void didUpdateWidget(covariant InExpWidget oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+    print('🚀 InExpWidget didUpdateWidget вызван для ${widget.isIncome ? "доходов" : "расходов"}');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      print('🔄 InExpWidget: вызываю fetchTransactions');
+      final transactionCubit = context.read<TransactionCubit>();
+      transactionCubit.fetchTransactions(
+        startDate: DateTime.now().copyWith(hour: 0, minute: 0),
+        endDate: DateTime.now().copyWith(hour: 23, minute: 59),
+        isIncome: widget.isIncome,
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
