@@ -29,13 +29,14 @@ class AccountDeletePage extends StatelessWidget {
                   Navigator.of(context).pop();
                 },
               ),
-              IconButton(
-                icon: const Icon(Icons.highlight_remove_outlined),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
             ],
+            defaultLeading: false,
+            leading: IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
           ),
           body: BlocBuilder<MyAccountCubit, MyAccountState>(
             builder: (context, currencyState) {
@@ -47,8 +48,7 @@ class AccountDeletePage extends StatelessWidget {
                     icon: '💰',
                     title: 'Баланс',
                     value:
-                    "${NumberFormat("0.00").format(balance)} ${currencyState
-                        .selectedCurrency.symbol}",
+                        "${NumberFormat("0.00").format(balance)} ${currencyState.selectedCurrency.symbol}",
                   ),
                   const Divider(
                     height: 1,
@@ -73,8 +73,10 @@ class AccountDeletePage extends StatelessWidget {
                       ),
                       child: const Text(
                         'Удалить счет',
-                        style: TextStyle(fontSize: 16,
-                            fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -94,8 +96,7 @@ class AccountDeletePage extends StatelessWidget {
         return AlertDialog(
           title: const Text('Подтверждение удаления'),
           content: Text(
-            'Вы уверены, что хотите удалить счет "${account
-                .name}"? Это действие нельзя отменить.',
+            'Вы уверены, что хотите удалить счет "${account.name}"? Это действие нельзя отменить.',
           ),
           actions: [
             TextButton(
