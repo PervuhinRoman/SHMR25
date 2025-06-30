@@ -68,8 +68,11 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                         BlocProvider<DatePickerCubit>(
                           create: (context) => DatePickerCubit(),
                         ),
+                        BlocProvider<TransactionCubit>(
+                          create: (context) => TransactionCubit(),
+                        ),
                       ],
-                      child: AnalyzePage(),
+                      child: AnalyzePage(isIncome: widget.isIncome),
                     );
                   },
                 ),
