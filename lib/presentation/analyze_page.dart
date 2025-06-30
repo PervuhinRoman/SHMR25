@@ -4,11 +4,13 @@ import 'package:intl/intl.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/domain/cubit/datepicker_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transaction_cubit.dart';
+import 'package:shmr_finance/presentation/selected_category_page.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_analyze_category.dart';
 
 class AnalyzePage extends StatefulWidget {
   final bool isIncome;
+
   const AnalyzePage({super.key, required this.isIncome});
 
   @override
@@ -53,10 +55,12 @@ class _AnalyzePageState extends State<AnalyzePage> {
 
               final totalSum = categories.fold<num>(
                 0,
-                    (sum, item) => sum + item.totalAmount,
+                (sum, item) => sum + item.totalAmount,
               );
-              
-              print("📃 Все категории из транзакций в виджете анализа: $categories");
+
+              print(
+                "📃 Все категории из транзакций в виджете анализа: $categories",
+              );
               return Scaffold(
                 appBar: CustomAppBar(title: "Анализ", bgColor: Colors.white),
                 body: Column(
@@ -184,9 +188,12 @@ class _AnalyzePageState extends State<AnalyzePage> {
                       child: () {
                         if (transactionState.status ==
                             TransactionStatus.loading) {
-                          return const Center(child: CircularProgressIndicator());
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
-                        if (transactionState.status == TransactionStatus.error) {
+                        if (transactionState.status ==
+                            TransactionStatus.error) {
                           return Center(
                             child: Text('Ошибка: ${transactionState.error}'),
                           );
@@ -214,9 +221,48 @@ class _AnalyzePageState extends State<AnalyzePage> {
                                 return ItemAnalyzeCategory(
                                   categoryTitle: item.category.name,
                                   icon: item.category.emoji,
-                                  percent: (item.totalAmount * 100 / totalSum).toStringAsFixed(2).toString(),
+                                  percent:
+                                      (item.totalAmount * 100 / totalSum)
+                                          .toStringAsFixed(2)
+                                          .toString(),
                                   totalSum: item.totalAmount.toString(),
-                                  lastTransaction: item.lastTransaction?.comment,
+                                  lastTransaction:
+                                      item.lastTransaction?.comment,
+                                  categoryId: item.category.id,
+                                  // onTapFunc: () {
+                                  //   Navigator.of(context).push(
+                                  //     MaterialPageRoute(
+                                  //       builder:
+                                  //           (context) =>
+                                  //               BlocProvider<TransactionCubit>(
+                                  //                 create:
+                                  //                     (context) =>
+                                  //                         TransactionCubit(),
+                                  //                 child: SelectedCategoryPage(
+                                  //                   isIncome: widget.isIncome,
+                                  //                   selectedCategory:
+                                  //                       item.category,
+                                  //                 ),
+                                  //               ),
+                                  //     ),
+                                  //   );
+                                  // },
+                                  onTapFunc: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => BlocProvider(
+                                              create:
+                                                  (context) =>
+                                                      DatePickerCubit(),
+                                              child: SelectedCategoryPage(
+                                                isIncome: widget.isIncome,
+                                                selectedCategory: item.category,
+                                              ),
+                                            ),
+                                      ),
+                                    );
+                                  },
                                 );
                               }
                             },

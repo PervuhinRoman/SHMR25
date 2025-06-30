@@ -8,6 +8,8 @@ class ItemAnalyzeCategory extends StatelessWidget {
   final String? lastTransaction;
   final String percent;
   final String totalSum;
+  final int categoryId;
+  final VoidCallback onTapFunc;
   const ItemAnalyzeCategory({
     super.key,
     required this.categoryTitle,
@@ -15,6 +17,8 @@ class ItemAnalyzeCategory extends StatelessWidget {
     this.lastTransaction,
     required this.percent,
     required this.totalSum,
+    required this.categoryId,
+    required this.onTapFunc,
   });
 
   @override
@@ -43,6 +47,7 @@ class ItemAnalyzeCategory extends StatelessWidget {
         ],
       ),
       trailing: Icon(Icons.arrow_forward_ios_rounded, size: 16, color: CustomAppTheme.figmaBgGrayColor,),
+      onTap: onTapFunc,
     );
   }
 }
