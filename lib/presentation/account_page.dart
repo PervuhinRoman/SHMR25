@@ -11,6 +11,9 @@ import 'package:shmr_finance/presentation/edit_account_page.dart';
 import 'package:shmr_finance/presentation/widgets/animated_balance_tile.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 
+import '../data/services/balance_visibility_service.dart';
+import '../domain/cubit/blur_cubit.dart';
+
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
 
@@ -23,6 +26,29 @@ class _AccountPageState extends State<AccountPage> {
   AccountResponse? _accountData;
   bool _isLoading = true;
   String? _error;
+
+  final BalanceVisibilityService _balanceVisibilityService = BalanceVisibilityService();
+  bool _isServiceInitialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isServiceInitialized) {
+      _initializeBalanceVisibilityService();
+      _isServiceInitialized = true;
+    }
+  }
+
+  Future<void> _initializeBalanceVisibilityService() async {
+    final blurCubit = context.read<BlurCubit>();
+    await _balanceVisibilityService.initialize(blurCubit);
+  }
+
+  @override
+  void dispose() {
+    _balanceVisibilityService.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {

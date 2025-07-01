@@ -72,28 +72,6 @@ class BaseScreen extends StatefulWidget {
 
 class _BaseScreenState extends State<BaseScreen> {
   int currentPageIndex = 0;
-  final BalanceVisibilityService _balanceVisibilityService = BalanceVisibilityService();
-  bool _isServiceInitialized = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_isServiceInitialized) {
-      _initializeBalanceVisibilityService();
-      _isServiceInitialized = true;
-    }
-  }
-
-  Future<void> _initializeBalanceVisibilityService() async {
-    final blurCubit = context.read<BlurCubit>();
-    await _balanceVisibilityService.initialize(blurCubit);
-  }
-
-  @override
-  void dispose() {
-    _balanceVisibilityService.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
