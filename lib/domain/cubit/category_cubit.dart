@@ -101,8 +101,8 @@ class CategoryCubit extends Cubit<CategoryState> {
       // Ищем по эмодзи (если пользователь ввел эмодзи)
       final emojiRatio = ratio(queryLower, category.emoji);
       
-      // Если хотя бы одно совпадение выше порога (60%), добавляем в результаты
-      if (nameRatio > 60 || emojiRatio > 60) {
+      // Если хотя бы одно совпадение выше порога (10%), добавляем в результаты
+      if (nameRatio > 10 || emojiRatio > 10) {
         results.add(category);
       }
     }
