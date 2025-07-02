@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -121,7 +123,7 @@ class AccountDeletePage extends StatelessWidget {
 
   void _deleteAccount(BuildContext context) {
     // TODO: Реализовать удаление счета через репозиторий
-    print('Удаление счета ${account.id}');
+    log('Удаление счета ${account.id}');
 
     // Показываем уведомление об успешном удалении
     ScaffoldMessenger.of(context).showSnackBar(

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -35,7 +37,6 @@ class _AnalyzePageState extends State<AnalyzePage> {
   @override
   Widget build(BuildContext context) {
     DatePickerCubit datePickerCubit = context.read<DatePickerCubit>();
-    TransactionCubit transactionCubit = context.read<TransactionCubit>();
 
     return BlocListener<DatePickerCubit, DatePickerState>(
       listener: (context, datePickerState) {
@@ -50,7 +51,6 @@ class _AnalyzePageState extends State<AnalyzePage> {
         builder: (context, datePickerState) {
           return BlocBuilder<TransactionCubit, TransactionState>(
             builder: (context, transactionState) {
-              // final categories = transactionState.transactionsCategories;
               final categories = transactionState.combineCategories;
 
               final totalSum = categories.fold<num>(
@@ -58,8 +58,9 @@ class _AnalyzePageState extends State<AnalyzePage> {
                 (sum, item) => sum + item.totalAmount,
               );
 
-              print(
-                "📃 Все категории из транзакций в виджете анализа: $categories",
+              log(
+                "📃 Все категории из транзакций в виджет анализа: $categories",
+                name: 'Category',
               );
               return Scaffold(
                 appBar: CustomAppBar(title: "Анализ", bgColor: Colors.white),
@@ -175,7 +176,10 @@ class _AnalyzePageState extends State<AnalyzePage> {
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [Text("Сумма"), Text("${totalSum} ₽")],
+                        children: [
+                          Text("Сумма"),
+                          Text("${totalSum} ₽"),
+                        ], // TODO: добавить форматирование
                       ),
                     ),
                     const Divider(

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,14 +16,14 @@ import 'package:shmr_finance/app_theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Небольшая задержка для стабильности инициализации
+  // Задержка для стабильности инициализации
   await Future.delayed(const Duration(milliseconds: 100));
   
   try {
     await SharedPreferences.getInstance(); // Инициализируем SharedPreferences
-    print('✅ SharedPreferences успешно инициализирован');
+    log('✅ SharedPreferences успешно инициализирован', time: DateTime.now(), name: 'SharedPrefs');
   } catch (e) {
-    print('❌ Ошибка инициализации SharedPreferences: $e');
+    log('❌ Ошибка инициализации SharedPreferences: $e', time: DateTime.now(), name: 'SharedPrefs');
   }
   
   runApp(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:shmr_finance/domain/cubit/account/blur_cubit.dart';
@@ -16,7 +17,7 @@ class BalanceVisibilityService {
   Future<void> initialize(BlurCubit blurCubit) async {
     _blurCubit = blurCubit;
     _startListening();
-    print('📱 BalanceVisibilityService инициализирован');
+    log('📱 BalanceVisibilityService инициализирован', name: 'Blur');
   }
 
   // Начало прослушивания сенсоров
@@ -45,7 +46,7 @@ class BalanceVisibilityService {
       // Вибрация для обратной связи
       HapticFeedback.mediumImpact();
 
-      print('🔄 Переключение видимости баланса через сенсор');
+      log('🔄 Переключение видимости баланса через сенсор', name: 'Blur');
     }
   }
 

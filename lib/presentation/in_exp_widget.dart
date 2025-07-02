@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -22,11 +24,12 @@ class _InExpWidgetState extends State<InExpWidget> {
   @override
   void initState() {
     super.initState();
-    print(
+    log(
       '🚀 InExpWidget initState вызван для ${widget.isIncome ? "доходов" : "расходов"}',
+      name: "InExpWidget",
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('🔄 InExpWidget: вызываю fetchTransactions');
+      log('🔄 InExpWidget: вызываю fetchTransactions', name: "InExpWidget");
       final transactionCubit = context.read<TransactionCubit>();
       transactionCubit.fetchTransactions(
         startDate: DateTime.now().copyWith(
@@ -41,13 +44,13 @@ class _InExpWidgetState extends State<InExpWidget> {
 
   @override
   void didUpdateWidget(covariant InExpWidget oldWidget) {
-    // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
-    print(
+    log(
       '🚀 InExpWidget didUpdateWidget вызван для ${widget.isIncome ? "доходов" : "расходов"}',
+      name: "InExpWidget",
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('🔄 InExpWidget: вызываю fetchTransactions');
+      log('🔄 InExpWidget: вызываю fetchTransactions', name: "InExpWidget");
       final transactionCubit = context.read<TransactionCubit>();
       transactionCubit.fetchTransactions(
         startDate: DateTime.now().copyWith(hour: 0, minute: 0),
@@ -93,17 +96,22 @@ class _InExpWidgetState extends State<InExpWidget> {
       ),
       body: BlocBuilder<TransactionCubit, TransactionState>(
         builder: (context, state) {
-          print(
+          log(
             '🔄 Состояние UI: ${state.status}, транзакций: ${state.transactions.length}, источник: ${state.dataSource}',
+            name: "InExpWidget",
           );
           final transactions = state.transactions;
-          print('📊 Транзакции для отображения: ${transactions.length}');
+          log(
+            '📊 Транзакции для отображения: ${transactions.length}',
+            name: "InExpWidget",
+          );
 
           // Проверяем первые несколько транзакций
           for (int i = 0; i < transactions.length && i < 3; i++) {
             final t = transactions[i];
-            print(
+            log(
               '📋 Транзакция $i: id=${t.id}, amount=${t.amount}, category=${t.category.name}, isIncome=${t.category.isIncome}',
+              name: "InExpWidget",
             );
           }
 
@@ -111,7 +119,7 @@ class _InExpWidgetState extends State<InExpWidget> {
             0,
             (sum, item) => sum + double.parse(item.amount),
           );
-          print('💰 Общая сумма: $totalSum');
+          log('💰 Общая сумма: $totalSum', name: "InExpWidget");
 
           return Column(
             children: [
@@ -178,23 +186,28 @@ class _InExpWidgetState extends State<InExpWidget> {
                 ),
               Expanded(
                 child: () {
-                  print(
+                  log(
                     '🎨 Рендеринг списка: статус=${state.status}, количество=${transactions.length}',
+                    name: "InExpWidget",
                   );
                   if (state.status == TransactionStatus.loading) {
-                    print('⏳ Показываю индикатор загрузки');
+                    log('⏳ Показываю индикатор загрузки', name: "InExpWidget");
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (state.status == TransactionStatus.error) {
-                    print('❌ Показываю ошибку: ${state.error}');
+                    log(
+                      '❌ Показываю ошибку: ${state.error}',
+                      name: "InExpWidget",
+                    );
                     return Center(child: Text('Ошибка: ${state.error}'));
                   }
                   if (transactions.isEmpty) {
-                    print('📭 Показываю "Нет данных"');
+                    log('📭 Показываю "Нет данных"', name: "InExpWidget");
                     return const Center(child: Text('Нет данных за период'));
                   } else {
-                    print(
+                    log(
                       '📋 Показываю список из ${transactions.length} транзакций',
+                      name: "InExpWidget",
                     );
                     return ListView.builder(
                       itemCount: transactions.length * 2 + 1,
@@ -211,9 +224,7 @@ class _InExpWidgetState extends State<InExpWidget> {
                             return const SizedBox.shrink();
                           }
                           final item = transactions[itemIndex];
-                          print(
-                            '🎯 Рендеринг элемента $itemIndex: ${item.category.name} - ${item.amount}',
-                          );
+
                           return InExpItem(
                             categoryTitle: item.category.name,
                             amount: item.amount,

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:shmr_finance/data/repositories/category_repo.dart';
 import 'package:shmr_finance/data/repositories/transaction_repo.dart';
 
@@ -36,14 +38,18 @@ class TransactionRepoImp implements TransactionRepository {
     ),
   ];
 
-  TransactionRepoImp(this._accountRepo, this._categoryRepo, [TransactionDatabase? transactionDatabase])
-      : _transactionDatabase = transactionDatabase ?? TransactionDatabase.instance;
+  TransactionRepoImp(
+    this._accountRepo,
+    this._categoryRepo, [
+    TransactionDatabase? transactionDatabase,
+  ]) : _transactionDatabase =
+           transactionDatabase ?? TransactionDatabase.instance;
 
   // Метод для получения категории по ID
   Future<Category> _getCategoryById(int categoryId) async {
     final categories = await _categoryRepo.getAllCategories();
     return categories.firstWhere(
-          (category) => category.id == categoryId,
+      (category) => category.id == categoryId,
       orElse: () => throw Exception('Category not found'),
     );
   }
@@ -69,7 +75,9 @@ class TransactionRepoImp implements TransactionRepository {
   }
 
   // Метод для преобразования Transaction в TransactionResponse
-  Future<TransactionResponse> _toTransactionResponse(Transaction transaction) async {
+  Future<TransactionResponse> _toTransactionResponse(
+    Transaction transaction,
+  ) async {
     final category = await _getCategoryById(transaction.categoryId);
     final account = await _getAccountBriefById(transaction.accountId);
 
@@ -87,12 +95,15 @@ class TransactionRepoImp implements TransactionRepository {
 
   @override
   Future<List<TransactionResponse>> getPeriodTransactionsByAccount(
-      int accountId, {
-        DateTime? startDate,
-        DateTime? endDate,
-      }) async {
+    int accountId, {
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
     try {
-      print('🌐 Выполняем сетевой запрос для аккаунта $accountId, период: ${startDate?.toIso8601String().substring(0, 10)} - ${endDate?.toIso8601String().substring(0, 10)}');
+      log(
+        '🌐 Выполняем сетевой запрос для аккаунта $accountId, период: ${startDate?.toIso8601String().substring(0, 10)} - ${endDate?.toIso8601String().substring(0, 10)}',
+        name: 'TransactionRepo',
+      );
       // TODO: Перенести работу DIO в Service
       final dio = Dio();
       final response = await dio.get(
@@ -102,17 +113,21 @@ class TransactionRepoImp implements TransactionRepository {
           'endDate': DateFormat('yyyy-MM-dd').format(endDate!),
         },
         options: Options(
-          headers: {
-            'Authorization': 'Bearer BpSpdGeoNdjhGmR79DByflxf',
-          },
+          headers: {'Authorization': 'Bearer BpSpdGeoNdjhGmR79DByflxf'},
         ),
       );
 
-      print('📡 Получен ответ от сервера: ${response.statusCode}');
+      log(
+        '📡 Получен ответ от сервера: ${response.statusCode}',
+        name: 'TransactionRepo',
+      );
 
       // Используем Freezed для десериализации
       final List<dynamic> rawData = response.data;
-      print('📊 Сырых данных получено: ${rawData.length}');
+      log(
+        '📊 Сырых данных получено: ${rawData.length}',
+        name: 'TransactionRepo',
+      );
       final List<TransactionResponse> responses = [];
 
       for (final item in rawData) {
@@ -120,7 +135,7 @@ class TransactionRepoImp implements TransactionRepository {
           if (item is Map<String, dynamic>) {
             // Используем автоматически сгенерированный fromJson
             final transactionResponse = TransactionResponse.fromJson(item);
-            
+
             // Проверяем, что транзакция принадлежит нужному аккаунту
             // TODO: убрать / изменить, когда будем работать с реальным аккаунтом
             if (transactionResponse.account.id == accountId) {
@@ -128,27 +143,58 @@ class TransactionRepoImp implements TransactionRepository {
             }
           }
         } catch (e) {
-          print('Error parsing transaction: $e');
+          log('Error parsing transaction: $e', name: 'TransactionRepo');
           continue;
         }
       }
 
-      print('📊 После парсинга: ${responses.length} транзакций');
+      log(
+        '📊 После парсинга: ${responses.length} транзакций',
+        name: 'TransactionRepo',
+      );
       // Фильтрация по датам
       var filteredResponses = responses;
-      final startOfDay = startDate.copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
-      filteredResponses = filteredResponses
-          .where((t) => t.transactionDate.isAtSameMomentAs(startOfDay) || t.transactionDate.isAfter(startOfDay))
-          .toList();
-      final endOfDay = endDate.copyWith(hour: 23, minute: 59, second: 59, millisecond: 999, microsecond: 999);
-      filteredResponses = filteredResponses
-          .where((t) => t.transactionDate.isAtSameMomentAs(endOfDay) || t.transactionDate.isBefore(endOfDay))
-          .toList();
+      final startOfDay = startDate.copyWith(
+        hour: 0,
+        minute: 0,
+        second: 0,
+        millisecond: 0,
+        microsecond: 0,
+      );
+      filteredResponses =
+          filteredResponses
+              .where(
+                (t) =>
+                    t.transactionDate.isAtSameMomentAs(startOfDay) ||
+                    t.transactionDate.isAfter(startOfDay),
+              )
+              .toList();
+      final endOfDay = endDate.copyWith(
+        hour: 23,
+        minute: 59,
+        second: 59,
+        millisecond: 999,
+        microsecond: 999,
+      );
+      filteredResponses =
+          filteredResponses
+              .where(
+                (t) =>
+                    t.transactionDate.isAtSameMomentAs(endOfDay) ||
+                    t.transactionDate.isBefore(endOfDay),
+              )
+              .toList();
 
-      print('📊 После фильтрации по датам: ${filteredResponses.length} транзакций');
+      log(
+        '📊 После фильтрации по датам: ${filteredResponses.length} транзакций',
+        name: 'TransactionRepo',
+      );
       return filteredResponses;
     } catch (e) {
-      print('❌ Error in getPeriodTransactionsByAccount: $e');
+      log(
+        '❌ Error in getPeriodTransactionsByAccount: $e',
+        name: 'TransactionRepo',
+      );
       // Возвращаем пустой список в случае ошибки
       return [];
     }
@@ -162,7 +208,9 @@ class TransactionRepoImp implements TransactionRepository {
   }
 
   @override
-  Future<TransactionResponse> createTransaction(TransactionRequest request) async {
+  Future<TransactionResponse> createTransaction(
+    TransactionRequest request,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 500));
     final newTransaction = Transaction(
       id: _transactions.length + 1,
@@ -180,10 +228,16 @@ class TransactionRepoImp implements TransactionRepository {
   }
 
   @override
-  Future<TransactionResponse> updateTransaction(int id, TransactionRequest request) async {
+  Future<TransactionResponse> updateTransaction(
+    int id,
+    TransactionRequest request,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 500));
     final index = _transactions.indexWhere((t) => t.id == id);
-    if (index == -1) throw Exception('Transaction not found'); // TODO: куда выкидывать ошибки потом...
+    if (index == -1)
+      throw Exception(
+        'Transaction not found',
+      ); // TODO: куда выкидывать ошибки потом...
 
     final updatedTransaction = Transaction(
       id: id,
@@ -208,7 +262,10 @@ class TransactionRepoImp implements TransactionRepository {
 
   // Локальное сохранение и получение транзакций за сегодня
   Future<void> saveTodayTransactions(List<Transaction> transactions) async {
-    print('💾 Сохранение транзакций за сегодня в кэш: ${transactions.length} транзакций');
+    log(
+      '💾 Сохранение транзакций за сегодня в кэш: ${transactions.length} транзакций',
+      name: 'TransactionRepo',
+    );
     await _transactionDatabase.clearTransactions();
     for (final t in transactions) {
       await _transactionDatabase.insertTransaction({
@@ -219,7 +276,10 @@ class TransactionRepoImp implements TransactionRepository {
         'note': t.comment ?? '',
       });
     }
-    print('✅ Транзакции за сегодня успешно сохранены в кэш');
+    log(
+      '✅ Транзакции за сегодня успешно сохранены в кэш',
+      name: 'TransactionRepo',
+    );
   }
 
   Future<List<TransactionResponse>> getTodayTransactions() async {
@@ -241,16 +301,18 @@ class TransactionRepoImp implements TransactionRepository {
       try {
         final category = await _getCategoryById(transaction.categoryId);
         final account = await _getAccountBriefById(transaction.accountId);
-        responses.add(TransactionResponse(
-          id: transaction.id,
-          account: account,
-          category: category,
-          amount: transaction.amount,
-          transactionDate: transaction.transactionDate,
-          comment: transaction.comment,
-          createdAt: transaction.createdAt,
-          updatedAt: transaction.updatedAt,
-        ));
+        responses.add(
+          TransactionResponse(
+            id: transaction.id,
+            account: account,
+            category: category,
+            amount: transaction.amount,
+            transactionDate: transaction.transactionDate,
+            comment: transaction.comment,
+            createdAt: transaction.createdAt,
+            updatedAt: transaction.updatedAt,
+          ),
+        );
       } catch (_) {
         continue;
       }
@@ -258,32 +320,60 @@ class TransactionRepoImp implements TransactionRepository {
     return responses;
   }
 
-  Future<void> saveTransactionsForPeriod(List<TransactionResponse> transactions, DateTime startDate, DateTime endDate) async {
-    print('💾 Сохранение транзакций за период ${startDate.toIso8601String().substring(0, 10)} - ${endDate.toIso8601String().substring(0, 10)} в кэш: ${transactions.length} транзакций');
+  Future<void> saveTransactionsForPeriod(
+    List<TransactionResponse> transactions,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    log(
+      '💾 Сохранение транзакций за период ${startDate.toIso8601String().substring(0, 10)} - ${endDate.toIso8601String().substring(0, 10)} в кэш: ${transactions.length} транзакций',
+      name: 'TransactionRepo',
+    );
     final startDateStr = startDate.toIso8601String().substring(0, 10);
     final endDateStr = endDate.toIso8601String().substring(0, 10);
-    final maps = transactions.map((t) => {
-      'id': t.id.toString(),
-      'amount': double.tryParse(t.amount) ?? 0.0,
-      'category': t.category.id.toString(),
-      'date': t.transactionDate.toIso8601String().substring(0, 10),
-      'note': t.comment ?? '',
-    }).toList();
-    await _transactionDatabase.saveTransactionsForPeriod(maps, startDateStr, endDateStr);
-    print('✅ Транзакции за период успешно сохранены в кэш');
+    final maps =
+        transactions
+            .map(
+              (t) => {
+                'id': t.id.toString(),
+                'amount': double.tryParse(t.amount) ?? 0.0,
+                'category': t.category.id.toString(),
+                'date': t.transactionDate.toIso8601String().substring(0, 10),
+                'note': t.comment ?? '',
+              },
+            )
+            .toList();
+    await _transactionDatabase.saveTransactionsForPeriod(
+      maps,
+      startDateStr,
+      endDateStr,
+    );
+    log(
+      '✅ Транзакции за период успешно сохранены в кэш',
+      name: 'TransactionRepo',
+    );
   }
 
-  Future<List<TransactionResponse>> getTransactionsForPeriod(DateTime startDate, DateTime endDate) async {
+  Future<List<TransactionResponse>> getTransactionsForPeriod(
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
     final startDateStr = startDate.toIso8601String().substring(0, 10);
     final endDateStr = endDate.toIso8601String().substring(0, 10);
-    final maps = await _transactionDatabase.getTransactionsByPeriod(startDateStr, endDateStr);
-    print('📊 getTransactionsForPeriod: получено из БД ${maps.length} записей');
-    
+    final maps = await _transactionDatabase.getTransactionsByPeriod(
+      startDateStr,
+      endDateStr,
+    );
+    log(
+      '📊 getTransactionsForPeriod: получено из БД ${maps.length} записей',
+      name: 'TransactionRepo',
+    );
+
     final List<TransactionResponse> responses = [];
     for (int i = 0; i < maps.length; i++) {
       final map = maps[i];
-      print('📊 Обрабатываю запись $i: $map');
-      
+      log('📊 Обрабатываю запись $i: $map', name: 'TransactionRepo');
+
       final transaction = Transaction(
         id: int.tryParse(map['id'].toString()) ?? 0,
         accountId: 0, // Можно доработать, если нужно
@@ -294,16 +384,25 @@ class TransactionRepoImp implements TransactionRepository {
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
-      
-      print('📊 Восстановлена из кэша транзакция: id=${transaction.id}, categoryId=${transaction.categoryId}, amount=${transaction.amount}');
-      
+
+      log(
+        '📊 Восстановлена из кэша транзакция: id=${transaction.id}, categoryId=${transaction.categoryId}, amount=${transaction.amount}',
+        name: 'TransactionRepo',
+      );
+
       try {
         final category = await _getCategoryById(transaction.categoryId);
-        print('📊 Получена категория: id=${category.id}, name=${category.name}, isIncome=${category.isIncome}');
-        
+        log(
+          '📊 Получена категория: id=${category.id}, name=${category.name}, isIncome=${category.isIncome}',
+          name: 'TransactionRepo',
+        );
+
         final account = await _getAccountBriefById(transaction.accountId);
-        print('📊 Получен аккаунт: id=${account.id}, name=${account.name}');
-        
+        log(
+          '📊 Получен аккаунт: id=${account.id}, name=${account.name}',
+          name: 'TransactionRepo',
+        );
+
         final response = TransactionResponse(
           id: transaction.id,
           account: account,
@@ -314,16 +413,22 @@ class TransactionRepoImp implements TransactionRepository {
           createdAt: transaction.createdAt,
           updatedAt: transaction.updatedAt,
         );
-        
-        print('📊 Создан TransactionResponse: id=${response.id}, category=${response.category.name}, isIncome=${response.category.isIncome}');
+
+        log(
+          '📊 Создан TransactionResponse: id=${response.id}, category=${response.category.name}, isIncome=${response.category.isIncome}',
+          name: 'TransactionRepo',
+        );
         responses.add(response);
       } catch (e) {
-        print('❌ Ошибка при обработке записи $i: $e');
+        log('❌ Ошибка при обработке записи $i: $e', name: 'TransactionRepo');
         continue;
       }
     }
-    
-    print('📊 getTransactionsForPeriod: итого создано ${responses.length} TransactionResponse');
+
+    log(
+      '📊 getTransactionsForPeriod: итого создано ${responses.length} TransactionResponse',
+      name: 'TransactionRepo',
+    );
     return responses;
   }
 }

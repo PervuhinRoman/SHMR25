@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
@@ -25,11 +27,14 @@ class _SelectedCategoryPageState extends State<SelectedCategoryPage> {
   @override
   void initState() {
     super.initState();
-    print(
+    log(
       '🚀 SelectedCategoryPage initState вызван для ${widget.isIncome ? "доходов" : "расходов"}',
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('🔄 SelectedCategoryPage: вызываю fetchTransactions');
+      log(
+        '🔄 SelectedCategoryPage: вызываю fetchTransactions',
+        name: 'SelectedCategoryPage',
+      );
       final transactionCubit = context.read<TransactionCubit>();
       final datePickerCubit = context.read<DatePickerCubit>();
 
@@ -55,7 +60,7 @@ class _SelectedCategoryPageState extends State<SelectedCategoryPage> {
                   .where((t) => t.category.id == widget.selectedCategory.id)
                   .toList();
 
-          print(transactions);
+          log("$transactions", name: 'SelectedCategoryPage');
           return Column(
             children: [
               Expanded(

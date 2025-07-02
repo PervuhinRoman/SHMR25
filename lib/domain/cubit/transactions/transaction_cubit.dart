@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart' show Cubit;
 import 'package:shmr_finance/domain/cubit/transactions/sort_type_cubit.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -22,19 +24,20 @@ class TransactionCubit extends Cubit<TransactionState> {
     DateTime? endDate,
     required bool isIncome,
   }) async {
-    print(
+    log(
       '🎯 fetchTransactions вызван: isIncome=$isIncome, startDate=$startDate, endDate=$endDate',
+      name: 'Transaction',
     );
     // Проверка наличия соединения с интернетом
     final connectivityResult = await Connectivity().checkConnectivity();
     final hasInternet = connectivityResult != ConnectivityResult.none;
     if (!hasInternet) {
-      print('🌐 Интернет недоступен, загружаем из кэша');
+      log('🌐 Интернет недоступен, загружаем из кэша', name: 'Transaction');
       await fetchLocalTransactionsForPeriod(startDate, endDate, isIncome);
       return;
     }
 
-    print('🌐 Интернет доступен, загружаем из сети');
+    log('🌐 Интернет доступен, загружаем из сети', name: 'Transaction');
 
     try {
       final AccountRepoImp accountRepo = AccountRepoImp();
@@ -44,20 +47,24 @@ class TransactionCubit extends Cubit<TransactionState> {
         categoryRepo,
       );
 
-      print('📡 Выполняем сетевой запрос...');
+      log('📡 Выполняем сетевой запрос...', name: 'Transaction');
       final List<TransactionResponse> rawResponses = await transactionRepo
           .getPeriodTransactionsByAccount(
             1, // TODO: захардкоженный аккаунт
             startDate: startDate,
             endDate: endDate,
           );
-      print('📡 Получено из сети: ${rawResponses.length} транзакций');
+      log(
+        '📡 Получено из сети: ${rawResponses.length} транзакций',
+        name: 'Transaction',
+      );
 
       // Проверяем первые три транзакции перед фильтрацией
       for (int i = 0; i < rawResponses.length && i < 3; i++) {
         final response = rawResponses[i];
-        print(
+        log(
           '📊 Транзакция $i: id=${response.id}, amount=${response.amount}, category=${response.category.name}, isIncome=${response.category.isIncome}',
+          name: 'Transaction',
         );
       }
 
@@ -65,8 +72,9 @@ class TransactionCubit extends Cubit<TransactionState> {
           rawResponses
               .where((response) => response.category.isIncome == isIncome)
               .toList();
-      print(
+      log(
         '📡 Отфильтровано по isIncome=$isIncome: ${responses.length} транзакций',
+        name: 'Transaction',
       );
 
       // Сохраняем транзакции в локальное хранилище за период
@@ -102,8 +110,9 @@ class TransactionCubit extends Cubit<TransactionState> {
                 .toList();
         await transactionRepo.saveTodayTransactions(todayTransactions);
       }
-      print(
+      log(
         '✅ Эмитим состояние: ${responses.length} транзакций, статус: loaded, источник: network',
+        name: 'Transaction',
       );
       if (!isClosed) {
         emit(
@@ -117,7 +126,7 @@ class TransactionCubit extends Cubit<TransactionState> {
         _updateCategoriesFromTransactions();
       }
     } catch (e) {
-      print('❌ Ошибка при загрузке из сети: $e');
+      log('❌ Ошибка при загрузке из сети: $e', name: 'Transaction');
       if (!isClosed) {
         emit(
           state.copyWith(error: e.toString(), status: TransactionStatus.error),
@@ -127,7 +136,7 @@ class TransactionCubit extends Cubit<TransactionState> {
   }
 
   Future<void> fetchLocalTransactions() async {
-    print('📱 Загрузка локальных транзакций за сегодня');
+    log('📱 Загрузка локальных транзакций за сегодня', name: 'Transaction');
     try {
       final AccountRepoImp accountRepo = AccountRepoImp();
       final CategoryRepoImpl categoryRepo = CategoryRepoImpl();
@@ -136,7 +145,10 @@ class TransactionCubit extends Cubit<TransactionState> {
         categoryRepo,
       );
       final responses = await transactionRepo.getTodayTransactions();
-      print('📱 Загружено из кэша за сегодня: ${responses.length} транзакций');
+      log(
+        '📱 Загружено из кэша за сегодня: ${responses.length} транзакций',
+        name: 'Transaction',
+      );
       if (!isClosed) {
         emit(
           state.copyWith(
@@ -148,7 +160,7 @@ class TransactionCubit extends Cubit<TransactionState> {
         _updateCategoriesFromTransactions();
       }
     } catch (e) {
-      print('❌ Ошибка при загрузке из кэша: $e');
+      log('❌ Ошибка при загрузке из кэша: $e', name: 'Transaction');
       if (!isClosed) {
         emit(
           state.copyWith(
@@ -167,12 +179,16 @@ class TransactionCubit extends Cubit<TransactionState> {
     bool isIncome,
   ) async {
     if (startDate == null || endDate == null) {
-      print('📱 Загрузка локальных транзакций за сегодня (fallback)');
+      log(
+        '📱 Загрузка локальных транзакций за сегодня (fallback)',
+        name: 'Transaction',
+      );
       await fetchLocalTransactions();
       return;
     }
-    print(
+    log(
       '📱 Загрузка локальных транзакций за период ${startDate.toIso8601String().substring(0, 10)} - ${endDate.toIso8601String().substring(0, 10)}',
+      name: 'Transaction',
     );
     try {
       final AccountRepoImp accountRepo = AccountRepoImp();
@@ -185,13 +201,17 @@ class TransactionCubit extends Cubit<TransactionState> {
         startDate,
         endDate,
       );
-      print('📱 Загружено из кэша за период: ${responses.length} транзакций');
+      log(
+        '📱 Загружено из кэша за период: ${responses.length} транзакций',
+        name: 'Transaction',
+      );
 
       // Проверяем данные перед фильтрацией
       for (int i = 0; i < responses.length && i < 3; i++) {
         final response = responses[i];
-        print(
+        log(
           '📊 Кэш транзакция $i: id=${response.id}, amount=${response.amount}, category=${response.category.name}, isIncome=${response.category.isIncome}',
+          name: 'Transaction',
         );
       }
 
@@ -199,15 +219,17 @@ class TransactionCubit extends Cubit<TransactionState> {
           responses
               .where((response) => response.category.isIncome == isIncome)
               .toList();
-      print(
+      log(
         '📱 Отфильтровано по isIncome=$isIncome: ${filteredResponses.length} транзакций',
+        name: 'Transaction',
       );
 
       // Проверяем отфильтрованные данные
       for (int i = 0; i < filteredResponses.length && i < 3; i++) {
         final response = filteredResponses[i];
-        print(
+        log(
           '✅ Отфильтрованная транзакция $i: id=${response.id}, amount=${response.amount}, category=${response.category.name}, isIncome=${response.category.isIncome}',
+          name: 'Transaction',
         );
       }
 
@@ -223,7 +245,7 @@ class TransactionCubit extends Cubit<TransactionState> {
         _updateCategoriesFromTransactions();
       }
     } catch (e) {
-      print('❌ Ошибка при загрузке из кэша за период: $e');
+      log('❌ Ошибка при загрузке из кэша за период: $e', name: 'Transaction');
       if (!isClosed) {
         emit(
           state.copyWith(

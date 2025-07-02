@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -16,11 +18,7 @@ class TransactionDatabase {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _createDB,
-    );
+    return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
   Future _createDB(Database db, int version) async {
@@ -37,7 +35,11 @@ class TransactionDatabase {
 
   Future<void> insertTransaction(Map<String, dynamic> json) async {
     final db = await instance.database;
-    await db.insert('transactions', json, conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert(
+      'transactions',
+      json,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<List<Map<String, dynamic>>> getTransactionsByDate(String date) async {
@@ -47,24 +49,37 @@ class TransactionDatabase {
       where: 'date = ?',
       whereArgs: [date],
     );
-    print('📖 Загружено из кэша за дату $date: ${result.length} транзакций');
+    log(
+      '📖 Загружено из кэша за дату $date: ${result.length} транзакций',
+      time: DateTime.now(),
+    );
     return result;
   }
 
-  Future<List<Map<String, dynamic>>> getTransactionsByPeriod(String startDate, String endDate) async {
+  Future<List<Map<String, dynamic>>> getTransactionsByPeriod(
+    String startDate,
+    String endDate,
+  ) async {
     final db = await instance.database;
     final result = await db.query(
       'transactions',
       where: 'date BETWEEN ? AND ?',
       whereArgs: [startDate, endDate],
     );
-    print('📖 Загружено из кэша за период $startDate - $endDate: ${result.length} транзакций');
+    log(
+      '📖 Загружено из кэша за период $startDate - $endDate: ${result.length} транзакций',
+      name: "TransactionDatabase",
+    );
     return result;
   }
 
-  Future<void> saveTransactionsForPeriod(List<Map<String, dynamic>> transactions, String startDate, String endDate) async {
+  Future<void> saveTransactionsForPeriod(
+    List<Map<String, dynamic>> transactions,
+    String startDate,
+    String endDate,
+  ) async {
     final db = await instance.database;
-    print('🗑️ Удаление старых транзакций за период $startDate - $endDate');
+    log('🗑️ Удаление старых транзакций за период $startDate - $endDate');
     // Удаляем старые транзакции за этот период
     await db.delete(
       'transactions',
@@ -73,9 +88,15 @@ class TransactionDatabase {
     );
     // Вставляем новые
     for (final transaction in transactions) {
-      await db.insert('transactions', transaction, conflictAlgorithm: ConflictAlgorithm.replace);
+      await db.insert(
+        'transactions',
+        transaction,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
-    print('💾 Сохранено в кэш за период $startDate - $endDate: ${transactions.length} транзакций');
+    log(
+      '💾 Сохранено в кэш за период $startDate - $endDate: ${transactions.length} транзакций',
+    );
   }
 
   Future<void> clearTransactions() async {
@@ -89,4 +110,4 @@ class TransactionDatabase {
       await db.close();
     }
   }
-} 
+}
