@@ -4,9 +4,9 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:shmr_finance/domain/models/category/category.dart';
 import 'package:shmr_finance/domain/models/category/combine_category.dart';
 
-import 'package:shmr_finance/data/repositories/account_repo_imp.dart';
-import 'package:shmr_finance/data/repositories/category_repo_imp.dart';
-import 'package:shmr_finance/data/repositories/transaction_repo_imp.dart';
+import 'package:shmr_finance/data/repositories/account_repo_impl.dart';
+import 'package:shmr_finance/data/repositories/category_repo_impl.dart';
+import 'package:shmr_finance/data/repositories/transaction_repo_impl.dart';
 import 'package:shmr_finance/domain/models/transaction/transaction.dart';
 
 part 'transaction_state.dart';

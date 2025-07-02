@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shmr_finance/app_theme.dart';
-import 'package:shmr_finance/data/repositories/account_repo_imp.dart';
+import 'package:shmr_finance/data/repositories/account_repo_impl.dart';
 import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
 import 'package:shmr_finance/domain/models/account/account.dart';
 import 'package:shmr_finance/domain/models/currency/currency.dart';
