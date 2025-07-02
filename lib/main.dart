@@ -12,20 +12,36 @@ import 'package:shmr_finance/presentation/categories_page.dart';
 import 'package:shmr_finance/presentation/in_exp_widget.dart';
 import 'package:shmr_finance/presentation/settings_page.dart';
 import 'package:shmr_finance/app_theme.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
+  // Устанавливаем цвета для статус бара и навигационной панели
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      systemNavigationBarColor: CustomAppTheme.figmaNavBarColor,
+      statusBarColor: CustomAppTheme.figmaMainColor,
+    ),
+  );
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Задержка для стабильности инициализации
   await Future.delayed(const Duration(milliseconds: 100));
-  
+
   try {
     await SharedPreferences.getInstance(); // Инициализируем SharedPreferences
-    log('✅ SharedPreferences успешно инициализирован', time: DateTime.now(), name: 'SharedPrefs');
+    log(
+      '✅ SharedPreferences успешно инициализирован',
+      time: DateTime.now(),
+      name: 'SharedPrefs',
+    );
   } catch (e) {
-    log('❌ Ошибка инициализации SharedPreferences: $e', time: DateTime.now(), name: 'SharedPrefs');
+    log(
+      '❌ Ошибка инициализации SharedPreferences: $e',
+      time: DateTime.now(),
+      name: 'SharedPrefs',
+    );
   }
-  
+
   runApp(
     MultiBlocProvider(
       providers: [
@@ -44,22 +60,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        useMaterial3: true,
-        textTheme: TextTheme(bodyMedium: TextStyle(fontSize: 16)),
-        colorScheme: ColorScheme.light(primary: CustomAppTheme.figmaMainColor),
-        appBarTheme: AppBarTheme(
-          backgroundColor: CustomAppTheme.figmaMainColor,
+    return SafeArea(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          useMaterial3: true,
+          textTheme: TextTheme(bodyMedium: TextStyle(fontSize: 16)),
+          colorScheme: ColorScheme.light(
+            primary: CustomAppTheme.figmaMainColor,
+          ),
+          appBarTheme: AppBarTheme(
+            backgroundColor: CustomAppTheme.figmaMainColor,
+          ),
+          navigationBarTheme: NavigationBarThemeData(
+            indicatorColor: CustomAppTheme.figmaMainLightColor,
+            backgroundColor: CustomAppTheme.figmaNavBarColor,
+          ),
         ),
-        navigationBarTheme: NavigationBarThemeData(
-          indicatorColor: CustomAppTheme.figmaMainLightColor,
-          backgroundColor: CustomAppTheme.figmaNavBarColor,
-        ),
+        home: const BaseScreen(),
       ),
-      home: const BaseScreen(),
     );
   }
 }
