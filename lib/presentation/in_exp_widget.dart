@@ -138,7 +138,7 @@ class _InExpWidgetState extends State<InExpWidget> {
                       child: Padding(
                         padding: const EdgeInsets.only(right: 16),
                         child: Text(
-                          "${NumberFormat("0.00").format(totalSum)} ₽",
+                          "${NumberFormat('#,##0.00', 'ru_RU').format(totalSum)} ₽",
                           textAlign: TextAlign.end,
                         ),
                       ),

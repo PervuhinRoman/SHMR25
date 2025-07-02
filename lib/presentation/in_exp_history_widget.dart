@@ -298,7 +298,7 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                               child: Padding(
                                 padding: const EdgeInsets.only(right: 16),
                                 child: Text(
-                                  "$totalSum ₽", // TODO: добавить форматирование вывода суммы по разрядам и кол-во символов после точки
+                                  "${NumberFormat('#,##0.00', 'ru_RU').format(totalSum)} ₽",
                                   textAlign: TextAlign.end,
                                 ),
                               ),

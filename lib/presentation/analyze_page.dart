@@ -178,8 +178,10 @@ class _AnalyzePageState extends State<AnalyzePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text("Сумма"),
-                          Text("${totalSum} ₽"),
-                        ], // TODO: добавить форматирование
+                          Text(
+                            "${NumberFormat('#,##0.00', 'ru_RU').format(totalSum)} ₽",
+                          ),
+                        ],
                       ),
                     ),
                     const Divider(
@@ -233,24 +235,6 @@ class _AnalyzePageState extends State<AnalyzePage> {
                                   lastTransaction:
                                       item.lastTransaction?.comment,
                                   categoryId: item.category.id,
-                                  // onTapFunc: () {
-                                  //   Navigator.of(context).push(
-                                  //     MaterialPageRoute(
-                                  //       builder:
-                                  //           (context) =>
-                                  //               BlocProvider<TransactionCubit>(
-                                  //                 create:
-                                  //                     (context) =>
-                                  //                         TransactionCubit(),
-                                  //                 child: SelectedCategoryPage(
-                                  //                   isIncome: widget.isIncome,
-                                  //                   selectedCategory:
-                                  //                       item.category,
-                                  //                 ),
-                                  //               ),
-                                  //     ),
-                                  //   );
-                                  // },
                                   onTapFunc: () {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(

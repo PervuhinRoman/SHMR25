@@ -234,10 +234,6 @@ class TransactionRepoImp implements TransactionRepository {
   ) async {
     await Future.delayed(const Duration(milliseconds: 500));
     final index = _transactions.indexWhere((t) => t.id == id);
-    if (index == -1)
-      throw Exception(
-        'Transaction not found',
-      ); // TODO: куда выкидывать ошибки потом...
 
     final updatedTransaction = Transaction(
       id: id,

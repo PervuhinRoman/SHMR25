@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-import '../../app_theme.dart';
+import 'package:shmr_finance/app_theme.dart';
 
 class ItemAnalyzeCategory extends StatelessWidget {
   final String categoryTitle;
@@ -36,7 +37,9 @@ class ItemAnalyzeCategory extends StatelessWidget {
               color: CustomAppTheme.figmaDarkGrayColor,
             ),
           ),
-          Text("${totalSum} ₽"), // TODO: добавить форматирование
+          Text(
+            "${NumberFormat('#,##0.00', 'ru_RU').format(double.tryParse(totalSum))} ₽",
+          ),
         ],
       ),
       title: Row(
@@ -46,7 +49,11 @@ class ItemAnalyzeCategory extends StatelessWidget {
           Text("$percent%"),
         ],
       ),
-      trailing: Icon(Icons.arrow_forward_ios_rounded, size: 16, color: CustomAppTheme.figmaBgGrayColor,),
+      trailing: Icon(
+        Icons.arrow_forward_ios_rounded,
+        size: 16,
+        color: CustomAppTheme.figmaBgGrayColor,
+      ),
       onTap: onTapFunc,
     );
   }
