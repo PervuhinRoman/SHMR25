@@ -4,10 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
 
-import '../app_theme.dart';
-import '../domain/cubit/datepicker_cubit.dart';
-import '../domain/cubit/sort_type_cubit.dart';
-import '../domain/cubit/transaction_cubit.dart';
+import 'package:shmr_finance/app_theme.dart';
+import 'package:shmr_finance/domain/cubit/transactions/datepicker_cubit.dart';
+import 'package:shmr_finance/domain/cubit/transactions/sort_type_cubit.dart';
+import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
 import 'in_exp_history_widget.dart';
 
 class InExpWidget extends StatefulWidget {
@@ -22,12 +22,17 @@ class _InExpWidgetState extends State<InExpWidget> {
   @override
   void initState() {
     super.initState();
-    print('🚀 InExpWidget initState вызван для ${widget.isIncome ? "доходов" : "расходов"}');
+    print(
+      '🚀 InExpWidget initState вызван для ${widget.isIncome ? "доходов" : "расходов"}',
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       print('🔄 InExpWidget: вызываю fetchTransactions');
       final transactionCubit = context.read<TransactionCubit>();
       transactionCubit.fetchTransactions(
-        startDate: DateTime.now().copyWith(hour: 0, minute: 0),
+        startDate: DateTime.now().copyWith(
+          hour: 0,
+          minute: 0,
+        ), // TODO: Избыточна ли данная передача? (далее есть проверка)
         endDate: DateTime.now().copyWith(hour: 23, minute: 59),
         isIncome: widget.isIncome,
       );
@@ -38,7 +43,9 @@ class _InExpWidgetState extends State<InExpWidget> {
   void didUpdateWidget(covariant InExpWidget oldWidget) {
     // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
-    print('🚀 InExpWidget didUpdateWidget вызван для ${widget.isIncome ? "доходов" : "расходов"}');
+    print(
+      '🚀 InExpWidget didUpdateWidget вызван для ${widget.isIncome ? "доходов" : "расходов"}',
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       print('🔄 InExpWidget: вызываю fetchTransactions');
       final transactionCubit = context.read<TransactionCubit>();
@@ -86,22 +93,26 @@ class _InExpWidgetState extends State<InExpWidget> {
       ),
       body: BlocBuilder<TransactionCubit, TransactionState>(
         builder: (context, state) {
-          print('🔄 Состояние UI: ${state.status}, транзакций: ${state.transactions.length}, источник: ${state.dataSource}');
+          print(
+            '🔄 Состояние UI: ${state.status}, транзакций: ${state.transactions.length}, источник: ${state.dataSource}',
+          );
           final transactions = state.transactions;
           print('📊 Транзакции для отображения: ${transactions.length}');
-          
+
           // Проверяем первые несколько транзакций
           for (int i = 0; i < transactions.length && i < 3; i++) {
             final t = transactions[i];
-            print('📋 Транзакция $i: id=${t.id}, amount=${t.amount}, category=${t.category.name}, isIncome=${t.category.isIncome}');
+            print(
+              '📋 Транзакция $i: id=${t.id}, amount=${t.amount}, category=${t.category.name}, isIncome=${t.category.isIncome}',
+            );
           }
-          
+
           final totalSum = transactions.fold<num>(
             0,
             (sum, item) => sum + double.parse(item.amount),
           );
           print('💰 Общая сумма: $totalSum');
-          
+
           return Column(
             children: [
               Container(
@@ -129,31 +140,37 @@ class _InExpWidgetState extends State<InExpWidget> {
               ),
               if (state.dataSource != null)
                 Container(
-                  color: state.dataSource == DataSource.cache 
-                      ? Colors.orange.withValues(alpha: 0.1) 
-                      : Colors.green.withValues(alpha: 0.1),
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  color:
+                      state.dataSource == DataSource.cache
+                          ? Colors.orange.withValues(alpha: 0.1)
+                          : Colors.green.withValues(alpha: 0.1),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 16,
+                  ),
                   child: Row(
                     children: [
                       Icon(
-                        state.dataSource == DataSource.cache 
-                            ? Icons.storage 
+                        state.dataSource == DataSource.cache
+                            ? Icons.storage
                             : Icons.cloud_download,
                         size: 16,
-                        color: state.dataSource == DataSource.cache 
-                            ? Colors.orange 
-                            : Colors.green,
+                        color:
+                            state.dataSource == DataSource.cache
+                                ? Colors.orange
+                                : Colors.green,
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        state.dataSource == DataSource.cache 
-                            ? "Данные из кэша" 
+                        state.dataSource == DataSource.cache
+                            ? "Данные из кэша"
                             : "Данные из сети",
                         style: TextStyle(
                           fontSize: 12,
-                          color: state.dataSource == DataSource.cache 
-                              ? Colors.orange 
-                              : Colors.green,
+                          color:
+                              state.dataSource == DataSource.cache
+                                  ? Colors.orange
+                                  : Colors.green,
                         ),
                       ),
                     ],
@@ -161,7 +178,9 @@ class _InExpWidgetState extends State<InExpWidget> {
                 ),
               Expanded(
                 child: () {
-                  print('🎨 Рендеринг списка: статус=${state.status}, количество=${transactions.length}');
+                  print(
+                    '🎨 Рендеринг списка: статус=${state.status}, количество=${transactions.length}',
+                  );
                   if (state.status == TransactionStatus.loading) {
                     print('⏳ Показываю индикатор загрузки');
                     return const Center(child: CircularProgressIndicator());
@@ -174,7 +193,9 @@ class _InExpWidgetState extends State<InExpWidget> {
                     print('📭 Показываю "Нет данных"');
                     return const Center(child: Text('Нет данных за период'));
                   } else {
-                    print('📋 Показываю список из ${transactions.length} транзакций');
+                    print(
+                      '📋 Показываю список из ${transactions.length} транзакций',
+                    );
                     return ListView.builder(
                       itemCount: transactions.length * 2 + 1,
                       itemBuilder: (context, index) {
@@ -190,7 +211,9 @@ class _InExpWidgetState extends State<InExpWidget> {
                             return const SizedBox.shrink();
                           }
                           final item = transactions[itemIndex];
-                          print('🎯 Рендеринг элемента $itemIndex: ${item.category.name} - ${item.amount}');
+                          print(
+                            '🎯 Рендеринг элемента $itemIndex: ${item.category.name} - ${item.amount}',
+                          );
                           return InExpItem(
                             categoryTitle: item.category.name,
                             amount: item.amount,

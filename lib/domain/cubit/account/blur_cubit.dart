@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'blur_state.dart';
+part 'blur_state.dart';
 
 class BlurCubit extends Cubit<BlurState> {
   static const String _balanceVisibleKey = 'balance_visible';

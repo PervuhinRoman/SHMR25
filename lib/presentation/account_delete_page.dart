@@ -6,7 +6,7 @@ import 'package:shmr_finance/domain/models/account/account.dart';
 import 'package:shmr_finance/presentation/widgets/animated_balance_tile.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 
-import '../domain/cubit/account_cubit.dart';
+import '../domain/cubit/account/account_cubit.dart';
 
 class AccountDeletePage extends StatelessWidget {
   final AccountResponse account;

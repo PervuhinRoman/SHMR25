@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shmr_finance/app_theme.dart';
-import 'package:shmr_finance/domain/cubit/account_cubit.dart';
+import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 
 class EditAccountPage extends StatefulWidget {

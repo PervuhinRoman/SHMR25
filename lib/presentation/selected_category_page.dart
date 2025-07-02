@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
 
-import '../app_theme.dart';
-import '../domain/cubit/datepicker_cubit.dart';
-import '../domain/cubit/transaction_cubit.dart';
-import '../domain/models/category/category.dart';
+import 'package:shmr_finance/app_theme.dart';
+import 'package:shmr_finance/domain/cubit/transactions/datepicker_cubit.dart';
+import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
+import 'package:shmr_finance/domain/models/category/category.dart';
 
 class SelectedCategoryPage extends StatefulWidget {
   final Category selectedCategory;

@@ -3,9 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shmr_finance/app_theme.dart';
-import 'package:shmr_finance/domain/cubit/blur_cubit.dart';
-
-import '../../domain/cubit/blur_state.dart';
+import 'package:shmr_finance/domain/cubit/account/blur_cubit.dart';
 
 class AnimatedBalanceTile extends StatefulWidget {
   final String icon;

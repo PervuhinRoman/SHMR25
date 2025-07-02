@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'package:shmr_finance/domain/cubit/blur_cubit.dart';
+import 'package:shmr_finance/domain/cubit/account/blur_cubit.dart';
 
 class BalanceVisibilityService {
   static const double threshold = 5.0;

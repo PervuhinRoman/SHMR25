@@ -2,7 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:shmr_finance/data/repositories/category_repo_imp.dart';
 import 'package:shmr_finance/domain/models/category/category.dart';
-import 'category_state.dart';
+
+part 'category_state.dart';
 
 class CategoryCubit extends Cubit<CategoryState> {
   final CategoryRepoImpl _categoryRepo = CategoryRepoImpl();

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shmr_finance/app_theme.dart';
-import 'package:shmr_finance/domain/cubit/category_cubit.dart';
-import 'package:shmr_finance/domain/cubit/category_state.dart';
+import 'package:shmr_finance/domain/cubit/categories/category_cubit.dart';
 import 'package:shmr_finance/presentation/widgets/item_category.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 

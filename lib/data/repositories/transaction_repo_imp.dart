@@ -92,7 +92,7 @@ class TransactionRepoImp implements TransactionRepository {
         DateTime? endDate,
       }) async {
     try {
-      print('🌐 Выполняю сетевой запрос для аккаунта $accountId, период: ${startDate?.toIso8601String().substring(0, 10)} - ${endDate?.toIso8601String().substring(0, 10)}');
+      print('🌐 Выполняем сетевой запрос для аккаунта $accountId, период: ${startDate?.toIso8601String().substring(0, 10)} - ${endDate?.toIso8601String().substring(0, 10)}');
       // TODO: Перенести работу DIO в Service
       final dio = Dio();
       final response = await dio.get(
@@ -109,6 +109,7 @@ class TransactionRepoImp implements TransactionRepository {
       );
 
       print('📡 Получен ответ от сервера: ${response.statusCode}');
+
       // Используем Freezed для десериализации
       final List<dynamic> rawData = response.data;
       print('📊 Сырых данных получено: ${rawData.length}');
@@ -121,6 +122,7 @@ class TransactionRepoImp implements TransactionRepository {
             final transactionResponse = TransactionResponse.fromJson(item);
             
             // Проверяем, что транзакция принадлежит нужному аккаунту
+            // TODO: убрать / изменить, когда будем работать с реальным аккаунтом
             if (transactionResponse.account.id == accountId) {
               responses.add(transactionResponse);
             }
@@ -134,18 +136,14 @@ class TransactionRepoImp implements TransactionRepository {
       print('📊 После парсинга: ${responses.length} транзакций');
       // Фильтрация по датам
       var filteredResponses = responses;
-      if (startDate != null) {
-        final startOfDay = startDate.copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
-        filteredResponses = filteredResponses
-            .where((t) => t.transactionDate.isAtSameMomentAs(startOfDay) || t.transactionDate.isAfter(startOfDay))
-            .toList();
-      }
-      if (endDate != null) {
-        final endOfDay = endDate.copyWith(hour: 23, minute: 59, second: 59, millisecond: 999, microsecond: 999);
-        filteredResponses = filteredResponses
-            .where((t) => t.transactionDate.isAtSameMomentAs(endOfDay) || t.transactionDate.isBefore(endOfDay))
-            .toList();
-      }
+      final startOfDay = startDate.copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
+      filteredResponses = filteredResponses
+          .where((t) => t.transactionDate.isAtSameMomentAs(startOfDay) || t.transactionDate.isAfter(startOfDay))
+          .toList();
+      final endOfDay = endDate.copyWith(hour: 23, minute: 59, second: 59, millisecond: 999, microsecond: 999);
+      filteredResponses = filteredResponses
+          .where((t) => t.transactionDate.isAtSameMomentAs(endOfDay) || t.transactionDate.isBefore(endOfDay))
+          .toList();
 
       print('📊 После фильтрации по датам: ${filteredResponses.length} транзакций');
       return filteredResponses;
@@ -208,7 +206,7 @@ class TransactionRepoImp implements TransactionRepository {
     _transactions.removeWhere((t) => t.id == id);
   }
 
-  // --- Локальное сохранение и получение транзакций за сегодня ---
+  // Локальное сохранение и получение транзакций за сегодня
   Future<void> saveTodayTransactions(List<Transaction> transactions) async {
     print('💾 Сохранение транзакций за сегодня в кэш: ${transactions.length} транзакций');
     await _transactionDatabase.clearTransactions();
@@ -297,7 +295,7 @@ class TransactionRepoImp implements TransactionRepository {
         updatedAt: DateTime.now(),
       );
       
-      print('📊 Создана транзакция: id=${transaction.id}, categoryId=${transaction.categoryId}, amount=${transaction.amount}');
+      print('📊 Восстановлена из кэша транзакция: id=${transaction.id}, categoryId=${transaction.categoryId}, amount=${transaction.amount}');
       
       try {
         final category = await _getCategoryById(transaction.categoryId);

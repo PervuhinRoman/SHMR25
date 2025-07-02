@@ -1,13 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart' show Cubit;
-import 'package:shmr_finance/domain/cubit/sort_type_cubit.dart';
+import 'package:shmr_finance/domain/cubit/transactions/sort_type_cubit.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:shmr_finance/domain/models/category/category.dart';
 import 'package:shmr_finance/domain/models/category/combine_category.dart';
 
-import '../../data/repositories/account_repo_imp.dart';
-import '../../data/repositories/category_repo_imp.dart';
-import '../../data/repositories/transaction_repo_imp.dart';
-import '../models/transaction/transaction.dart';
+import 'package:shmr_finance/data/repositories/account_repo_imp.dart';
+import 'package:shmr_finance/data/repositories/category_repo_imp.dart';
+import 'package:shmr_finance/data/repositories/transaction_repo_imp.dart';
+import 'package:shmr_finance/domain/models/transaction/transaction.dart';
 
 part 'transaction_state.dart';
 
@@ -17,9 +17,6 @@ class TransactionCubit extends Cubit<TransactionState> {
         TransactionState(transactions: [], status: TransactionStatus.loading),
       );
 
-  final AccountRepoImp accountRepo = AccountRepoImp();
-  final CategoryRepoImpl categoryRepo = CategoryRepoImpl();
-
   Future<void> fetchTransactions({
     DateTime? startDate,
     DateTime? endDate,
@@ -28,6 +25,7 @@ class TransactionCubit extends Cubit<TransactionState> {
     print(
       '🎯 fetchTransactions вызван: isIncome=$isIncome, startDate=$startDate, endDate=$endDate',
     );
+    // Проверка наличия соединения с интернетом
     final connectivityResult = await Connectivity().checkConnectivity();
     final hasInternet = connectivityResult != ConnectivityResult.none;
     if (!hasInternet) {
@@ -35,7 +33,9 @@ class TransactionCubit extends Cubit<TransactionState> {
       await fetchLocalTransactionsForPeriod(startDate, endDate, isIncome);
       return;
     }
+
     print('🌐 Интернет доступен, загружаем из сети');
+
     try {
       final AccountRepoImp accountRepo = AccountRepoImp();
       final CategoryRepoImpl categoryRepo = CategoryRepoImpl();
@@ -43,16 +43,17 @@ class TransactionCubit extends Cubit<TransactionState> {
         accountRepo,
         categoryRepo,
       );
-      print('📡 Выполняю сетевой запрос...');
+
+      print('📡 Выполняем сетевой запрос...');
       final List<TransactionResponse> rawResponses = await transactionRepo
           .getPeriodTransactionsByAccount(
-            1,
+            1, // TODO: захардкоженный аккаунт
             startDate: startDate,
             endDate: endDate,
           );
       print('📡 Получено из сети: ${rawResponses.length} транзакций');
 
-      // Проверяем данные перед фильтрацией
+      // Проверяем первые три транзакции перед фильтрацией
       for (int i = 0; i < rawResponses.length && i < 3; i++) {
         final response = rawResponses[i];
         print(
@@ -76,7 +77,7 @@ class TransactionCubit extends Cubit<TransactionState> {
           endDate,
         );
       } else {
-        // Fallback для сегодняшних транзакций
+        // Fallback для сегодняшних транзакций (т.е. если null)
         final today = DateTime.now();
         final todayTransactions =
             rawResponses
@@ -258,7 +259,10 @@ class TransactionCubit extends Cubit<TransactionState> {
   void _updateCategoriesFromTransactions() {
     if (!isClosed) {
       // Сначала фильтруем по isIncome
-      final filtered = state.transactions.where((t) => t.category.isIncome == state.isIncome).toList();
+      final filtered =
+          state.transactions
+              .where((t) => t.category.isIncome == state.isIncome)
+              .toList();
 
       // Группируем по категории
       final Map<int, List<TransactionResponse>> grouped = {};
@@ -266,25 +270,28 @@ class TransactionCubit extends Cubit<TransactionState> {
         grouped.putIfAbsent(t.category.id, () => []).add(t);
       }
 
-      final combineCategories = grouped.entries.map((entry) {
-        final category = entry.value.first.category;
-        final totalAmount = entry.value.fold<double>(
-          0,
-          (sum, t) => sum + (double.tryParse(t.amount) ?? 0),
-        );
-        final lastTransaction = entry.value.isNotEmpty
-            ? entry.value.reduce((a, b) => a.transactionDate.isAfter(b.transactionDate) ? a : b)
-            : null;
-        return CombineCategory(
-          category: category,
-          totalAmount: totalAmount,
-          lastTransaction: lastTransaction,
-        );
-      }).toList();
+      final combineCategories =
+          grouped.entries.map((entry) {
+            final category = entry.value.first.category;
+            final totalAmount = entry.value.fold<double>(
+              0,
+              (sum, t) => sum + (double.tryParse(t.amount) ?? 0),
+            );
+            final lastTransaction =
+                entry.value.isNotEmpty
+                    ? entry.value.reduce(
+                      (a, b) =>
+                          a.transactionDate.isAfter(b.transactionDate) ? a : b,
+                    )
+                    : null;
+            return CombineCategory(
+              category: category,
+              totalAmount: totalAmount,
+              lastTransaction: lastTransaction,
+            );
+          }).toList();
 
-      emit(state.copyWith(
-        combineCategories: combineCategories,
-      ));
+      emit(state.copyWith(combineCategories: combineCategories));
     }
   }
 }
