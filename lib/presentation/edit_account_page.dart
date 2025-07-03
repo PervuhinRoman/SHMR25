@@ -25,7 +25,8 @@ class _EditAccountPageState extends State<EditAccountPage> {
     super.didChangeDependencies();
     // Устанавливаем текущее имя счета из AccountCubit
     final accountState = context.read<MyAccountCubit>().state;
-    if (_accountNameController.text.isEmpty && accountState.accountName.isNotEmpty) {
+    if (_accountNameController.text.isEmpty &&
+        accountState.accountName.isNotEmpty) {
       _accountNameController.text = accountState.accountName;
     }
   }
@@ -42,7 +43,26 @@ class _EditAccountPageState extends State<EditAccountPage> {
       appBar: CustomAppBar(title: "Редактировать счёт"),
       body: Column(
         children: [
-          _buildAccountNameField(),
+          Container(
+            height: 56,
+            color: CustomAppTheme.figmaNavBarColor,
+            child: TextField(
+              controller: _accountNameController,
+              onChanged: (value) {
+                context.read<MyAccountCubit>().setAccountName(value);
+              },
+              decoration: const InputDecoration(
+                hintText: 'Название счета...',
+                suffixIcon: Icon(Icons.edit, color: Colors.grey),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+              ),
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
           const Divider(
             height: 1,
             thickness: 1,
@@ -52,28 +72,4 @@ class _EditAccountPageState extends State<EditAccountPage> {
       ),
     );
   }
-
-  Widget _buildAccountNameField() {
-    return Container(
-      height: 56,
-      color: CustomAppTheme.figmaNavBarColor,
-      child: TextField(
-        controller: _accountNameController,
-        onChanged: (value) {
-          // Сохраняем изменения в AccountCubit
-          context.read<MyAccountCubit>().setAccountName(value);
-        },
-        decoration: const InputDecoration(
-          hintText: 'Название счета...',
-          suffixIcon: Icon(Icons.edit, color: Colors.grey),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
-        ),
-        style: const TextStyle(fontSize: 16),
-      ),
-    );
-  }
-} 
+}
