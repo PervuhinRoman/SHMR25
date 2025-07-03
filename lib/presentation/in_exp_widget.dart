@@ -28,18 +28,6 @@ class _InExpWidgetState extends State<InExpWidget> {
       '🚀 InExpWidget initState вызван для ${widget.isIncome ? "доходов" : "расходов"}',
       name: "InExpWidget",
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      log('🔄 InExpWidget: вызываю fetchTransactions', name: "InExpWidget");
-      final transactionCubit = context.read<TransactionCubit>();
-      transactionCubit.fetchTransactions(
-        startDate: DateTime.now().copyWith(
-          hour: 0,
-          minute: 0,
-        ), // TODO: Избыточна ли данная передача? (далее есть проверка)
-        endDate: DateTime.now().copyWith(hour: 23, minute: 59),
-        isIncome: widget.isIncome,
-      );
-    });
   }
 
   @override
@@ -53,8 +41,8 @@ class _InExpWidgetState extends State<InExpWidget> {
       log('🔄 InExpWidget: вызываю fetchTransactions', name: "InExpWidget");
       final transactionCubit = context.read<TransactionCubit>();
       transactionCubit.fetchTransactions(
-        startDate: DateTime.now().copyWith(hour: 0, minute: 0),
-        endDate: DateTime.now().copyWith(hour: 23, minute: 59),
+        startDate: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
+        endDate: DateTime.now().copyWith(hour: 23, minute: 59, second: 59),
         isIncome: widget.isIncome,
       );
     });
