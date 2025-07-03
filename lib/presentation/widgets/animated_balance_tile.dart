@@ -60,8 +60,8 @@ class _AnimatedBalanceTileState extends State<AnimatedBalanceTile>
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BlurCubit, BlurState>(
-      builder: (context, state) {
+    return BlocListener<BlurCubit, BlurState>(
+      listener: (context, state) {
         // Обновляем анимацию при изменении состояния
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (state.isBalanceVisible) {
@@ -70,44 +70,44 @@ class _AnimatedBalanceTileState extends State<AnimatedBalanceTile>
             _animationController.forward();
           }
         });
+      },
 
-        return Material(
-          color: CustomAppTheme.figmaMainLightColor,
-          child: InkWell(
-            onTap: widget.onTap,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              child: Row(
-                children: [
-                  Text(widget.icon, style: const TextStyle(fontSize: 24)),
-                  const SizedBox(width: 12),
-                  Expanded(child: Text(widget.title)),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: AnimatedBuilder(
-                      animation: _animationController,
-                      builder: (context, child) {
-                        return ImageFiltered(
-                          imageFilter: ImageFilter.blur(
-                            sigmaX: _blurAnimation.value,
-                            sigmaY: _blurAnimation.value,
-                          ),
-                          child: Text(widget.value),
-                        );
-                      },
-                    ),
+      child: Material(
+        color: CustomAppTheme.figmaMainLightColor,
+        child: InkWell(
+          onTap: widget.onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              children: [
+                Text(widget.icon, style: const TextStyle(fontSize: 24)),
+                const SizedBox(width: 12),
+                Expanded(child: Text(widget.title)),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: AnimatedBuilder(
+                    animation: _animationController,
+                    builder: (context, child) {
+                      return ImageFiltered(
+                        imageFilter: ImageFilter.blur(
+                          sigmaX: _blurAnimation.value,
+                          sigmaY: _blurAnimation.value,
+                        ),
+                        child: Text(widget.value),
+                      );
+                    },
                   ),
-                  const Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 16,
-                    color: Colors.grey,
-                  ),
-                ],
-              ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 16,
+                  color: Colors.grey,
+                ),
+              ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
