@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shmr_finance/presentation/transaction_dialog.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
 
@@ -97,6 +98,30 @@ class _SelectedCategoryPageState extends State<SelectedCategoryPage> {
                             icon: item.category.emoji,
                             time: item.transactionDate,
                             comment: item.comment,
+                            onTap: () {
+                              showGeneralDialog(
+                                context: context,
+                                pageBuilder: (
+                                  context,
+                                  animation,
+                                  secondaryAnimation,
+                                ) {
+                                  return BlocProvider(
+                                    create: (context) => TransactionCubit(),
+                                    child: TransactionPage(
+                                      isAdd: false,
+                                      accountName: item.account.name,
+                                      categoryName: item.category.name,
+                                      categoryEmoji: item.category.emoji,
+                                      categoryIndex: item.category.id,
+                                      amount: double.tryParse(item.amount),
+                                      dateTime: item.transactionDate,
+                                      title: item.comment,
+                                    ),
+                                  );
+                                },
+                              );
+                            },
                           );
                         }
                       },

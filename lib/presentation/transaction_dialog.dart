@@ -9,7 +9,27 @@ import '../app_theme.dart';
 
 class TransactionPage extends StatefulWidget {
   final bool isAdd;
-  const TransactionPage({super.key, required this.isAdd});
+  final String? categoryName;
+  final String? categoryEmoji;
+  final int? categoryIndex;
+  final String? accountName;
+  final int? accountIndex;
+  final double? amount;
+  final DateTime? dateTime;
+  final String? title;
+  
+  const TransactionPage({
+    super.key, 
+    required this.isAdd,
+    this.categoryName,
+    this.categoryEmoji,
+    this.categoryIndex,
+    this.accountName,
+    this.accountIndex,
+    this.amount,
+    this.dateTime,
+    this.title,
+  });
 
   @override
   State<TransactionPage> createState() => _TransactionPageState();
@@ -31,7 +51,24 @@ class _TransactionPageState extends State<TransactionPage> {
   @override
   void initState() {
     super.initState();
-    _amountController.text = _amount != null ? _amount!.toStringAsFixed(2) : '';
+    
+    // Инициализация полей данными из существующей транзакции
+    _selectedCategoryInd = widget.categoryIndex;
+    _selectedCategoryName = widget.categoryName;
+    _selectedAccountInd = widget.accountIndex;
+    _selectedAccountName = widget.accountName;
+    _amount = widget.amount;
+    _selectedDateTime = widget.dateTime ?? DateTime.now();
+    _title = widget.title;
+    
+    // Установка текста в контроллеры
+    if (_amount != null) {
+      _amountController.text = NumberFormat('#,##0.00', 'ru_RU').format(_amount);
+    }
+    if (_title != null) {
+      _titleController.text = _title!;
+    }
+    
     _amountFocusNode.addListener(() {
       if (!_amountFocusNode.hasFocus) {
         _saveAmount();
@@ -137,12 +174,14 @@ class _TransactionPageState extends State<TransactionPage> {
         ),
       ),
       body: SingleChildScrollView(
+        // `SingleChildScrollView` необходим, чтобы клавиатура не перекрывала виджеты
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Счёт
             ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               title: Row(
@@ -265,6 +304,8 @@ class _TransactionPageState extends State<TransactionPage> {
               thickness: 1,
               color: CustomAppTheme.figmaBgGrayColor,
             ),
+
+            // Категория
             ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               title: Row(
@@ -362,7 +403,6 @@ class _TransactionPageState extends State<TransactionPage> {
                         },
                       ),
                 );
-                if (!context.mounted) return;
                 if (selected != null) {
                   setState(() {
                     _selectedCategoryInd = selected['index'] as int?;
@@ -376,14 +416,15 @@ class _TransactionPageState extends State<TransactionPage> {
               thickness: 1,
               color: CustomAppTheme.figmaBgGrayColor,
             ),
+
+            // Сумма
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text("Сумма"),
-                  SizedBox(
-                    width: 120,
+                  Expanded(
                     child: TextField(
                       controller: _amountController,
                       focusNode: _amountFocusNode,
@@ -402,8 +443,7 @@ class _TransactionPageState extends State<TransactionPage> {
                         suffixText: '₽',
                       ),
                       onChanged: (value) {
-                        final normalized = value.replaceAll(',', '.');
-                        final parsed = double.tryParse(normalized);
+                        final parsed = double.tryParse(value);
                         if (parsed != null) {
                           setState(() {
                             _amount = parsed;
@@ -428,6 +468,8 @@ class _TransactionPageState extends State<TransactionPage> {
               thickness: 1,
               color: CustomAppTheme.figmaBgGrayColor,
             ),
+
+            // Время
             ListTile(
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
@@ -447,6 +489,8 @@ class _TransactionPageState extends State<TransactionPage> {
               thickness: 1,
               color: CustomAppTheme.figmaBgGrayColor,
             ),
+
+            // Название
             ListTile(
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
@@ -479,6 +523,7 @@ class _TransactionPageState extends State<TransactionPage> {
               thickness: 1,
               color: CustomAppTheme.figmaBgGrayColor,
             ),
+
             Padding(
               padding: const EdgeInsets.only(top: 32.0, left: 16, right: 16),
               child: ElevatedButton(

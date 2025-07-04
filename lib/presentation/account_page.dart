@@ -27,7 +27,8 @@ class _AccountPageState extends State<AccountPage> {
   bool _isLoading = true;
   String? _error;
 
-  final BalanceVisibilityService _balanceVisibilityService = BalanceVisibilityService();
+  final BalanceVisibilityService _balanceVisibilityService =
+      BalanceVisibilityService();
   bool _isServiceInitialized = false;
 
   @override
@@ -156,9 +157,10 @@ class _AccountPageState extends State<AccountPage> {
       builder: (context, accountState) {
         return Scaffold(
           appBar: CustomAppBar(
-            title: accountState.accountName.isNotEmpty 
-                ? accountState.accountName 
-                : "Мой счёт",
+            title:
+                accountState.accountName.isNotEmpty
+                    ? accountState.accountName
+                    : "Мой счёт",
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.mode_edit_outlined),
@@ -179,10 +181,10 @@ class _AccountPageState extends State<AccountPage> {
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _error != null
-                      ? Center(child: Text('Ошибка: $_error'))
-                      : _accountData == null
-                          ? const Center(child: Text('Нет данных'))
-                          : _buildAccountContent(),
+                  ? Center(child: Text('Ошибка: $_error'))
+                  : _accountData == null
+                  ? const Center(child: Text('Нет данных'))
+                  : _buildAccountContent(),
         );
       },
     );
@@ -207,7 +209,7 @@ class _AccountPageState extends State<AccountPage> {
                     icon: '💰',
                     title: 'Баланс',
                     value:
-                        "${NumberFormat("0.00").format(balance)} ${currencyState.selectedCurrency.symbol}",
+                        "${NumberFormat('#,##0.00', 'ru_RU').format(balance)} ${currencyState.selectedCurrency.symbol}",
                     onTap: _navigateToEditPage,
                   ),
                   const Divider(

@@ -8,6 +8,8 @@ class InExpItem extends StatelessWidget {
   final String icon;
   final DateTime time;
   final String? comment;
+  final VoidCallback? onTap;
+  
   const InExpItem({
     super.key,
     required this.categoryTitle,
@@ -15,6 +17,7 @@ class InExpItem extends StatelessWidget {
     required this.icon,
     required this.time,
     this.comment,
+    this.onTap,
   });
 
   @override
@@ -49,6 +52,7 @@ class InExpItem extends StatelessWidget {
         color: CustomAppTheme.figmaDarkGrayColor,
       ),
       trailing: Icon(Icons.arrow_forward_ios_rounded, size: 16),
+      onTap: onTap,
     );
   }
 }
