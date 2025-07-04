@@ -17,9 +17,9 @@ class TransactionPage extends StatefulWidget {
   final double? amount;
   final DateTime? dateTime;
   final String? title;
-  
+
   const TransactionPage({
-    super.key, 
+    super.key,
     required this.isAdd,
     this.categoryName,
     this.categoryEmoji,
@@ -51,7 +51,7 @@ class _TransactionPageState extends State<TransactionPage> {
   @override
   void initState() {
     super.initState();
-    
+
     // Инициализация полей данными из существующей транзакции
     _selectedCategoryInd = widget.categoryIndex;
     _selectedCategoryName = widget.categoryName;
@@ -60,15 +60,18 @@ class _TransactionPageState extends State<TransactionPage> {
     _amount = widget.amount;
     _selectedDateTime = widget.dateTime ?? DateTime.now();
     _title = widget.title;
-    
+
     // Установка текста в контроллеры
     if (_amount != null) {
-      _amountController.text = NumberFormat('#,##0.00', 'ru_RU').format(_amount);
+      _amountController.text = NumberFormat(
+        '#,##0.00',
+        'ru_RU',
+      ).format(_amount);
     }
     if (_title != null) {
       _titleController.text = _title!;
     }
-    
+
     _amountFocusNode.addListener(() {
       if (!_amountFocusNode.hasFocus) {
         _saveAmount();
@@ -104,6 +107,53 @@ class _TransactionPageState extends State<TransactionPage> {
     });
   }
 
+  bool _validateFields() {
+    if (_selectedAccountName == null) {
+      _showValidationDialog("Выберите счёт");
+      return false;
+    }
+    if (_selectedCategoryName == null) {
+      _showValidationDialog("Выберите категорию");
+      return false;
+    }
+    if (_amount == null || _amount == 0) {
+      _showValidationDialog("Введите сумму");
+      return false;
+    }
+    if (_title == null || _title!.trim().isEmpty) {
+      _showValidationDialog("Введите название транзакции");
+      return false;
+    }
+    return true;
+  }
+
+  void _showValidationDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Заполните все поля'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _saveTransaction() {
+    if (_validateFields()) {
+      // TODO: Здесь будет логика сохранения транзакции
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   void dispose() {
     _amountController.dispose();
@@ -124,7 +174,7 @@ class _TransactionPageState extends State<TransactionPage> {
       context: context,
       initialDate: _selectedDateTime,
       firstDate: DateTime(now.year - 5),
-      lastDate: DateTime(now.year + 5),
+      lastDate: DateTime.now(),
     );
     if (!context.mounted) return;
     if (pickedDate != null) {
@@ -151,6 +201,32 @@ class _TransactionPageState extends State<TransactionPage> {
     _titleFocusNode.unfocus();
   }
 
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Подтвердите удаление'),
+          content: const Text('Вы уверены, что хотите удалить эту транзакцию?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Отмена'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Удалить'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -161,7 +237,7 @@ class _TransactionPageState extends State<TransactionPage> {
           IconButton(
             icon: const Icon(Icons.check),
             onPressed: () {
-              Navigator.of(context).pop();
+              _saveTransaction();
             },
           ),
         ],
@@ -187,7 +263,12 @@ class _TransactionPageState extends State<TransactionPage> {
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Счёт"),
+                  Row(
+                    children: [
+                      Text("Счёт"),
+                      Text(" *", style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
                   Text(_selectedAccountName ?? "Выберите счёт"),
                 ],
               ),
@@ -311,7 +392,12 @@ class _TransactionPageState extends State<TransactionPage> {
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Категория"),
+                  Row(
+                    children: [
+                      Text("Категория"),
+                      Text(" *", style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
                   Text(_selectedCategoryName ?? "Выберите категорию"),
                 ],
               ),
@@ -423,7 +509,12 @@ class _TransactionPageState extends State<TransactionPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Сумма"),
+                  Row(
+                    children: [
+                      const Text("Сумма"),
+                      Text(" *", style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
                   Expanded(
                     child: TextField(
                       controller: _amountController,
@@ -496,26 +587,31 @@ class _TransactionPageState extends State<TransactionPage> {
                 horizontal: 16,
                 vertical: 8,
               ),
-              title: TextField(
-                controller: _titleController,
-                focusNode: _titleFocusNode,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: 'Название / описание',
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _title = value;
-                  });
-                },
-                onEditingComplete: () {
-                  _saveTitle();
-                  FocusScope.of(context).unfocus();
-                },
-                onSubmitted: (_) {
-                  _saveTitle();
-                  FocusScope.of(context).unfocus();
-                },
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: _titleController,
+                    focusNode: _titleFocusNode,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Название / описание',
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _title = value;
+                      });
+                    },
+                    onEditingComplete: () {
+                      _saveTitle();
+                      FocusScope.of(context).unfocus();
+                    },
+                    onSubmitted: (_) {
+                      _saveTitle();
+                      FocusScope.of(context).unfocus();
+                    },
+                  ),
+                ],
               ),
             ),
             const Divider(
@@ -527,7 +623,15 @@ class _TransactionPageState extends State<TransactionPage> {
             Padding(
               padding: const EdgeInsets.only(top: 32.0, left: 16, right: 16),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  if (widget.isAdd) {
+                    // Для новой транзакции - просто закрываем диалог
+                    Navigator.of(context).pop();
+                  } else {
+                    // Для редактирования - показываем диалог подтверждения удаления
+                    _showDeleteConfirmationDialog();
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: CustomAppTheme.figmaRedColor,
                   foregroundColor: Colors.white,
