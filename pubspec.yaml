@@ -48,6 +48,8 @@ dependencies:
   device_info_plus: ^10.1.0
   fuzzywuzzy: ^1.2.0
   fl_chart: ^0.69.0
+  pie_chart_widget:
+    path: packages/pie_chart_widget
 
 dev_dependencies:
   flutter_test:

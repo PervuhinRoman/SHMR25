@@ -1,10 +1,8 @@
 import 'dart:developer';
-import 'dart:math' show Random;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/domain/cubit/transactions/datepicker_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
@@ -12,6 +10,7 @@ import 'package:shmr_finance/domain/models/category/combine_category.dart';
 import 'package:shmr_finance/presentation/selected_category_page.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_analyze_category.dart';
+import 'package:pie_chart_widget/pie_chart_widget.dart';
 
 class AnalyzePage extends StatefulWidget {
   final bool isIncome;
@@ -22,36 +21,11 @@ class AnalyzePage extends StatefulWidget {
   State<AnalyzePage> createState() => _AnalyzePageState();
 }
 
-class _AnalyzePageState extends State<AnalyzePage>
-    with TickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _rotationAnimation;
-  late Animation<double> _fadeAnimation;
-  bool _isShowingTooltip = false;
-
-  // Генератор случайных цветов
-  final Random _random = Random();
+class _AnalyzePageState extends State<AnalyzePage> {
 
   @override
   void initState() {
     super.initState();
-
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-
-    _rotationAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-
-    // Анимация исчезновения старого контента (0-50% времени)
-    _fadeAnimation = Tween<double>(begin: 1, end: 0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: const Interval(0, 0.5, curve: Curves.easeOut),
-      ),
-    );
 
     final datePickerCubit = context.read<DatePickerCubit>();
     final transactionCubit = context.read<TransactionCubit>();
@@ -62,27 +36,6 @@ class _AnalyzePageState extends State<AnalyzePage>
       startDate: startDate,
       endDate: endDate,
     );
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  void _startAnimation() {
-    _animationController.reset();
-    _animationController.forward();
-  }
-
-  Color _getColorForIndex(int index, int totalCategories) {
-    // Генерируем детерминированный цвет на основе индекса
-    // чтобы цвета оставались постоянными для одной категории
-    final hue = (index * 360.0 / totalCategories) % 360.0;
-    final saturation = 0.7 + (_random.nextDouble() * 0.3); // 70-100%
-    final lightness = 0.4 + (_random.nextDouble() * 0.3); // 40-70%
-
-    return HSLColor.fromAHSL(1.0, hue, saturation, lightness).toColor();
   }
 
   Widget _buildPieChart(List<CombineCategory> categories, double totalSum) {
@@ -100,233 +53,51 @@ class _AnalyzePageState extends State<AnalyzePage>
       );
     }
 
-    if (categories.isEmpty) {
-      return SizedBox(
-        height: 300,
-        width: 300,
-        child: Stack(
-          children: [
-            Center(
-              child: PieChart(
-                PieChartData(
-                  sections: [
-                    PieChartSectionData(
-                      value: 1,
-                      color: Colors.grey[300]!,
-                      radius: 16,
-                      title: '',
-                    ),
-                  ],
-                  centerSpaceRadius: 100,
-                  sectionsSpace: 0,
-                ),
-              ),
-            ),
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.pie_chart, size: 32, color: Colors.grey[400]),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Нет категорий',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+    // Конвертируем данные в формат для пакета
+    final chartSections = categories.map((category) {
+      return ChartSection.fromData(
+        id: category.category.id.toString(),
+        name: category.category.name,
+        emoji: category.category.emoji,
+        value: category.totalAmount.toDouble(),
+        totalValue: totalSum,
+        additionalInfo: category.lastTransaction?.comment,
       );
-    }
+    }).toList();
 
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (context, child) {
-        // Определяем, какой контент показывать
-        final isNewContent = _animationController.value > 0.5;
-        final fadeValue =
-            isNewContent
-                ? (_animationController.value - 0.5) *
-                    2 // 0-1 для нового контента
-                : 1 -
-                    (_animationController.value *
-                        2); // 1-0 для старого контента
+    // Конфигурация графика
+    final config = PieChartConfig(
+      size: 300.0,
+      sectionRadius: 16.0,
+      centerSpaceRadius: 100.0,
+      legendDotSize: 12.0,
+      legendFontSize: 12.0,
+      maxLegendWidth: 180.0,
+      maxLegendHeight: 180.0,
+      legendRowSpacing: 1.0,
+      enableAnimation: true,
+      animationDuration: const Duration(milliseconds: 1500),
+      enableTooltips: true,
+      showLegend: true,
+      showPercentages: true,
+      numberFormat: '#,##0.00',
+    );
 
-        final sections =
-            categories.asMap().entries.map((entry) {
-              final index = entry.key;
-              final category = entry.value;
-              final percentage = (category.totalAmount * 100 / totalSum);
-
-              log(
-                "📊 Сектор $index: ${category.category.name} - ${category.totalAmount} (${percentage.toStringAsFixed(1)}%)",
-                name: 'PieChart',
-              );
-
-              return PieChartSectionData(
-                value: category.totalAmount.toDouble(),
-                color: _getColorForIndex(index, categories.length),
-                radius: 16,
-                title: '',
-                titleStyle: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                badgeWidget: null,
-                badgePositionPercentageOffset: 1.2,
-              );
-            }).toList();
-
-        log("📊 Создано секторов: ${sections.length}", name: 'PieChart');
-
-        return Transform.rotate(
-          angle: _rotationAnimation.value * 2 * 3.14159,
-          child: Opacity(
-            opacity: fadeValue,
-            child: SizedBox(
-              width: 300,
-              height: 300,
-              child: Stack(
-                children: [
-                  Center(
-                    child: PieChart(
-                      PieChartData(
-                        sections: sections,
-                        centerSpaceRadius: 100,
-                        sectionsSpace: 2,
-                        pieTouchData: PieTouchData(
-                          touchCallback: (
-                            FlTouchEvent event,
-                            pieTouchResponse,
-                          ) {
-                            if (event.isInterestedForInteractions &&
-                                pieTouchResponse != null) {
-                              final touchedSection =
-                                  pieTouchResponse.touchedSection;
-                              if (touchedSection != null) {
-                                final category =
-                                    categories[touchedSection
-                                        .touchedSectionIndex];
-                                _showTooltip(context, category);
-                              }
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Легенда внутри графика
-                  // TODO: можно прикрутить сортировку по процентам
-                  Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: 180,
-                        maxHeight: 180,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children:
-                            categories.asMap().entries.map((entry) {
-                              final index = entry.key;
-                              final category = entry.value;
-                              final percentage =
-                                  (category.totalAmount * 100 / totalSum);
-
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 1,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    // Цветной кружок
-                                    Container(
-                                      width: 12,
-                                      height: 12,
-                                      decoration: BoxDecoration(
-                                        color: _getColorForIndex(
-                                          index,
-                                          categories.length,
-                                        ),
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    // Процент и название
-                                    Flexible(
-                                      child: Text(
-                                        '${percentage.toStringAsFixed(0)}% ${category.category.name}',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
+    return Center(
+      child: PieChartWidget(
+        sections: chartSections,
+        config: config,
+        onSectionTap: (section) {
+          log("📊 Нажата секция: ${section.name}", name: 'PieChart');
+        },
+        onLegendTap: (section) {
+          log("📊 Нажата легенда: ${section.name}", name: 'PieChart');
+        },
+      ),
     );
   }
 
-  void _showTooltip(BuildContext context, dynamic category) {
-    // Защита от повторных вызовов
-    if (_isShowingTooltip) return;
 
-    _isShowingTooltip = true;
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Row(
-            children: [
-              Text(category.category.emoji),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  category.category.name,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          content: Text(
-            'Сумма: ${NumberFormat('#,##0.00', 'ru_RU').format(category.totalAmount)} ₽',
-            style: const TextStyle(fontSize: 16),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Закрыть'),
-            ),
-          ],
-        );
-      },
-    ).then((_) {
-      // Сбрасываем флаг когда диалог закрывается
-      _isShowingTooltip = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -340,8 +111,7 @@ class _AnalyzePageState extends State<AnalyzePage>
           startDate: datePickerState.startDate,
           endDate: datePickerState.endDate,
         );
-        // Запускаем анимацию при изменении данных
-        _startAnimation();
+
       },
       child: BlocBuilder<DatePickerCubit, DatePickerState>(
         builder: (context, datePickerState) {
