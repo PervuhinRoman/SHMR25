@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shmr_finance/app_theme.dart';
-import 'package:shmr_finance/domain/cubit/datepicker_cubit.dart';
-import 'package:shmr_finance/domain/cubit/sort_type_cubit.dart';
-import 'package:shmr_finance/domain/cubit/transaction_cubit.dart';
+import 'package:shmr_finance/domain/cubit/transactions/datepicker_cubit.dart';
+import 'package:shmr_finance/domain/cubit/transactions/sort_type_cubit.dart';
+import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
+import 'package:shmr_finance/presentation/analyze_page.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
 
@@ -62,7 +63,17 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                 context,
                 MaterialPageRoute<void>(
                   builder: (BuildContext context) {
-                    return Placeholder();
+                    return MultiBlocProvider(
+                      providers: [
+                        BlocProvider<DatePickerCubit>(
+                          create: (context) => DatePickerCubit(),
+                        ),
+                        BlocProvider<TransactionCubit>(
+                          create: (context) => TransactionCubit(),
+                        ),
+                      ],
+                      child: AnalyzePage(isIncome: widget.isIncome),
+                    );
                   },
                 ),
               );
@@ -287,7 +298,7 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                               child: Padding(
                                 padding: const EdgeInsets.only(right: 16),
                                 child: Text(
-                                  "$totalSum ₽", // TODO: добавить форматирование вывода суммы по разрядам и кол-во символов после точки
+                                  "${NumberFormat('#,##0.00', 'ru_RU').format(totalSum)} ₽",
                                   textAlign: TextAlign.end,
                                 ),
                               ),
@@ -298,31 +309,39 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                       // Индикатор источника данных
                       if (transactionState.dataSource != null)
                         Container(
-                          color: transactionState.dataSource == DataSource.cache 
-                              ? Colors.orange.withValues(alpha: 0.1) 
-                              : Colors.green.withValues(alpha: 0.1),
-                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                          color:
+                              transactionState.dataSource == DataSource.cache
+                                  ? Colors.orange.withValues(alpha: 0.1)
+                                  : Colors.green.withValues(alpha: 0.1),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 16,
+                          ),
                           child: Row(
                             children: [
                               Icon(
-                                transactionState.dataSource == DataSource.cache 
-                                    ? Icons.storage 
+                                transactionState.dataSource == DataSource.cache
+                                    ? Icons.storage
                                     : Icons.cloud_download,
                                 size: 16,
-                                color: transactionState.dataSource == DataSource.cache 
-                                    ? Colors.orange 
-                                    : Colors.green,
+                                color:
+                                    transactionState.dataSource ==
+                                            DataSource.cache
+                                        ? Colors.orange
+                                        : Colors.green,
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                transactionState.dataSource == DataSource.cache 
-                                    ? "Данные из кэша" 
+                                transactionState.dataSource == DataSource.cache
+                                    ? "Данные из кэша"
                                     : "Данные из сети",
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: transactionState.dataSource == DataSource.cache 
-                                      ? Colors.orange 
-                                      : Colors.green,
+                                  color:
+                                      transactionState.dataSource ==
+                                              DataSource.cache
+                                          ? Colors.orange
+                                          : Colors.green,
                                 ),
                               ),
                             ],

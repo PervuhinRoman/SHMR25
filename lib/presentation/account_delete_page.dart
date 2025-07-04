@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -6,7 +8,7 @@ import 'package:shmr_finance/domain/models/account/account.dart';
 import 'package:shmr_finance/presentation/widgets/animated_balance_tile.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 
-import '../domain/cubit/account_cubit.dart';
+import '../domain/cubit/account/account_cubit.dart';
 
 class AccountDeletePage extends StatelessWidget {
   final AccountResponse account;
@@ -29,13 +31,14 @@ class AccountDeletePage extends StatelessWidget {
                   Navigator.of(context).pop();
                 },
               ),
-              IconButton(
-                icon: const Icon(Icons.highlight_remove_outlined),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
             ],
+            defaultLeading: false,
+            leading: IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
           ),
           body: BlocBuilder<MyAccountCubit, MyAccountState>(
             builder: (context, currencyState) {
@@ -47,8 +50,7 @@ class AccountDeletePage extends StatelessWidget {
                     icon: '💰',
                     title: 'Баланс',
                     value:
-                    "${NumberFormat("0.00").format(balance)} ${currencyState
-                        .selectedCurrency.symbol}",
+                        "${NumberFormat("0.00").format(balance)} ${currencyState.selectedCurrency.symbol}",
                   ),
                   const Divider(
                     height: 1,
@@ -73,8 +75,10 @@ class AccountDeletePage extends StatelessWidget {
                       ),
                       child: const Text(
                         'Удалить счет',
-                        style: TextStyle(fontSize: 16,
-                            fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -94,8 +98,7 @@ class AccountDeletePage extends StatelessWidget {
         return AlertDialog(
           title: const Text('Подтверждение удаления'),
           content: Text(
-            'Вы уверены, что хотите удалить счет "${account
-                .name}"? Это действие нельзя отменить.',
+            'Вы уверены, что хотите удалить счет "${account.name}"? Это действие нельзя отменить.',
           ),
           actions: [
             TextButton(
@@ -120,7 +123,7 @@ class AccountDeletePage extends StatelessWidget {
 
   void _deleteAccount(BuildContext context) {
     // TODO: Реализовать удаление счета через репозиторий
-    print('Удаление счета ${account.id}');
+    log('Удаление счета ${account.id}');
 
     // Показываем уведомление об успешном удалении
     ScaffoldMessenger.of(context).showSnackBar(

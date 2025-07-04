@@ -1,30 +1,47 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shmr_finance/data/services/balance_visibility_service.dart';
-import 'package:shmr_finance/domain/cubit/account_cubit.dart';
-import 'package:shmr_finance/domain/cubit/blur_cubit.dart';
-import 'package:shmr_finance/domain/cubit/category_cubit.dart';
-import 'package:shmr_finance/domain/cubit/transaction_cubit.dart';
+import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
+import 'package:shmr_finance/domain/cubit/account/blur_cubit.dart';
+import 'package:shmr_finance/domain/cubit/categories/category_cubit.dart';
+import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
 import 'package:shmr_finance/presentation/account_page.dart';
 import 'package:shmr_finance/presentation/categories_page.dart';
 import 'package:shmr_finance/presentation/in_exp_widget.dart';
 import 'package:shmr_finance/presentation/settings_page.dart';
 import 'package:shmr_finance/app_theme.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
+  // Устанавливаем цвета для статус бара и навигационной панели
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      systemNavigationBarColor: CustomAppTheme.figmaNavBarColor,
+      statusBarColor: CustomAppTheme.figmaMainColor,
+    ),
+  );
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Небольшая задержка для стабильности инициализации
+
+  // Задержка для стабильности инициализации
   await Future.delayed(const Duration(milliseconds: 100));
-  
+
   try {
     await SharedPreferences.getInstance(); // Инициализируем SharedPreferences
-    print('✅ SharedPreferences успешно инициализирован');
+    log(
+      '✅ SharedPreferences успешно инициализирован',
+      time: DateTime.now(),
+      name: 'SharedPrefs',
+    );
   } catch (e) {
-    print('❌ Ошибка инициализации SharedPreferences: $e');
+    log(
+      '❌ Ошибка инициализации SharedPreferences: $e',
+      time: DateTime.now(),
+      name: 'SharedPrefs',
+    );
   }
-  
+
   runApp(
     MultiBlocProvider(
       providers: [
@@ -43,22 +60,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        useMaterial3: true,
-        textTheme: TextTheme(bodyMedium: TextStyle(fontSize: 16)),
-        colorScheme: ColorScheme.light(primary: CustomAppTheme.figmaMainColor),
-        appBarTheme: AppBarTheme(
-          backgroundColor: CustomAppTheme.figmaMainColor,
+    return SafeArea(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          useMaterial3: true,
+          textTheme: TextTheme(bodyMedium: TextStyle(fontSize: 16)),
+          colorScheme: ColorScheme.light(
+            primary: CustomAppTheme.figmaMainColor,
+          ),
+          appBarTheme: AppBarTheme(
+            backgroundColor: CustomAppTheme.figmaMainColor,
+          ),
+          navigationBarTheme: NavigationBarThemeData(
+            indicatorColor: CustomAppTheme.figmaMainLightColor,
+            backgroundColor: CustomAppTheme.figmaNavBarColor,
+          ),
         ),
-        navigationBarTheme: NavigationBarThemeData(
-          indicatorColor: CustomAppTheme.figmaMainLightColor,
-          backgroundColor: CustomAppTheme.figmaNavBarColor,
-        ),
+        home: const BaseScreen(),
       ),
-      home: const BaseScreen(),
     );
   }
 }
@@ -72,28 +93,6 @@ class BaseScreen extends StatefulWidget {
 
 class _BaseScreenState extends State<BaseScreen> {
   int currentPageIndex = 0;
-  final BalanceVisibilityService _balanceVisibilityService = BalanceVisibilityService();
-  bool _isServiceInitialized = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_isServiceInitialized) {
-      _initializeBalanceVisibilityService();
-      _isServiceInitialized = true;
-    }
-  }
-
-  Future<void> _initializeBalanceVisibilityService() async {
-    final blurCubit = context.read<BlurCubit>();
-    await _balanceVisibilityService.initialize(blurCubit);
-  }
-
-  @override
-  void dispose() {
-    _balanceVisibilityService.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {

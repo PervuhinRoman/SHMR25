@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shmr_finance/domain/models/currency/currency.dart';
@@ -15,13 +17,13 @@ class MyAccountCubit extends Cubit<MyAccountState> {
 
   Future<void> _loadAccountData() async {
     try {
-      print('📱 Загружаю данные аккаунта из SharedPreferences...');
+      log('📱 Загружаю данные аккаунта из SharedPreferences...', name: "Валюта");
       final prefs = await SharedPreferences.getInstance();
       
       // Загружаем валюту
       final currencyCode = prefs.getString(_currencyCodeKey);
       final currencySymbol = prefs.getString(_currencySymbolKey);
-      print('📱 Получен код валюты: $currencyCode, символ: $currencySymbol');
+      log('📱 Получен код валюты: $currencyCode, символ: $currencySymbol', name: "Валюта");
       
       Currency currency;
       if (currencyCode != null) {
@@ -29,30 +31,30 @@ class MyAccountCubit extends Cubit<MyAccountState> {
       } else {
         currency = Currencies.available.first;
       }
-      print('📱 Найдена валюта: ${currency.code}');
+      log('📱 Найдена валюта: ${currency.code}', name: "Валюта");
       
       // Загружаем имя счета
       final accountName = prefs.getString(_accountNameKey) ?? 'Мой счёт';
-      print('📱 Загружено имя счета: $accountName');
+      log('📱 Загружено имя счета: $accountName', name: "Имя счёта");
       
       emit(state.copyWith(
         selectedCurrency: currency,
         accountName: accountName,
         isLoading: false,
       ));
-      print('📡 Состояние обновлено после загрузки: ${state.selectedCurrency.code}, ${state.accountName}');
+      log('📡 Состояние обновлено после загрузки: ${state.selectedCurrency.code}, ${state.accountName}');
     } catch (e) {
-      print('❌ Ошибка при загрузке данных аккаунта: $e');
+      log('❌ Ошибка при загрузке данных аккаунта: $e');
       emit(state.copyWith(isLoading: false));
     }
   }
 
   Future<void> setCurrency(Currency currency) async {
-    print('🔄 setCurrency вызван: ${currency.code} (${currency.symbol})');
+    log('🔄 setCurrency вызван: ${currency.code} (${currency.symbol})', name: "Валюта");
     await _saveCurrencyToPrefs(currency.code, currency.symbol);
-    print('💾 Валюта сохранена в SharedPreferences: ${currency.code} (${currency.symbol})');
+    log('💾 Валюта сохранена в SharedPreferences: ${currency.code} (${currency.symbol})', name: "Валюта");
     emit(state.copyWith(selectedCurrency: currency));
-    print('📡 Состояние обновлено: ${state.selectedCurrency.code} (${state.selectedCurrency.symbol})');
+    log('📡 Состояние обновлено: ${state.selectedCurrency.code} (${state.selectedCurrency.symbol})', name: "Валюта");
   }
 
   Future<void> setCurrencyByCode(String currencyCode) async {
@@ -63,11 +65,11 @@ class MyAccountCubit extends Cubit<MyAccountState> {
   }
 
   Future<void> setAccountName(String accountName) async {
-    print('🔄 setAccountName вызван: $accountName');
+    log('🔄 setAccountName вызван: $accountName', name: "Имя счёта");
     await _saveAccountNameToPrefs(accountName);
-    print('💾 Имя счета сохранено в SharedPreferences: $accountName');
+    log('💾 Имя счета сохранено в SharedPreferences: $accountName', name: "Имя счёта");
     emit(state.copyWith(accountName: accountName));
-    print('📡 Состояние обновлено: ${state.accountName}');
+    log('📡 Состояние обновлено: ${state.accountName}', name: "Имя счёта");
   }
 
   Future<void> _saveCurrencyToPrefs(String code, String symbol) async {
@@ -76,7 +78,7 @@ class MyAccountCubit extends Cubit<MyAccountState> {
       await prefs.setString(_currencyCodeKey, code);
       await prefs.setString(_currencySymbolKey, symbol);
     } catch (e) {
-      print('❌ Ошибка при сохранении валюты: $e');
+      log('❌ Ошибка при сохранении валюты: $e', name: "Валюта");
     }
   }
 
@@ -85,7 +87,7 @@ class MyAccountCubit extends Cubit<MyAccountState> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_accountNameKey, accountName);
     } catch (e) {
-      print('❌ Ошибка при сохранении имени счета: $e');
+      log('❌ Ошибка при сохранении имени счета: $e', name: "Валюта");
     }
   }
 } 

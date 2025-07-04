@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shmr_finance/app_theme.dart';
-import 'package:shmr_finance/data/repositories/account_repo_imp.dart';
-import 'package:shmr_finance/domain/cubit/account_cubit.dart';
+import 'package:shmr_finance/data/repositories/account_repo_impl.dart';
+import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
 import 'package:shmr_finance/domain/models/account/account.dart';
 import 'package:shmr_finance/domain/models/currency/currency.dart';
 import 'package:shmr_finance/presentation/account_delete_page.dart';
 import 'package:shmr_finance/presentation/edit_account_page.dart';
 import 'package:shmr_finance/presentation/widgets/animated_balance_tile.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
+
+import 'services/balance_visibility_service.dart';
+import '../domain/cubit/account/blur_cubit.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -23,6 +26,29 @@ class _AccountPageState extends State<AccountPage> {
   AccountResponse? _accountData;
   bool _isLoading = true;
   String? _error;
+
+  final BalanceVisibilityService _balanceVisibilityService = BalanceVisibilityService();
+  bool _isServiceInitialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isServiceInitialized) {
+      _initializeBalanceVisibilityService();
+      _isServiceInitialized = true;
+    }
+  }
+
+  Future<void> _initializeBalanceVisibilityService() async {
+    final blurCubit = context.read<BlurCubit>();
+    await _balanceVisibilityService.initialize(blurCubit);
+  }
+
+  @override
+  void dispose() {
+    _balanceVisibilityService.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {

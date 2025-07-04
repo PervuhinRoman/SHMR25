@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
-import 'package:shmr_finance/data/repositories/category_repo_imp.dart';
+import 'package:shmr_finance/data/repositories/category_repo_impl.dart';
 import 'package:shmr_finance/domain/models/category/category.dart';
-import 'category_state.dart';
+
+part 'category_state.dart';
 
 class CategoryCubit extends Cubit<CategoryState> {
   final CategoryRepoImpl _categoryRepo = CategoryRepoImpl();
@@ -15,7 +18,7 @@ class CategoryCubit extends Cubit<CategoryState> {
   Future<void> loadAllCategories() async {
     try {
       emit(state.copyWith(isLoading: true, error: null));
-      print('📱 Загружаю все категории...');
+      log('📱 Загружаю все категории...', name: 'Category');
       
       final categories = await _categoryRepo.getAllCategories();
       
@@ -24,9 +27,9 @@ class CategoryCubit extends Cubit<CategoryState> {
         filteredCategories: categories,
         isLoading: false,
       ));
-      print('✅ Загружено ${categories.length} категорий');
+      log('✅ Загружено ${categories.length} категорий', name: 'Category');
     } catch (e) {
-      print('❌ Ошибка при загрузке категорий: $e');
+      log('❌ Ошибка при загрузке категорий: $e', name: 'Category');
       emit(state.copyWith(
         isLoading: false,
         error: e.toString(),
@@ -38,7 +41,7 @@ class CategoryCubit extends Cubit<CategoryState> {
   Future<void> loadCategoriesByType(bool isIncome) async {
     try {
       emit(state.copyWith(isLoading: true, error: null));
-      print('📱 Загружаю категории ${isIncome ? "доходов" : "расходов"}...');
+      log('📱 Загружаю категории ${isIncome ? "доходов" : "расходов"}...', name: 'Category');
       
       final categories = await _categoryRepo.getCategoriesByType(isIncome);
       
@@ -47,9 +50,9 @@ class CategoryCubit extends Cubit<CategoryState> {
         filteredCategories: categories,
         isLoading: false,
       ));
-      print('✅ Загружено ${categories.length} категорий ${isIncome ? "доходов" : "расходов"}');
+      log('✅ Загружено ${categories.length} категорий ${isIncome ? "доходов" : "расходов"}', name: 'Category');
     } catch (e) {
-      print('❌ Ошибка при загрузке категорий: $e');
+      log('❌ Ошибка при загрузке категорий: $e', name: 'Category');
       emit(state.copyWith(
         isLoading: false,
         error: e.toString(),
@@ -101,8 +104,8 @@ class CategoryCubit extends Cubit<CategoryState> {
       // Ищем по эмодзи (если пользователь ввел эмодзи)
       final emojiRatio = ratio(queryLower, category.emoji);
       
-      // Если хотя бы одно совпадение выше порога (60%), добавляем в результаты
-      if (nameRatio > 60 || emojiRatio > 60) {
+      // Если хотя бы одно совпадение выше порога (10%), добавляем в результаты
+      if (nameRatio > 10 || emojiRatio > 10) {
         results.add(category);
       }
     }
@@ -125,7 +128,7 @@ class CategoryCubit extends Cubit<CategoryState> {
       filteredCategories: results,
     ));
     
-    print('🔍 Поиск: "$query" - найдено ${results.length} результатов');
+    log('🔍 Поиск: "$query" - найдено ${results.length} результатов', name: 'Category');
   }
 
   /// Очищает поиск

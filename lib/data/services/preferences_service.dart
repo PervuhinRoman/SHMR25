@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferencesService {
@@ -10,7 +12,7 @@ class PreferencesService {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getString(_selectedCurrencyKey) ?? 'RUB';
     } catch (e) {
-      print('❌ Ошибка при получении валюты из SharedPreferences: $e');
+      log('❌ Ошибка при получении валюты из SharedPreferences: $e', name: "SharedPrefs");
       return 'RUB'; // Fallback к рублю
     }
   }
@@ -21,7 +23,7 @@ class PreferencesService {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getString(_selectedCurrencySymbolKey) ?? '₽';
     } catch (e) {
-      print('❌ Ошибка при получении символа валюты из SharedPreferences: $e');
+      log('❌ Ошибка при получении символа валюты из SharedPreferences: $e', name: "SharedPrefs");
       return '₽'; // Fallback к рублю
     }
   }
@@ -32,9 +34,9 @@ class PreferencesService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_selectedCurrencyKey, currencyCode);
       await prefs.setString(_selectedCurrencySymbolKey, currencySymbol);
-      print('✅ Валюта успешно сохранена: $currencyCode ($currencySymbol)');
+      log('✅ Валюта успешно сохранена: $currencyCode ($currencySymbol)', name: "SharedPrefs");
     } catch (e) {
-      print('❌ Ошибка при сохранении валюты в SharedPreferences: $e');
+      log('❌ Ошибка при сохранении валюты в SharedPreferences: $e', name: "SharedPrefs");
       // Не выбрасываем исключение, чтобы не ломать UI
     }
   }

@@ -23,24 +23,30 @@ class InExpItem extends StatelessWidget {
       leading: Text(icon),
       title: Row(
         children: [
+          Expanded(child: Text(categoryTitle, textAlign: TextAlign.start)),
           Expanded(
-            child: Text(categoryTitle, textAlign: TextAlign.start),
-          ),
-          Expanded(
-            child: Text(amount, textAlign: TextAlign.end),
+            child: Text(
+              NumberFormat('#,##0.00', 'ru_RU').format(double.tryParse(amount)),
+              textAlign: TextAlign.end,
+            ),
           ),
         ],
       ),
       subtitle: Row(
         children: [
           Expanded(child: Text(comment ?? "", textAlign: TextAlign.start)),
-          Expanded(child: Text(DateFormat("dd.MM hh:mm").format(time), textAlign: TextAlign.end,)),
+          Expanded(
+            child: Text(
+              DateFormat("dd.MM hh:mm").format(time),
+              textAlign: TextAlign.end,
+            ),
+          ),
         ],
       ),
       subtitleTextStyle: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.bold,
-        color: CustomAppTheme.figmaDarkGrayColor
+        color: CustomAppTheme.figmaDarkGrayColor,
       ),
       trailing: Icon(Icons.arrow_forward_ios_rounded, size: 16),
     );

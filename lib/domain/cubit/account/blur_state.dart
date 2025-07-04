@@ -1,3 +1,5 @@
+part of 'blur_cubit.dart';
+
 class BlurState {
   final bool isBalanceVisible;
   final bool isLoading;

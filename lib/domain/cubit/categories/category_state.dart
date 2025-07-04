@@ -1,4 +1,4 @@
-import 'package:shmr_finance/domain/models/category/category.dart';
+part of 'category_cubit.dart';
 
 class CategoryState {
   final List<Category> categories;
