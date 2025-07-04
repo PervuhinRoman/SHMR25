@@ -6,6 +6,7 @@ import 'package:shmr_finance/domain/cubit/transactions/datepicker_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transactions/sort_type_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
 import 'package:shmr_finance/presentation/analyze_page.dart';
+import 'package:shmr_finance/presentation/transaction_dialog.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
 
@@ -404,9 +405,18 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
         shape: CircleBorder(),
         child: Icon(Icons.add),
+        onPressed:
+            () => showGeneralDialog(
+              context: context,
+              pageBuilder: (context, animation, secondaryAnimation) {
+                return BlocProvider(
+                  create: (context) => TransactionCubit(),
+                  child: TransactionPage(isAdd: true),
+                );
+              },
+            ),
       ),
     );
   }
