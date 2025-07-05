@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -307,7 +309,7 @@ class _AccountPageState extends State<AccountPage> {
                       ),
                       onBarTap: (bar) {
                         // Обработка нажатия на столбец
-                        print(
+                        log(
                           'Нажат столбец: ${bar.formattedDate} - ${bar.value}',
                         );
                       },
@@ -425,25 +427,23 @@ class _AccountPageState extends State<AccountPage> {
         final dayIncome = incomeTransactions
             .where(
               (t) =>
-                  t != null &&
                   t.transactionDate.isAfter(dayStart) &&
                   t.transactionDate.isBefore(dayEnd),
             )
             .fold<double>(
               0,
-              (sum, t) => sum + (double.tryParse(t?.amount ?? '0') ?? 0),
+              (sum, t) => sum + (double.tryParse(t.amount) ?? 0),
             );
 
         final dayExpense = expenseTransactions
             .where(
               (t) =>
-                  t != null &&
                   t.transactionDate.isAfter(dayStart) &&
                   t.transactionDate.isBefore(dayEnd),
             )
             .fold<double>(
               0,
-              (sum, t) => sum + (double.tryParse(t?.amount ?? '0') ?? 0),
+              (sum, t) => sum + (double.tryParse(t.amount) ?? 0),
             );
 
         final balance = dayIncome - dayExpense;
@@ -468,25 +468,23 @@ class _AccountPageState extends State<AccountPage> {
         final monthIncome = incomeTransactions
             .where(
               (t) =>
-                  t != null &&
                   t.transactionDate.isAfter(monthStart) &&
                   t.transactionDate.isBefore(monthEnd),
             )
             .fold<double>(
               0,
-              (sum, t) => sum + (double.tryParse(t?.amount ?? '0') ?? 0),
+              (sum, t) => sum + (double.tryParse(t.amount) ?? 0),
             );
 
         final monthExpense = expenseTransactions
             .where(
               (t) =>
-                  t != null &&
                   t.transactionDate.isAfter(monthStart) &&
                   t.transactionDate.isBefore(monthEnd),
             )
             .fold<double>(
               0,
-              (sum, t) => sum + (double.tryParse(t?.amount ?? '0') ?? 0),
+              (sum, t) => sum + (double.tryParse(t.amount) ?? 0),
             );
 
         final balance = monthIncome - monthExpense;

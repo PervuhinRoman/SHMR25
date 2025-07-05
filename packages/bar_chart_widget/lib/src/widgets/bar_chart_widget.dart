@@ -159,8 +159,6 @@ class _BarChartWidgetState extends State<BarChartWidget>
     return const SizedBox.shrink();
   }
 
-
-
   /// Строит пустое состояние
   Widget _buildEmptyState() {
     return SizedBox(
@@ -226,7 +224,8 @@ class _BarChartWidgetState extends State<BarChartWidget>
           minY: minValue < 0 ? minValue * 1.1 : 0, // Минимальный отступ снизу
           barTouchData: BarTouchData(
             touchTooltipData: BarTouchTooltipData(
-              getTooltipItem: (group, groupIndex, rod, rodIndex) => null, // Возвращаем null для отключения tooltip
+              getTooltipItem: (group, groupIndex, rod, rodIndex) =>
+                  null, // Возвращаем null для отключения tooltip
             ),
             touchCallback: (FlTouchEvent event, barTouchResponse) {
               // Обрабатываем только удержание (long press)
@@ -263,7 +262,7 @@ class _BarChartWidgetState extends State<BarChartWidget>
             ),
           ),
           borderData: FlBorderData(show: false), // Убираем границы
-          gridData: FlGridData(show: false), // Убираем сетку
+          gridData: const FlGridData(show: false), // Убираем сетку
           barGroups: bars,
         ),
       ),

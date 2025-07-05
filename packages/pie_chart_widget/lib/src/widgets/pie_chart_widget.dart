@@ -101,7 +101,7 @@ class _PieChartWidgetState extends State<PieChartWidget>
     return HSLColor.fromAHSL(1.0, hue, saturation, lightness).toColor();
   }
 
-  /// Показывает тултип с информацией о секции
+  /// Показывает tooltip с информацией о секции
   void _showTooltip(ChartSection section) {
     if (!widget.config.enableTooltips || _isShowingTooltip) return;
 
