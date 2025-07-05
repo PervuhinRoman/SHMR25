@@ -306,6 +306,7 @@ class _AccountPageState extends State<AccountPage> {
                         enableTooltips: true,
                         numberFormat: '#,##0',
                         showGrid: false,
+                        onBoard: 1000.0, // Базовая линия на уровне 1000 рублей
                       ),
                       onBarTap: (bar) {
                         // Обработка нажатия на столбец

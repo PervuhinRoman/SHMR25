@@ -114,8 +114,13 @@ class _BarChartWidgetState extends State<BarChartWidget>
       final index = entry.key;
       final bar = entry.value;
 
+      // Рассчитываем позиции столбца
+      final double baseline = 0, fromY = 0, toY;
+
+      toY = baseline + bar.value;
+
       log(
-        "📊 Столбец $index: ${bar.formattedDate} - ${bar.value}",
+        "📊 Столбец $index: ${bar.formattedDate} - ${bar.value} (fromY: $fromY, toY: $toY, baseline: $baseline)",
         name: 'BarChart',
       );
 
@@ -123,7 +128,8 @@ class _BarChartWidgetState extends State<BarChartWidget>
         x: index,
         barRods: [
           BarChartRodData(
-            toY: bar.value,
+            fromY: fromY,
+            toY: toY,
             color: Color(bar.color),
             width: widget.config.barWidth,
             borderRadius: BorderRadius.circular(widget.config.barRadius),
@@ -204,24 +210,46 @@ class _BarChartWidgetState extends State<BarChartWidget>
   /// Строит основной график
   Widget _buildChart() {
     final bars = _buildBars();
-    final maxValue = widget.bars.fold<double>(
-      0,
-      (max, bar) => bar.value > max ? bar.value : max,
-    );
+
+    // Рассчитываем базовую линию
     final minValue = widget.bars.fold<double>(
       0,
       (min, bar) => bar.value < min ? bar.value : min,
     );
+    final maxValue = widget.bars.fold<double>(
+      0,
+      (max, bar) => bar.value > max ? bar.value : max,
+    );
+
+    // Используем onBoard из конфигурации или автоматически рассчитываем
+    final baseline = widget.config.onBoard ?? (minValue < 0 ? -minValue : 0);
+
+    // Рассчитываем диапазон с учетом базовой линии
+    // Для отрицательных значений: baseline + minValue (может быть меньше baseline)
+    // Для положительных значений: baseline + maxValue
+    final actualMinY =
+        baseline + minValue; // Минимальное значение с учетом сдвига
+    final actualMaxY =
+        baseline + maxValue; // Максимальное значение с учетом сдвига
 
     log("📊 Создано столбцов: ${bars.length}", name: 'BarChart');
+    log("📊 Исходные значения: minValue=$minValue, maxValue=$maxValue",
+        name: 'BarChart');
+    log("📊 Базовая линия: $baseline", name: 'BarChart');
+    log("📊 Диапазон осей: minY=$actualMinY, maxY=$actualMaxY",
+        name: 'BarChart');
 
     return SizedBox(
       height: widget.config.height,
       child: BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
-          maxY: maxValue > 0 ? maxValue * 1.1 : 0, // Минимальный отступ сверху
-          minY: minValue < 0 ? minValue * 1.1 : 0, // Минимальный отступ снизу
+          maxY: actualMaxY > 0
+              ? actualMaxY * 1.1
+              : baseline * 1.1, // Отступ сверху
+          minY: actualMinY < 0
+              ? actualMinY * 1.1
+              : actualMinY, // Отступ снизу для отрицательных
           barTouchData: BarTouchData(
             touchTooltipData: BarTouchTooltipData(
               getTooltipItem: (group, groupIndex, rod, rodIndex) =>
