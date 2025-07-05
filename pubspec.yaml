@@ -47,6 +47,13 @@ dependencies:
   sensors_plus: ^4.0.2
   device_info_plus: ^10.1.0
   fuzzywuzzy: ^1.2.0
+  fl_chart: ^0.69.0
+  pie_chart_widget:
+    path: packages/pie_chart_widget
+  bar_chart_widget:
+    path: packages/bar_chart_widget
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.6
 
 dev_dependencies:
   flutter_test:
@@ -113,3 +120,22 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon.jpeg"
+  adaptive_icon_background: "#1a3c1a"
+  adaptive_icon_foreground: "assets/icon.jpeg"
+  remove_alpha_ios: true
+
+flutter_native_splash:
+  color: "#1a3c1a"
+  image: assets/splash.jpeg
+  android: true
+  ios: true
+  android_gravity: center
+  ios_content_mode: center
+  fullscreen: true
+  android_screen_orientation: portrait
+  web: false

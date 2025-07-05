@@ -6,9 +6,11 @@ import 'package:intl/intl.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/domain/cubit/transactions/datepicker_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
+import 'package:shmr_finance/domain/models/category/combine_category.dart';
 import 'package:shmr_finance/presentation/selected_category_page.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_analyze_category.dart';
+import 'package:pie_chart_widget/pie_chart_widget.dart';
 
 class AnalyzePage extends StatefulWidget {
   final bool isIncome;
@@ -20,9 +22,11 @@ class AnalyzePage extends StatefulWidget {
 }
 
 class _AnalyzePageState extends State<AnalyzePage> {
+
   @override
   void initState() {
     super.initState();
+
     final datePickerCubit = context.read<DatePickerCubit>();
     final transactionCubit = context.read<TransactionCubit>();
     final startDate = datePickerCubit.state.startDate;
@@ -33,6 +37,67 @@ class _AnalyzePageState extends State<AnalyzePage> {
       endDate: endDate,
     );
   }
+
+  Widget _buildPieChart(List<CombineCategory> categories, double totalSum) {
+    // Отладочная информация
+    log(
+      "📊 График: количество категорий = ${categories.length}",
+      name: 'PieChart',
+    );
+    log("📊 График: общая сумма = $totalSum", name: 'PieChart');
+    for (int i = 0; i < categories.length; i++) {
+      final category = categories[i];
+      log(
+        "📊 Категория $i: ${category.category.name} - ${category.totalAmount}",
+        name: 'PieChart',
+      );
+    }
+
+    // Конвертируем данные в формат для пакета
+    final chartSections = categories.map((category) {
+      return ChartSection.fromData(
+        id: category.category.id.toString(),
+        name: category.category.name,
+        emoji: category.category.emoji,
+        value: category.totalAmount.toDouble(),
+        totalValue: totalSum,
+        additionalInfo: category.lastTransaction?.comment,
+      );
+    }).toList();
+
+    // Конфигурация графика
+    final config = PieChartConfig(
+      size: 300.0,
+      sectionRadius: 16.0,
+      centerSpaceRadius: 100.0,
+      legendDotSize: 12.0,
+      legendFontSize: 12.0,
+      maxLegendWidth: 180.0,
+      maxLegendHeight: 180.0,
+      legendRowSpacing: 1.0,
+      enableAnimation: true,
+      animationDuration: const Duration(milliseconds: 1500),
+      enableTooltips: true,
+      showLegend: true,
+      showPercentages: true,
+      numberFormat: '#,##0.00',
+    );
+
+    return Center(
+      child: PieChartWidget(
+        sections: chartSections,
+        config: config,
+        onSectionTap: (section) {
+          log("📊 Нажата секция: ${section.name}", name: 'PieChart');
+        },
+        onLegendTap: (section) {
+          log("📊 Нажата легенда: ${section.name}", name: 'PieChart');
+        },
+      ),
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +111,7 @@ class _AnalyzePageState extends State<AnalyzePage> {
           startDate: datePickerState.startDate,
           endDate: datePickerState.endDate,
         );
+
       },
       child: BlocBuilder<DatePickerCubit, DatePickerState>(
         builder: (context, datePickerState) {
@@ -126,7 +192,7 @@ class _AnalyzePageState extends State<AnalyzePage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Период: начало"),
+                          Text("Период: конец"),
                           InputChip(
                             label: Text(
                               datePickerState.endDate != null
@@ -146,7 +212,7 @@ class _AnalyzePageState extends State<AnalyzePage> {
                                   await showDatePicker(
                                     context: context,
                                     initialDate:
-                                        datePickerState.startDate ??
+                                        datePickerState.endDate ??
                                         DateTime.now(),
                                     firstDate: DateTime(2000),
                                     lastDate: DateTime(2100),
@@ -189,7 +255,10 @@ class _AnalyzePageState extends State<AnalyzePage> {
                       thickness: 1,
                       color: CustomAppTheme.figmaBgGrayColor,
                     ),
-                    Text("ГРАФИК", textAlign: TextAlign.center),
+                    // Круговой график
+                    Center(
+                      child: _buildPieChart(categories, totalSum.toDouble()),
+                    ),
                     Expanded(
                       child: () {
                         if (transactionState.status ==

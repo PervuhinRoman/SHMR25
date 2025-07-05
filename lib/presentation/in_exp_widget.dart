@@ -3,13 +3,14 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
+import 'package:shmr_finance/presentation/transaction_dialog.dart';
 
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/domain/cubit/transactions/datepicker_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transactions/sort_type_cubit.dart';
-import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
 import 'in_exp_history_widget.dart';
 
 class InExpWidget extends StatefulWidget {
@@ -24,6 +25,12 @@ class _InExpWidgetState extends State<InExpWidget> {
   @override
   void initState() {
     super.initState();
+    final transactionCubit = context.read<TransactionCubit>();
+    transactionCubit.fetchTransactions(
+      startDate: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
+      endDate: DateTime.now().copyWith(hour: 23, minute: 59, second: 59),
+      isIncome: widget.isIncome,
+    );
     log(
       '🚀 InExpWidget initState вызван для ${widget.isIncome ? "доходов" : "расходов"}',
       name: "InExpWidget",
@@ -219,6 +226,33 @@ class _InExpWidgetState extends State<InExpWidget> {
                             icon: item.category.emoji,
                             time: item.transactionDate,
                             comment: item.comment,
+                            onTap: () {
+                              showGeneralDialog(
+                                context: context,
+                                pageBuilder: (
+                                  context,
+                                  animation,
+                                  secondaryAnimation,
+                                ) {
+                                  return BlocProvider(
+                                    create: (context) => TransactionCubit(),
+                                    child: TransactionPage(
+                                      isAdd: false,
+                                      accountName: item.account.name,
+                                      categoryName: item.category.name,
+                                      categoryEmoji: item.category.emoji,
+                                      categoryIndex:
+                                          item
+                                              .category
+                                              .id, // Предполагаем, что id используется как индекс
+                                      amount: double.tryParse(item.amount),
+                                      dateTime: item.transactionDate,
+                                      title: item.comment,
+                                    ),
+                                  );
+                                },
+                              );
+                            },
                           );
                         }
                       },
@@ -229,6 +263,20 @@ class _InExpWidgetState extends State<InExpWidget> {
             ],
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        shape: CircleBorder(),
+        child: Icon(Icons.add),
+        onPressed:
+            () => showGeneralDialog(
+              context: context,
+              pageBuilder: (context, animation, secondaryAnimation) {
+                return BlocProvider(
+                  create: (context) => TransactionCubit(),
+                  child: TransactionPage(isAdd: true),
+                );
+              },
+            ),
       ),
     );
   }
