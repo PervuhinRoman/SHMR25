@@ -4,13 +4,16 @@ import 'package:intl/intl.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/data/repositories/account_repo_impl.dart';
 import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
+import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
 import 'package:shmr_finance/domain/models/account/account.dart';
 import 'package:shmr_finance/domain/models/currency/currency.dart';
 import 'package:shmr_finance/presentation/account_delete_page.dart';
 import 'package:shmr_finance/presentation/edit_account_page.dart';
 import 'package:shmr_finance/presentation/widgets/animated_balance_tile.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
+import 'package:bar_chart_widget/bar_chart_widget.dart';
 
+import '../domain/models/transaction/transaction.dart';
 import 'services/balance_visibility_service.dart';
 import '../domain/cubit/account/blur_cubit.dart';
 
@@ -30,6 +33,11 @@ class _AccountPageState extends State<AccountPage> {
   final BalanceVisibilityService _balanceVisibilityService =
       BalanceVisibilityService();
   bool _isServiceInitialized = false;
+
+  // Состояние для segmented control
+  int _selectedPeriodIndex = 0; // 0 - дни, 1 - месяцы
+  List<BarData> _chartData = [];
+  bool _isChartLoading = false;
 
   @override
   void didChangeDependencies() {
@@ -55,6 +63,7 @@ class _AccountPageState extends State<AccountPage> {
   void initState() {
     super.initState();
     _loadAccountData();
+    _loadChartData();
   }
 
   Future<void> _loadAccountData() async {
@@ -226,10 +235,115 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                 ],
               ),
+              const SizedBox(height: 24),
+              // График баланса
+              _buildBalanceChart(),
             ],
           ),
         );
       },
+    );
+  }
+
+  /// Строит виджет графика баланса
+  Widget _buildBalanceChart() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Segmented Control
+          Container(
+            decoration: BoxDecoration(
+              color: CustomAppTheme.figmaBgGrayColor.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildPeriodButton(
+                    title: '30 дней',
+                    isSelected: _selectedPeriodIndex == 0,
+                    onTap: () => _onPeriodChanged(0),
+                  ),
+                ),
+                Expanded(
+                  child: _buildPeriodButton(
+                    title: '12 месяцев',
+                    isSelected: _selectedPeriodIndex == 1,
+                    onTap: () => _onPeriodChanged(1),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          // График
+          SizedBox(
+            height: 300,
+            child:
+                _isChartLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _chartData.isEmpty
+                    ? const Center(
+                      child: Text(
+                        'Нет данных для отображения',
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                      ),
+                    )
+                    : BarChartWidget(
+                      bars: _chartData,
+                      config: BarChartConfig(
+                        height: 250,
+                        barWidth: 8,
+                        positiveColor: CustomAppTheme.figmaMainColor,
+                        negativeColor: CustomAppTheme.figmaRedColor,
+                        textColor: CustomAppTheme.figmaDarkGrayColor,
+                        gridColor: CustomAppTheme.figmaBgGrayColor,
+                        labelFontSize: 8,
+                        enableTooltips: true,
+                        numberFormat: '#,##0',
+                        showGrid: false,
+                      ),
+                      onBarTap: (bar) {
+                        // Обработка нажатия на столбец
+                        print(
+                          'Нажат столбец: ${bar.formattedDate} - ${bar.value}',
+                        );
+                      },
+                    ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Строит кнопку периода для segmented control
+  Widget _buildPeriodButton({
+    required String title,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color:
+              isSelected ? CustomAppTheme.figmaMainColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          title,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color:
+                isSelected ? Colors.white : CustomAppTheme.figmaDarkGrayColor,
+          ),
+        ),
+      ),
     );
   }
 
@@ -238,6 +352,168 @@ class _AccountPageState extends State<AccountPage> {
       context,
       MaterialPageRoute(builder: (context) => const EditAccountPage()),
     );
+  }
+
+  /// Загружает данные для графика
+  Future<void> _loadChartData() async {
+    setState(() {
+      _isChartLoading = true;
+    });
+
+    try {
+      final endDate = DateTime.now();
+      final startDate =
+          _selectedPeriodIndex == 0
+              ? endDate.subtract(const Duration(days: 30)) // 30 дней
+              : DateTime(endDate.year - 1, endDate.month, 1); // 12 месяцев
+
+      // Загружаем все транзакции за период
+      await context.read<TransactionCubit>().fetchTransactions(
+        startDate: startDate,
+        endDate: endDate,
+        isIncome: true, // Доходы
+      );
+
+      // Получаем состояние с транзакциями
+      final transactionState = context.read<TransactionCubit>().state;
+      final incomeTransactions = transactionState.transactions;
+
+      // Загружаем расходы
+      await context.read<TransactionCubit>().fetchTransactions(
+        startDate: startDate,
+        endDate: endDate,
+        isIncome: false, // Расходы
+      );
+
+      if (!context.mounted) return;
+
+      final updatedState = context.read<TransactionCubit>().state;
+      final expenseTransactions = updatedState.transactions;
+
+      // Генерируем данные для графика
+      _generateChartData(
+        incomeTransactions,
+        expenseTransactions,
+        startDate,
+        endDate,
+      );
+    } catch (e) {
+      debugPrint('Ошибка загрузки данных графика: $e');
+    } finally {
+      setState(() {
+        _isChartLoading = false;
+      });
+    }
+  }
+
+  /// Генерирует данные для графика на основе транзакций
+  void _generateChartData(
+    List<TransactionResponse> incomeTransactions,
+    List<TransactionResponse> expenseTransactions,
+    DateTime startDate,
+    DateTime endDate,
+  ) {
+    final chartData = <BarData>[];
+
+    if (_selectedPeriodIndex == 0) {
+      // Группируем по дням
+      for (int i = 0; i < 30; i++) {
+        final date = endDate.subtract(Duration(days: 29 - i));
+        final dayStart = DateTime(date.year, date.month, date.day);
+        final dayEnd = dayStart.add(const Duration(days: 1));
+
+        final dayIncome = incomeTransactions
+            .where(
+              (t) =>
+                  t != null &&
+                  t.transactionDate.isAfter(dayStart) &&
+                  t.transactionDate.isBefore(dayEnd),
+            )
+            .fold<double>(
+              0,
+              (sum, t) => sum + (double.tryParse(t?.amount ?? '0') ?? 0),
+            );
+
+        final dayExpense = expenseTransactions
+            .where(
+              (t) =>
+                  t != null &&
+                  t.transactionDate.isAfter(dayStart) &&
+                  t.transactionDate.isBefore(dayEnd),
+            )
+            .fold<double>(
+              0,
+              (sum, t) => sum + (double.tryParse(t?.amount ?? '0') ?? 0),
+            );
+
+        final balance = dayIncome - dayExpense;
+
+        chartData.add(
+          BarData.fromData(
+            date: date,
+            value: balance,
+            positiveColor: CustomAppTheme.figmaMainColor.value,
+            negativeColor: CustomAppTheme.figmaRedColor.value,
+            dateFormat: 'dd.MM',
+          ),
+        );
+      }
+    } else {
+      // Группируем по месяцам
+      for (int i = 0; i < 12; i++) {
+        final date = DateTime(endDate.year, endDate.month - 11 + i, 1);
+        final monthStart = DateTime(date.year, date.month, 1);
+        final monthEnd = DateTime(date.year, date.month + 1, 1);
+
+        final monthIncome = incomeTransactions
+            .where(
+              (t) =>
+                  t != null &&
+                  t.transactionDate.isAfter(monthStart) &&
+                  t.transactionDate.isBefore(monthEnd),
+            )
+            .fold<double>(
+              0,
+              (sum, t) => sum + (double.tryParse(t?.amount ?? '0') ?? 0),
+            );
+
+        final monthExpense = expenseTransactions
+            .where(
+              (t) =>
+                  t != null &&
+                  t.transactionDate.isAfter(monthStart) &&
+                  t.transactionDate.isBefore(monthEnd),
+            )
+            .fold<double>(
+              0,
+              (sum, t) => sum + (double.tryParse(t?.amount ?? '0') ?? 0),
+            );
+
+        final balance = monthIncome - monthExpense;
+
+        chartData.add(
+          BarData.fromData(
+            date: date,
+            value: balance,
+            positiveColor: CustomAppTheme.figmaMainColor.value,
+            negativeColor: CustomAppTheme.figmaRedColor.value,
+            dateFormat: 'MM.yy',
+          ),
+        );
+      }
+    }
+
+    setState(() {
+      _chartData = chartData;
+    });
+  }
+
+  /// Обработчик изменения периода
+  void _onPeriodChanged(int index) {
+    setState(() {
+      _selectedPeriodIndex = index;
+    });
+    _loadChartData();
   }
 }
 

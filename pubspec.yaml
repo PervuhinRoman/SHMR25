@@ -50,6 +50,8 @@ dependencies:
   fl_chart: ^0.69.0
   pie_chart_widget:
     path: packages/pie_chart_widget
+  bar_chart_widget:
+    path: packages/bar_chart_widget
 
 dev_dependencies:
   flutter_test:
