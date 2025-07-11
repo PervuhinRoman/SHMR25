@@ -110,6 +110,7 @@ class _SelectedCategoryPageState extends State<SelectedCategoryPage> {
                                     create: (context) => TransactionCubit(),
                                     child: TransactionPage(
                                       isAdd: false,
+                                      isIncome: widget.isIncome,
                                       accountName: item.account.name,
                                       categoryName: item.category.name,
                                       categoryEmoji: item.category.emoji,

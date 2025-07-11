@@ -9,6 +9,7 @@ import '../app_theme.dart';
 
 class TransactionPage extends StatefulWidget {
   final bool isAdd;
+  final bool isIncome;
   final String? categoryName;
   final String? categoryEmoji;
   final int? categoryIndex;
@@ -21,6 +22,7 @@ class TransactionPage extends StatefulWidget {
   const TransactionPage({
     super.key,
     required this.isAdd,
+    required this.isIncome,
     this.categoryName,
     this.categoryEmoji,
     this.categoryIndex,
@@ -420,70 +422,76 @@ class _TransactionPageState extends State<TransactionPage> {
                   builder:
                       (context) => BlocBuilder<CategoryCubit, CategoryState>(
                         builder: (context, state) {
-                          return Padding(
-                            padding: MediaQuery.of(context).viewInsets,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 40,
-                                  height: 4,
-                                  margin: const EdgeInsets.only(
-                                    bottom: 16,
-                                    top: 16,
+                          context.read<CategoryCubit>().loadCategoriesByType(
+                            widget.isIncome,
+                          );
+                          return SingleChildScrollView(
+                            child: Padding(
+                              padding: MediaQuery.of(context).viewInsets,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 40,
+                                    height: 4,
+                                    margin: const EdgeInsets.only(
+                                      bottom: 16,
+                                      top: 16,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[300],
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
                                   ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[300],
-                                    borderRadius: BorderRadius.circular(2),
+                                  const Text(
+                                    'Выберите категорию',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
-                                const Text(
-                                  'Выберите категорию',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
+                                  const SizedBox(height: 16),
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemCount: state.filteredCategories.length,
+                                    itemBuilder: (context, index) {
+                                      final category = state.categories[index];
+                                      return Column(
+                                        children: [
+                                          ListTile(
+                                            leading: Text(category.emoji),
+                                            title: Text(category.name),
+                                            trailing:
+                                                _selectedCategoryInd == index
+                                                    ? Icon(
+                                                      Icons.check,
+                                                      color:
+                                                          CustomAppTheme
+                                                              .figmaMainColor,
+                                                    )
+                                                    : null,
+                                            onTap: () {
+                                              Navigator.of(context).pop({
+                                                'index': index,
+                                                'name': category.name,
+                                              });
+                                            },
+                                          ),
+                                          const Divider(
+                                            height: 1,
+                                            thickness: 1,
+                                            color:
+                                                CustomAppTheme.figmaBgGrayColor,
+                                          ),
+                                        ],
+                                      );
+                                    },
                                   ),
-                                ),
-                                const SizedBox(height: 16),
-                                ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  itemCount: state.filteredCategories.length,
-                                  itemBuilder: (context, index) {
-                                    final category = state.categories[index];
-                                    return Column(
-                                      children: [
-                                        ListTile(
-                                          leading: Text(category.emoji),
-                                          title: Text(category.name),
-                                          trailing:
-                                              _selectedCategoryInd == index
-                                                  ? Icon(
-                                                    Icons.check,
-                                                    color:
-                                                        CustomAppTheme
-                                                            .figmaMainColor,
-                                                  )
-                                                  : null,
-                                          onTap: () {
-                                            Navigator.of(context).pop({
-                                              'index': index,
-                                              'name': category.name,
-                                            });
-                                          },
-                                        ),
-                                        const Divider(
-                                          height: 1,
-                                          thickness: 1,
-                                          color:
-                                              CustomAppTheme.figmaBgGrayColor,
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                                const SizedBox(height: 32),
-                              ],
+                                  const SizedBox(height: 32),
+                                ],
+                              ),
                             ),
                           );
                         },
