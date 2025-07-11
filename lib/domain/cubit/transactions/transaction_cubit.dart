@@ -10,6 +10,7 @@ import 'package:shmr_finance/data/repositories/account_repo_impl.dart';
 import 'package:shmr_finance/data/repositories/category_repo_impl.dart';
 import 'package:shmr_finance/data/repositories/transaction_repo_impl.dart';
 import 'package:shmr_finance/domain/models/transaction/transaction.dart';
+import 'package:shmr_finance/data/database/transaction_database.dart';
 
 part 'transaction_state.dart';
 
@@ -79,37 +80,13 @@ class TransactionCubit extends Cubit<TransactionState> {
 
       // Сохраняем транзакции в локальное хранилище за период
       if (startDate != null && endDate != null) {
-        await transactionRepo.saveTransactionsForPeriod(
+        await transactionRepo.saveTransactionsForPeriodDrift(
           rawResponses,
           startDate,
           endDate,
+          AppDatabase.instance,
         );
-      } else {
-        // Fallback для сегодняшних транзакций (т.е. если null)
-        final today = DateTime.now();
-        final todayTransactions =
-            rawResponses
-                .where(
-                  (response) =>
-                      response.transactionDate.year == today.year &&
-                      response.transactionDate.month == today.month &&
-                      response.transactionDate.day == today.day,
-                )
-                .map(
-                  (r) => Transaction(
-                    id: r.id,
-                    accountId: r.account.id,
-                    categoryId: r.category.id,
-                    amount: r.amount,
-                    transactionDate: r.transactionDate,
-                    comment: r.comment,
-                    createdAt: r.createdAt,
-                    updatedAt: r.updatedAt,
-                  ),
-                )
-                .toList();
-        await transactionRepo.saveTodayTransactions(todayTransactions);
-      }
+      } // else-блок с todayTransactions можно закомментировать или удалить, если не нужен
       log(
         '✅ Эмитим состояние: ${responses.length} транзакций, статус: loaded, источник: network',
         name: 'Transaction',
@@ -144,7 +121,22 @@ class TransactionCubit extends Cubit<TransactionState> {
         accountRepo,
         categoryRepo,
       );
-      final responses = await transactionRepo.getTodayTransactions();
+      final today = DateTime.now();
+      final startOfDay = DateTime(today.year, today.month, today.day, 0, 0, 0);
+      final endOfDay = DateTime(
+        today.year,
+        today.month,
+        today.day,
+        23,
+        59,
+        59,
+        999,
+      );
+      final responses = await transactionRepo.getTransactionsForPeriodDrift(
+        startOfDay,
+        endOfDay,
+        AppDatabase.instance,
+      );
       log(
         '📱 Загружено из кэша за сегодня: ${responses.length} транзакций',
         name: 'Transaction',
@@ -197,23 +189,15 @@ class TransactionCubit extends Cubit<TransactionState> {
         accountRepo,
         categoryRepo,
       );
-      final responses = await transactionRepo.getTransactionsForPeriod(
+      final responses = await transactionRepo.getTransactionsForPeriodDrift(
         startDate,
         endDate,
+        AppDatabase.instance,
       );
       log(
         '📱 Загружено из кэша за период: ${responses.length} транзакций',
         name: 'Transaction',
       );
-
-      // Проверяем данные перед фильтрацией
-      for (int i = 0; i < responses.length && i < 3; i++) {
-        final response = responses[i];
-        log(
-          '📊 Кэш транзакция $i: id=${response.id}, amount=${response.amount}, category=${response.category.name}, isIncome=${response.category.isIncome}',
-          name: 'Transaction',
-        );
-      }
 
       final filteredResponses =
           responses
@@ -223,15 +207,6 @@ class TransactionCubit extends Cubit<TransactionState> {
         '📱 Отфильтровано по isIncome=$isIncome: ${filteredResponses.length} транзакций',
         name: 'Transaction',
       );
-
-      // Проверяем отфильтрованные данные
-      for (int i = 0; i < filteredResponses.length && i < 3; i++) {
-        final response = filteredResponses[i];
-        log(
-          '✅ Отфильтрованная транзакция $i: id=${response.id}, amount=${response.amount}, category=${response.category.name}, isIncome=${response.category.isIncome}',
-          name: 'Transaction',
-        );
-      }
 
       if (!isClosed) {
         emit(

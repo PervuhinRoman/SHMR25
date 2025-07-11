@@ -54,6 +54,9 @@ dependencies:
     path: packages/bar_chart_widget
   flutter_launcher_icons: ^0.14.4
   flutter_native_splash: ^2.4.6
+  drift: ^2.26.1
+  drift_flutter: ^0.2.4
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +66,7 @@ dev_dependencies:
   build_runner: ^2.4.15
   json_serializable: ^6.9.5
   flutter_dotenv: ^5.2.1
+  drift_dev: ^2.26.1
 
 
   # The "flutter_lints" package below contains a set of recommended lints to
