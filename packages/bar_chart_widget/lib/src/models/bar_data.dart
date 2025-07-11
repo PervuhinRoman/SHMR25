@@ -4,13 +4,13 @@ import 'package:intl/intl.dart';
 class BarData {
   /// Дата (для отображения на оси X)
   final DateTime date;
-  
+
   /// Значение столбца (баланс за день/месяц)
   final double value;
-  
+
   /// Форматированная дата для отображения
   final String formattedDate;
-  
+
   /// Цвет столбца (зависит от значения)
   final int color;
 
@@ -29,13 +29,12 @@ class BarData {
     required int negativeColor,
     String? dateFormat,
   }) {
-    final formatter = dateFormat != null 
-        ? DateFormat(dateFormat)
-        : DateFormat('dd.MM');
-    
+    final formatter =
+        dateFormat != null ? DateFormat(dateFormat) : DateFormat('dd.MM');
+
     return BarData(
       date: date,
-      value: value,
+      value: value.abs(),
       formattedDate: formatter.format(date),
       color: value >= 0 ? positiveColor : negativeColor,
     );
@@ -56,4 +55,4 @@ class BarData {
   String toString() {
     return 'BarData{date: $formattedDate, value: $value}';
   }
-} 
+}

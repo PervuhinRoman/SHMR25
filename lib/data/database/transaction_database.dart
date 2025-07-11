@@ -1,113 +1,67 @@
-import 'dart:developer';
+import 'package:drift/drift.dart';
+import 'package:drift_flutter/drift_flutter.dart';
+import 'tables/transaction_response_db.dart';
+import 'tables/account_brief_db.dart';
+import 'tables/category_db.dart';
+import 'package:path_provider/path_provider.dart';
 
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+part 'transaction_database.g.dart';
 
-class TransactionDatabase {
-  static final TransactionDatabase instance = TransactionDatabase._init();
-  static Database? _database;
+@DriftDatabase(tables: [TransactionResponseDB, AccountBriefDB, CategoryDB])
+class AppDatabase extends _$AppDatabase {
+  static final AppDatabase instance = AppDatabase._internal();
+  AppDatabase._internal() : super(_openConnection());
+  factory AppDatabase() => instance;
 
-  TransactionDatabase._init();
+  @override
+  int get schemaVersion => 1;
 
-  Future<Database> get database async {
-    if (_database != null) return _database!;
-    _database = await _initDB('transactions.db');
-    return _database!;
-  }
-
-  Future<Database> _initDB(String filePath) async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
-    return await openDatabase(path, version: 1, onCreate: _createDB);
-  }
-
-  Future _createDB(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE transactions(
-        id TEXT PRIMARY KEY,
-        amount REAL,
-        category TEXT,
-        date TEXT,
-        note TEXT
-      )
-    ''');
-  }
-
-  Future<void> insertTransaction(Map<String, dynamic> json) async {
-    final db = await instance.database;
-    await db.insert(
-      'transactions',
-      json,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  Future<List<Map<String, dynamic>>> getTransactionsByDate(String date) async {
-    final db = await instance.database;
-    final result = await db.query(
-      'transactions',
-      where: 'date = ?',
-      whereArgs: [date],
-    );
-    log(
-      '📖 Загружено из кэша за дату $date: ${result.length} транзакций',
-      time: DateTime.now(),
-    );
-    return result;
-  }
-
-  Future<List<Map<String, dynamic>>> getTransactionsByPeriod(
-    String startDate,
-    String endDate,
+  /// Вставка транзакций с учётом связанных аккаунтов и категорий
+  Future<void> insertTransactionResponses(
+    List<Insertable<TransactionResponseDBData>> transactions,
+    List<Insertable<AccountBriefDBData>> accounts,
+    List<Insertable<CategoryDBData>> categories,
   ) async {
-    final db = await instance.database;
-    final result = await db.query(
-      'transactions',
-      where: 'date BETWEEN ? AND ?',
-      whereArgs: [startDate, endDate],
-    );
-    log(
-      '📖 Загружено из кэша за период $startDate - $endDate: ${result.length} транзакций',
-      name: "TransactionDatabase",
-    );
-    return result;
+    await batch((batch) {
+      batch.insertAllOnConflictUpdate(accountBriefDB, accounts);
+      batch.insertAllOnConflictUpdate(categoryDB, categories);
+      batch.insertAllOnConflictUpdate(transactionResponseDB, transactions);
+    });
   }
 
-  Future<void> saveTransactionsForPeriod(
-    List<Map<String, dynamic>> transactions,
-    String startDate,
-    String endDate,
-  ) async {
-    final db = await instance.database;
-    log('🗑️ Удаление старых транзакций за период $startDate - $endDate');
-    // Удаляем старые транзакции за этот период
-    await db.delete(
-      'transactions',
-      where: 'date BETWEEN ? AND ?',
-      whereArgs: [startDate, endDate],
-    );
-    // Вставляем новые
-    for (final transaction in transactions) {
-      await db.insert(
-        'transactions',
-        transaction,
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    }
-    log(
-      '💾 Сохранено в кэш за период $startDate - $endDate: ${transactions.length} транзакций',
-    );
+  /// Получение транзакций за период
+  Future<List<TransactionResponseDBData>> getTransactionsByPeriod(
+    DateTime start,
+    DateTime end,
+  ) {
+    return (select(transactionResponseDB)..where(
+      (tbl) =>
+          tbl.transactionDate.isBiggerOrEqualValue(start) &
+          tbl.transactionDate.isSmallerOrEqualValue(end),
+    )).get();
   }
 
-  Future<void> clearTransactions() async {
-    final db = await instance.database;
-    await db.delete('transactions');
+  /// Удаление транзакций за период
+  Future<int> deleteTransactionsByPeriod(DateTime start, DateTime end) {
+    return (delete(transactionResponseDB)..where(
+      (tbl) =>
+          tbl.transactionDate.isBiggerOrEqualValue(start) &
+          tbl.transactionDate.isSmallerOrEqualValue(end),
+    )).go();
   }
 
-  Future close() async {
-    final db = _database;
-    if (db != null) {
-      await db.close();
-    }
+  /// Очистка всех транзакций
+  Future<int> clearAllTransactions() {
+    return delete(transactionResponseDB).go();
+  }
+
+  /// Метод для подключения к БД
+  static QueryExecutor _openConnection() {
+    return driftDatabase(
+      name: 'app_database',
+      native: const DriftNativeOptions(
+        databaseDirectory: getApplicationSupportDirectory,
+      ),
+    );
   }
 }

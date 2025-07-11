@@ -10,11 +10,12 @@ import 'account_repo.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import '../database/transaction_database.dart';
+import 'package:drift/drift.dart';
 
 class TransactionRepoImp implements TransactionRepository {
   final CategoryRepository _categoryRepo;
   final AccountRepository _accountRepo;
-  final TransactionDatabase _transactionDatabase;
+  final AppDatabase _transactionDatabase;
   final List<Transaction> _transactions = [
     Transaction(
       id: 1,
@@ -41,9 +42,8 @@ class TransactionRepoImp implements TransactionRepository {
   TransactionRepoImp(
     this._accountRepo,
     this._categoryRepo, [
-    TransactionDatabase? transactionDatabase,
-  ]) : _transactionDatabase =
-           transactionDatabase ?? TransactionDatabase.instance;
+    AppDatabase? transactionDatabase,
+  ]) : _transactionDatabase = transactionDatabase ?? AppDatabase.instance;
 
   // Метод для получения категории по ID
   Future<Category> _getCategoryById(int categoryId) async {
@@ -135,15 +135,16 @@ class TransactionRepoImp implements TransactionRepository {
           if (item is Map<String, dynamic>) {
             // Используем автоматически сгенерированный fromJson
             final transactionResponse = TransactionResponse.fromJson(item);
+            responses.add(transactionResponse);
 
             // Проверяем, что транзакция принадлежит нужному аккаунту
             // TODO: убрать / изменить, когда будем работать с реальным аккаунтом
-            if (transactionResponse.account.id == accountId) {
-              responses.add(transactionResponse);
-            }
+            // if (transactionResponse.account.id == accountId) {
+            //   responses.add(transactionResponse);
+            // }
           }
         } catch (e) {
-          log('Error parsing transaction: $e', name: 'TransactionRepo');
+          log('❗ Ошибка при парсинге: $e', name: 'TransactionRepo');
           continue;
         }
       }
@@ -152,8 +153,9 @@ class TransactionRepoImp implements TransactionRepository {
         '📊 После парсинга: ${responses.length} транзакций',
         name: 'TransactionRepo',
       );
-      // Фильтрация по датам
-      var filteredResponses = responses;
+
+      // Фильтрация и сортировка по датам
+      var filteredSortedResponses = responses;
       final startOfDay = startDate.copyWith(
         hour: 0,
         minute: 0,
@@ -161,8 +163,8 @@ class TransactionRepoImp implements TransactionRepository {
         millisecond: 0,
         microsecond: 0,
       );
-      filteredResponses =
-          filteredResponses
+      filteredSortedResponses =
+          filteredSortedResponses
               .where(
                 (t) =>
                     t.transactionDate.isAtSameMomentAs(startOfDay) ||
@@ -176,8 +178,8 @@ class TransactionRepoImp implements TransactionRepository {
         millisecond: 999,
         microsecond: 999,
       );
-      filteredResponses =
-          filteredResponses
+      filteredSortedResponses =
+          filteredSortedResponses
               .where(
                 (t) =>
                     t.transactionDate.isAtSameMomentAs(endOfDay) ||
@@ -186,10 +188,15 @@ class TransactionRepoImp implements TransactionRepository {
               .toList();
 
       log(
-        '📊 После фильтрации по датам: ${filteredResponses.length} транзакций',
+        '📊 После фильтрации по датам: ${filteredSortedResponses.length} транзакций',
         name: 'TransactionRepo',
       );
-      return filteredResponses;
+
+      filteredSortedResponses.sort(
+        (a, b) => b.transactionDate.compareTo(a.transactionDate),
+      );
+
+      return filteredSortedResponses;
     } catch (e) {
       log(
         '❌ Error in getPeriodTransactionsByAccount: $e',
@@ -256,175 +263,98 @@ class TransactionRepoImp implements TransactionRepository {
     _transactions.removeWhere((t) => t.id == id);
   }
 
-  // Локальное сохранение и получение транзакций за сегодня
-  Future<void> saveTodayTransactions(List<Transaction> transactions) async {
-    log(
-      '💾 Сохранение транзакций за сегодня в кэш: ${transactions.length} транзакций',
-      name: 'TransactionRepo',
-    );
-    await _transactionDatabase.clearTransactions();
-    for (final t in transactions) {
-      await _transactionDatabase.insertTransaction({
-        'id': t.id.toString(),
-        'amount': double.tryParse(t.amount) ?? 0.0,
-        'category': t.categoryId.toString(),
-        'date': t.transactionDate.toIso8601String().substring(0, 10),
-        'note': t.comment ?? '',
-      });
-    }
-    log(
-      '✅ Транзакции за сегодня успешно сохранены в кэш',
-      name: 'TransactionRepo',
-    );
-  }
-
-  Future<List<TransactionResponse>> getTodayTransactions() async {
-    final today = DateTime.now();
-    final dateStr = today.toIso8601String().substring(0, 10);
-    final maps = await _transactionDatabase.getTransactionsByDate(dateStr);
-    final List<TransactionResponse> responses = [];
-    for (final map in maps) {
-      final transaction = Transaction(
-        id: int.tryParse(map['id'].toString()) ?? 0,
-        accountId: 0, // Можно доработать, если нужно
-        categoryId: int.tryParse(map['category'].toString()) ?? 0,
-        amount: map['amount'].toString(),
-        transactionDate: DateTime.parse(map['date']),
-        comment: map['note'],
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
-      try {
-        final category = await _getCategoryById(transaction.categoryId);
-        final account = await _getAccountBriefById(transaction.accountId);
-        responses.add(
-          TransactionResponse(
-            id: transaction.id,
-            account: account,
-            category: category,
-            amount: transaction.amount,
-            transactionDate: transaction.transactionDate,
-            comment: transaction.comment,
-            createdAt: transaction.createdAt,
-            updatedAt: transaction.updatedAt,
-          ),
-        );
-      } catch (_) {
-        continue;
-      }
-    }
-    return responses;
-  }
-
-  Future<void> saveTransactionsForPeriod(
+  /// Сохранение транзакций за период
+  Future<void> saveTransactionsForPeriodDrift(
     List<TransactionResponse> transactions,
     DateTime startDate,
     DateTime endDate,
+    AppDatabase db,
   ) async {
-    log(
-      '💾 Сохранение транзакций за период ${startDate.toIso8601String().substring(0, 10)} - ${endDate.toIso8601String().substring(0, 10)} в кэш: ${transactions.length} транзакций',
-      name: 'TransactionRepo',
-    );
-    final startDateStr = startDate.toIso8601String().substring(0, 10);
-    final endDateStr = endDate.toIso8601String().substring(0, 10);
-    final maps =
-        transactions
-            .map(
-              (t) => {
-                'id': t.id.toString(),
-                'amount': double.tryParse(t.amount) ?? 0.0,
-                'category': t.category.id.toString(),
-                'date': t.transactionDate.toIso8601String().substring(0, 10),
-                'note': t.comment ?? '',
-              },
-            )
-            .toList();
-    await _transactionDatabase.saveTransactionsForPeriod(
-      maps,
-      startDateStr,
-      endDateStr,
-    );
-    log(
-      '✅ Транзакции за период успешно сохранены в кэш',
-      name: 'TransactionRepo',
+    await db.deleteTransactionsByPeriod(startDate, endDate);
+
+    final transactionsData = <Insertable<TransactionResponseDBData>>[];
+    final accountsData = <Insertable<AccountBriefDBData>>[];
+    final categoriesData = <Insertable<CategoryDBData>>[];
+
+    for (final t in transactions) {
+      accountsData.add(
+        AccountBriefDBCompanion(
+          id: Value(t.account.id),
+          name: Value(t.account.name),
+          balance: Value(t.account.balance),
+          currency: Value(t.account.currency),
+        ),
+      );
+      categoriesData.add(
+        CategoryDBCompanion(
+          id: Value(t.category.id),
+          name: Value(t.category.name),
+          emoji: Value(t.category.emoji),
+          isIncome: Value(t.category.isIncome),
+        ),
+      );
+      transactionsData.add(
+        TransactionResponseDBCompanion(
+          id: Value(t.id),
+          accountId: Value(t.account.id),
+          categoryId: Value(t.category.id),
+          amount: Value(t.amount),
+          transactionDate: Value(t.transactionDate),
+          comment: Value(t.comment),
+          createdAt: Value(t.createdAt),
+          updatedAt: Value(t.updatedAt),
+        ),
+      );
+    }
+    await db.insertTransactionResponses(
+      transactionsData,
+      accountsData,
+      categoriesData,
     );
   }
 
-  Future<List<TransactionResponse>> getTransactionsForPeriod(
+  /// Получение транзакций за период
+  Future<List<TransactionResponse>> getTransactionsForPeriodDrift(
     DateTime startDate,
     DateTime endDate,
+    AppDatabase db,
   ) async {
-    final startDateStr = startDate.toIso8601String().substring(0, 10);
-    final endDateStr = endDate.toIso8601String().substring(0, 10);
-    final maps = await _transactionDatabase.getTransactionsByPeriod(
-      startDateStr,
-      endDateStr,
+    final transactionResponses = await db.getTransactionsByPeriod(
+      startDate,
+      endDate,
     );
-    log(
-      '📊 getTransactionsForPeriod: получено из БД ${maps.length} записей',
-      name: 'TransactionRepo',
-    );
-
-    final List<TransactionResponse> responses = [];
-    for (int i = 0; i < maps.length; i++) {
-      final map = maps[i];
-      log('📊 Обрабатываю запись $i: $map', name: 'TransactionRepo');
-
-      final transaction = Transaction(
-        id: int.tryParse(map['id'].toString()) ?? 0,
-        accountId: 0, // Можно доработать, если нужно
-        categoryId: int.tryParse(map['category'].toString()) ?? 0,
-        amount: map['amount'].toString(),
-        transactionDate: DateTime.parse(map['date']),
-        comment: map['note'],
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+    final result = <TransactionResponse>[];
+    for (final t in transactionResponses) {
+      // Получаем связанные аккаунт и категорию
+      final account =
+          await (db.select(db.accountBriefDB)
+            ..where((a) => a.id.equals(t.accountId))).getSingle();
+      final category =
+          await (db.select(db.categoryDB)
+            ..where((c) => c.id.equals(t.categoryId))).getSingle();
+      result.add(
+        TransactionResponse(
+          id: t.id,
+          account: AccountBrief(
+            id: account.id,
+            name: account.name,
+            balance: account.balance,
+            currency: account.currency,
+          ),
+          category: Category(
+            id: category.id,
+            name: category.name,
+            emoji: category.emoji,
+            isIncome: category.isIncome,
+          ),
+          amount: t.amount,
+          transactionDate: t.transactionDate,
+          comment: t.comment,
+          createdAt: t.createdAt,
+          updatedAt: t.updatedAt,
+        ),
       );
-
-      log(
-        '📊 Восстановлена из кэша транзакция: id=${transaction.id}, categoryId=${transaction.categoryId}, amount=${transaction.amount}',
-        name: 'TransactionRepo',
-      );
-
-      try {
-        final category = await _getCategoryById(transaction.categoryId);
-        log(
-          '📊 Получена категория: id=${category.id}, name=${category.name}, isIncome=${category.isIncome}',
-          name: 'TransactionRepo',
-        );
-
-        final account = await _getAccountBriefById(transaction.accountId);
-        log(
-          '📊 Получен аккаунт: id=${account.id}, name=${account.name}',
-          name: 'TransactionRepo',
-        );
-
-        final response = TransactionResponse(
-          id: transaction.id,
-          account: account,
-          category: category,
-          amount: transaction.amount,
-          transactionDate: transaction.transactionDate,
-          comment: transaction.comment,
-          createdAt: transaction.createdAt,
-          updatedAt: transaction.updatedAt,
-        );
-
-        log(
-          '📊 Создан TransactionResponse: id=${response.id}, category=${response.category.name}, isIncome=${response.category.isIncome}',
-          name: 'TransactionRepo',
-        );
-        responses.add(response);
-      } catch (e) {
-        log('❌ Ошибка при обработке записи $i: $e', name: 'TransactionRepo');
-        continue;
-      }
     }
-
-    log(
-      '📊 getTransactionsForPeriod: итого создано ${responses.length} TransactionResponse',
-      name: 'TransactionRepo',
-    );
-    return responses;
+    return result;
   }
 }

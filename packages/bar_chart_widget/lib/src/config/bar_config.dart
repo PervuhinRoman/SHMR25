@@ -47,6 +47,10 @@ class BarChartConfig {
   /// Длительность анимации
   final Duration animationDuration;
 
+  /// Базовая линия для отображения столбцов (все столбцы отображаются выше этой линии)
+  /// Если null, автоматически рассчитывается на основе минимального значения
+  final double? onBoard;
+
   const BarChartConfig({
     this.height = 300.0,
     this.barWidth = 20.0,
@@ -63,6 +67,7 @@ class BarChartConfig {
     this.dateFormat,
     this.enableAnimation = true,
     this.animationDuration = const Duration(milliseconds: 1000),
+    this.onBoard,
   });
 
   /// Создает конфигурацию по умолчанию для маленького графика
@@ -100,6 +105,7 @@ class BarChartConfig {
     String? dateFormat,
     bool? enableAnimation,
     Duration? animationDuration,
+    double? onBoard,
   }) {
     return BarChartConfig(
       height: height ?? this.height,
@@ -117,6 +123,7 @@ class BarChartConfig {
       dateFormat: dateFormat ?? this.dateFormat,
       enableAnimation: enableAnimation ?? this.enableAnimation,
       animationDuration: animationDuration ?? this.animationDuration,
+      onBoard: onBoard ?? this.onBoard,
     );
   }
 } 
