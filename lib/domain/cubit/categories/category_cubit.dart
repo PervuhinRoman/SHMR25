@@ -9,7 +9,7 @@ part 'category_state.dart';
 
 class CategoryCubit extends Cubit<CategoryState> {
   final CategoryRepoImpl _categoryRepo = CategoryRepoImpl();
-  
+
   CategoryCubit() : super(const CategoryState(isLoading: true)) {
     loadAllCategories();
   }
@@ -19,21 +19,20 @@ class CategoryCubit extends Cubit<CategoryState> {
     try {
       emit(state.copyWith(isLoading: true, error: null));
       log('📱 Загружаю все категории...', name: 'Category');
-      
+
       final categories = await _categoryRepo.getAllCategories();
-      
-      emit(state.copyWith(
-        categories: categories,
-        filteredCategories: categories,
-        isLoading: false,
-      ));
+
+      emit(
+        state.copyWith(
+          categories: categories,
+          filteredCategories: categories,
+          isLoading: false,
+        ),
+      );
       log('✅ Загружено ${categories.length} категорий', name: 'Category');
     } catch (e) {
       log('❌ Ошибка при загрузке категорий: $e', name: 'Category');
-      emit(state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      ));
+      emit(state.copyWith(isLoading: false, error: e.toString()));
     }
   }
 
@@ -41,22 +40,27 @@ class CategoryCubit extends Cubit<CategoryState> {
   Future<void> loadCategoriesByType(bool isIncome) async {
     try {
       emit(state.copyWith(isLoading: true, error: null));
-      log('📱 Загружаю категории ${isIncome ? "доходов" : "расходов"}...', name: 'Category');
-      
+      log(
+        '📱 Загружаю категории ${isIncome ? "доходов" : "расходов"}...',
+        name: 'Category',
+      );
+
       final categories = await _categoryRepo.getCategoriesByType(isIncome);
-      
-      emit(state.copyWith(
-        categories: categories,
-        filteredCategories: categories,
-        isLoading: false,
-      ));
-      log('✅ Загружено ${categories.length} категорий ${isIncome ? "доходов" : "расходов"}', name: 'Category');
+
+      emit(
+        state.copyWith(
+          categories: categories,
+          //filteredCategories: categories,
+          isLoading: false,
+        ),
+      );
+      log(
+        '✅ Загружено ${categories.length} категорий ${isIncome ? "доходов" : "расходов"}',
+        name: 'Category',
+      );
     } catch (e) {
       log('❌ Ошибка при загрузке категорий: $e', name: 'Category');
-      emit(state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      ));
+      emit(state.copyWith(isLoading: false, error: e.toString()));
     }
   }
 
@@ -72,10 +76,9 @@ class CategoryCubit extends Cubit<CategoryState> {
 
   /// Обновляет список категорий
   void updateCategories(List<Category> categories) {
-    emit(state.copyWith(
-      categories: categories,
-      filteredCategories: categories,
-    ));
+    emit(
+      state.copyWith(categories: categories, filteredCategories: categories),
+    );
   }
 
   /// Очищает ошибку
@@ -87,10 +90,12 @@ class CategoryCubit extends Cubit<CategoryState> {
   void searchCategories(String query) {
     if (query.isEmpty) {
       // Если запрос пустой, показываем все категории
-      emit(state.copyWith(
-        searchQuery: query,
-        filteredCategories: state.categories,
-      ));
+      emit(
+        state.copyWith(
+          searchQuery: query,
+          filteredCategories: state.categories,
+        ),
+      );
       return;
     }
 
@@ -100,10 +105,10 @@ class CategoryCubit extends Cubit<CategoryState> {
     for (final category in state.categories) {
       // Ищем по названию категории
       final nameRatio = ratio(queryLower, category.name.toLowerCase());
-      
+
       // Ищем по эмодзи (если пользователь ввел эмодзи)
       final emojiRatio = ratio(queryLower, category.emoji);
-      
+
       // Если хотя бы одно совпадение выше порога (10%), добавляем в результаты
       if (nameRatio > 10 || emojiRatio > 10) {
         results.add(category);
@@ -115,27 +120,24 @@ class CategoryCubit extends Cubit<CategoryState> {
       final aNameRatio = ratio(queryLower, a.name.toLowerCase());
       final aEmojiRatio = ratio(queryLower, a.emoji);
       final aMaxRatio = aNameRatio > aEmojiRatio ? aNameRatio : aEmojiRatio;
-      
+
       final bNameRatio = ratio(queryLower, b.name.toLowerCase());
       final bEmojiRatio = ratio(queryLower, b.emoji);
       final bMaxRatio = bNameRatio > bEmojiRatio ? bNameRatio : bEmojiRatio;
-      
+
       return bMaxRatio.compareTo(aMaxRatio); // Сортировка по убыванию
     });
 
-    emit(state.copyWith(
-      searchQuery: query,
-      filteredCategories: results,
-    ));
-    
-    log('🔍 Поиск: "$query" - найдено ${results.length} результатов', name: 'Category');
+    emit(state.copyWith(searchQuery: query, filteredCategories: results));
+
+    log(
+      '🔍 Поиск: "$query" - найдено ${results.length} результатов',
+      name: 'Category',
+    );
   }
 
   /// Очищает поиск
   void clearSearch() {
-    emit(state.copyWith(
-      searchQuery: '',
-      filteredCategories: state.categories,
-    ));
+    emit(state.copyWith(searchQuery: '', filteredCategories: state.categories));
   }
-} 
+}

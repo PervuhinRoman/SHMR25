@@ -455,7 +455,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                     shrinkWrap: true,
                                     physics:
                                         const NeverScrollableScrollPhysics(),
-                                    itemCount: state.filteredCategories.length,
+                                    itemCount: state.categories.length,
                                     itemBuilder: (context, index) {
                                       final category = state.categories[index];
                                       return Column(
