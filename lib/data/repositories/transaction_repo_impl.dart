@@ -2,13 +2,12 @@ import 'dart:developer';
 
 import 'package:shmr_finance/data/repositories/category_repo.dart';
 import 'package:shmr_finance/data/repositories/transaction_repo.dart';
+import 'package:shmr_finance/data/services/api_service.dart';
 
 import '../../domain/models/account/account.dart';
 import '../../domain/models/category/category.dart';
 import '../../domain/models/transaction/transaction.dart';
 import 'account_repo.dart';
-import 'package:dio/dio.dart';
-import 'package:intl/intl.dart';
 import '../database/transaction_database.dart';
 import 'package:drift/drift.dart';
 
@@ -16,6 +15,7 @@ class TransactionRepoImp implements TransactionRepository {
   final CategoryRepository _categoryRepo;
   final AccountRepository _accountRepo;
   final AppDatabase _transactionDatabase;
+  final ApiService _apiService;
   final List<Transaction> _transactions = [
     Transaction(
       id: 1,
@@ -43,7 +43,9 @@ class TransactionRepoImp implements TransactionRepository {
     this._accountRepo,
     this._categoryRepo, [
     AppDatabase? transactionDatabase,
-  ]) : _transactionDatabase = transactionDatabase ?? AppDatabase.instance;
+    ApiService? apiService,
+  ]) : _transactionDatabase = transactionDatabase ?? AppDatabase.instance,
+       _apiService = apiService ?? ApiService();
 
   // Метод для получения категории по ID
   Future<Category> _getCategoryById(int categoryId) async {
@@ -104,99 +106,23 @@ class TransactionRepoImp implements TransactionRepository {
         '🌐 Выполняем сетевой запрос для аккаунта $accountId, период: ${startDate?.toIso8601String().substring(0, 10)} - ${endDate?.toIso8601String().substring(0, 10)}',
         name: 'TransactionRepo',
       );
-      // TODO: Перенести работу DIO в Service
-      final dio = Dio();
-      final response = await dio.get(
-        'https://shmr-finance.ru/api/v1/transactions/account/$accountId/period',
-        queryParameters: {
-          'startDate': DateFormat('yyyy-MM-dd').format(startDate!),
-          'endDate': DateFormat('yyyy-MM-dd').format(endDate!),
-        },
-        options: Options(
-          headers: {'Authorization': 'Bearer BpSpdGeoNdjhGmR79DByflxf'},
-        ),
+      
+      // Используем API сервис вместо прямых вызовов DIO
+      final responses = await _apiService.getPeriodTransactionsByAccount(
+        accountId,
+        startDate: startDate,
+        endDate: endDate,
       );
 
       log(
-        '📡 Получен ответ от сервера: ${response.statusCode}',
+        '📊 Получено транзакций: ${responses.length}',
         name: 'TransactionRepo',
       );
 
-      // Используем Freezed для десериализации
-      final List<dynamic> rawData = response.data;
-      log(
-        '📊 Сырых данных получено: ${rawData.length}',
-        name: 'TransactionRepo',
-      );
-      final List<TransactionResponse> responses = [];
+      // Сортировка по дате (новые сначала)
+      responses.sort((a, b) => b.transactionDate.compareTo(a.transactionDate));
 
-      for (final item in rawData) {
-        try {
-          if (item is Map<String, dynamic>) {
-            // Используем автоматически сгенерированный fromJson
-            final transactionResponse = TransactionResponse.fromJson(item);
-            responses.add(transactionResponse);
-
-            // Проверяем, что транзакция принадлежит нужному аккаунту
-            // TODO: убрать / изменить, когда будем работать с реальным аккаунтом
-            // if (transactionResponse.account.id == accountId) {
-            //   responses.add(transactionResponse);
-            // }
-          }
-        } catch (e) {
-          log('❗ Ошибка при парсинге: $e', name: 'TransactionRepo');
-          continue;
-        }
-      }
-
-      log(
-        '📊 После парсинга: ${responses.length} транзакций',
-        name: 'TransactionRepo',
-      );
-
-      // Фильтрация и сортировка по датам
-      var filteredSortedResponses = responses;
-      final startOfDay = startDate.copyWith(
-        hour: 0,
-        minute: 0,
-        second: 0,
-        millisecond: 0,
-        microsecond: 0,
-      );
-      filteredSortedResponses =
-          filteredSortedResponses
-              .where(
-                (t) =>
-                    t.transactionDate.isAtSameMomentAs(startOfDay) ||
-                    t.transactionDate.isAfter(startOfDay),
-              )
-              .toList();
-      final endOfDay = endDate.copyWith(
-        hour: 23,
-        minute: 59,
-        second: 59,
-        millisecond: 999,
-        microsecond: 999,
-      );
-      filteredSortedResponses =
-          filteredSortedResponses
-              .where(
-                (t) =>
-                    t.transactionDate.isAtSameMomentAs(endOfDay) ||
-                    t.transactionDate.isBefore(endOfDay),
-              )
-              .toList();
-
-      log(
-        '📊 После фильтрации по датам: ${filteredSortedResponses.length} транзакций',
-        name: 'TransactionRepo',
-      );
-
-      filteredSortedResponses.sort(
-        (a, b) => b.transactionDate.compareTo(a.transactionDate),
-      );
-
-      return filteredSortedResponses;
+      return responses;
     } catch (e) {
       log(
         '❌ Error in getPeriodTransactionsByAccount: $e',
@@ -209,29 +135,44 @@ class TransactionRepoImp implements TransactionRepository {
 
   @override
   Future<TransactionResponse> getTransaction(int id) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    final transaction = _transactions.firstWhere((t) => t.id == id);
-    return _toTransactionResponse(transaction);
+    try {
+      return await _apiService.getTransaction(id);
+    } catch (e) {
+      log(
+        '❌ Error in getTransaction: $e',
+        name: 'TransactionRepo',
+      );
+      rethrow;
+    }
   }
 
   @override
   Future<TransactionResponse> createTransaction(
     TransactionRequest request,
   ) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    final newTransaction = Transaction(
-      id: _transactions.length + 1,
-      accountId: request.accountId,
-      categoryId: request.categoryId,
-      amount: request.amount,
-      transactionDate: request.transactionDate,
-      comment: request.comment,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
-
-    _transactions.add(newTransaction);
-    return _toTransactionResponse(newTransaction);
+    try {
+      final transaction = await _apiService.createTransaction(request);
+      // Преобразуем Transaction в TransactionResponse
+      final category = await _getCategoryById(transaction.categoryId);
+      final account = await _getAccountBriefById(transaction.accountId);
+      
+      return TransactionResponse(
+        id: transaction.id,
+        account: account,
+        category: category,
+        amount: transaction.amount,
+        transactionDate: transaction.transactionDate,
+        comment: transaction.comment,
+        createdAt: transaction.createdAt,
+        updatedAt: transaction.updatedAt,
+      );
+    } catch (e) {
+      log(
+        '❌ Error in createTransaction: $e',
+        name: 'TransactionRepo',
+      );
+      rethrow;
+    }
   }
 
   @override
@@ -239,28 +180,28 @@ class TransactionRepoImp implements TransactionRepository {
     int id,
     TransactionRequest request,
   ) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    final index = _transactions.indexWhere((t) => t.id == id);
-
-    final updatedTransaction = Transaction(
-      id: id,
-      accountId: request.accountId,
-      categoryId: request.categoryId,
-      amount: request.amount,
-      transactionDate: request.transactionDate,
-      comment: request.comment,
-      createdAt: _transactions[index].createdAt,
-      updatedAt: DateTime.now(),
-    );
-
-    _transactions[index] = updatedTransaction;
-    return _toTransactionResponse(updatedTransaction);
+    try {
+      return await _apiService.updateTransaction(id, request);
+    } catch (e) {
+      log(
+        '❌ Error in updateTransaction: $e',
+        name: 'TransactionRepo',
+      );
+      rethrow;
+    }
   }
 
   @override
   Future<void> deleteTransaction(int id) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    _transactions.removeWhere((t) => t.id == id);
+    try {
+      await _apiService.deleteTransaction(id);
+    } catch (e) {
+      log(
+        '❌ Error in deleteTransaction: $e',
+        name: 'TransactionRepo',
+      );
+      rethrow;
+    }
   }
 
   /// Сохранение транзакций за период
