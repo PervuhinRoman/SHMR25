@@ -55,6 +55,25 @@ class AppDatabase extends _$AppDatabase {
     return delete(transactionResponseDB).go();
   }
 
+  // Сохранение категорий в кэш
+  Future<void> saveCategories(List<Insertable<CategoryDBData>> categories) async {
+    await batch((batch) {
+      batch.insertAllOnConflictUpdate(categoryDB, categories);
+    });
+  }
+
+  // Получение всех категорий из кэша
+  Future<List<CategoryDBData>> getCategories() {
+    return select(categoryDB).get();
+  }
+
+  // Получение категорий по типу (доходы/расходы)
+  Future<List<CategoryDBData>> getCategoriesByType(bool isIncome) {
+    return (select(categoryDB)
+      ..where((c) => c.isIncome.equals(isIncome)))
+      .get();
+  }
+
   /// Метод для подключения к БД
   static QueryExecutor _openConnection() {
     return driftDatabase(
