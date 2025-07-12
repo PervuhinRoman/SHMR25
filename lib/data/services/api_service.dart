@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../domain/models/account/account.dart';
 import '../../domain/models/category/category.dart';
 import '../../domain/models/transaction/transaction.dart';
+import 'isolate_deserialization_interceptor.dart';
 
 class ApiService {
   static const String _baseUrl = 'https://shmr-finance.ru/api/v1';
@@ -23,12 +24,15 @@ class ApiService {
       },
     ));
     
-    // Добавляем интерцептор для логирования
+    // Добавляем интерцепторы
     _dio.interceptors.add(LogInterceptor(
       requestBody: true,
       responseBody: true,
       logPrint: (obj) => log(obj.toString(), name: 'API'),
     ));
+    
+    // Добавляем интерцептор десериализации через изоляты
+    _dio.addIsolateDeserializationInterceptor();
   }
 
   // ==================== ACCOUNTS ====================

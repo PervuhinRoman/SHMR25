@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:worker_manager/worker_manager.dart';
 import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
 import 'package:shmr_finance/domain/cubit/account/blur_cubit.dart';
 import 'package:shmr_finance/domain/cubit/categories/category_cubit.dart';
@@ -26,6 +28,24 @@ void main() async {
 
   // Задержка для стабильности инициализации
   await Future.delayed(const Duration(milliseconds: 100));
+
+  // Инициализируем WorkerManager для десериализации через изоляты
+  try {
+    await workerManager.init(
+      isolatesCount: 2, // Оптимально для мобильных устройств
+    );
+    log(
+      '✅ WorkerManager успешно инициализирован',
+      time: DateTime.now(),
+      name: 'WorkerManager',
+    );
+  } catch (e) {
+    log(
+      '❌ Ошибка инициализации WorkerManager: $e',
+      time: DateTime.now(),
+      name: 'WorkerManager',
+    );
+  }
 
   try {
     await SharedPreferences.getInstance(); // Инициализируем SharedPreferences
