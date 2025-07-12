@@ -238,6 +238,7 @@ class _InExpWidgetState extends State<InExpWidget> {
                                     create: (context) => TransactionCubit(),
                                     child: TransactionPage(
                                       isAdd: false,
+                                      isIncome: widget.isIncome,
                                       accountName: item.account.name,
                                       categoryName: item.category.name,
                                       categoryEmoji: item.category.emoji,
@@ -273,7 +274,10 @@ class _InExpWidgetState extends State<InExpWidget> {
               pageBuilder: (context, animation, secondaryAnimation) {
                 return BlocProvider(
                   create: (context) => TransactionCubit(),
-                  child: TransactionPage(isAdd: true),
+                  child: TransactionPage(
+                    isAdd: true,
+                    isIncome: widget.isIncome,
+                  ),
                 );
               },
             ),
