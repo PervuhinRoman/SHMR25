@@ -3,11 +3,12 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'tables/transaction_response_db.dart';
 import 'tables/account_brief_db.dart';
 import 'tables/category_db.dart';
+import 'tables/transaction_diff_db.dart';
 import 'package:path_provider/path_provider.dart';
 
 part 'transaction_database.g.dart';
 
-@DriftDatabase(tables: [TransactionResponseDB, AccountBriefDB, CategoryDB])
+@DriftDatabase(tables: [TransactionResponseDB, AccountBriefDB, CategoryDB, TransactionDiffDB])
 class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
   AppDatabase._internal() : super(_openConnection());
@@ -72,6 +73,35 @@ class AppDatabase extends _$AppDatabase {
     return (select(categoryDB)
       ..where((c) => c.isIncome.equals(isIncome)))
       .get();
+  }
+
+  /// Добавить или обновить diff-операцию (по id транзакции)
+  Future<void> upsertTransactionDiff({
+    required int id,
+    required String operation,
+    String? transactionJson,
+    required DateTime timestamp,
+    String syncStatus = 'pending',
+  }) async {
+    into(transactionDiffDB).insertOnConflictUpdate(
+      TransactionDiffDBCompanion(
+        id: Value(id),
+        operation: Value(operation),
+        transactionJson: Value(transactionJson),
+        timestamp: Value(timestamp),
+        syncStatus: Value(syncStatus),
+      ),
+    );
+  }
+
+  /// Получить все diff-операции со статусом pending
+  Future<List<TransactionDiffDBData>> getPendingDiffs() {
+    return (select(transactionDiffDB)..where((tbl) => tbl.syncStatus.equals('pending'))).get();
+  }
+
+  /// Удалить diff-операцию по id (после успешной синхронизации)
+  Future<int> deleteDiffById(int id) {
+    return (delete(transactionDiffDB)..where((tbl) => tbl.id.equals(id))).go();
   }
 
   /// Метод для подключения к БД

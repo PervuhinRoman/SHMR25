@@ -1135,6 +1135,369 @@ class CategoryDBCompanion extends UpdateCompanion<CategoryDBData> {
   }
 }
 
+class $TransactionDiffDBTable extends TransactionDiffDB
+    with TableInfo<$TransactionDiffDBTable, TransactionDiffDBData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TransactionDiffDBTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _operationMeta = const VerificationMeta(
+    'operation',
+  );
+  @override
+  late final GeneratedColumn<String> operation = GeneratedColumn<String>(
+    'operation',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _transactionJsonMeta = const VerificationMeta(
+    'transactionJson',
+  );
+  @override
+  late final GeneratedColumn<String> transactionJson = GeneratedColumn<String>(
+    'transaction_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _timestampMeta = const VerificationMeta(
+    'timestamp',
+  );
+  @override
+  late final GeneratedColumn<DateTime> timestamp = GeneratedColumn<DateTime>(
+    'timestamp',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
+    'syncStatus',
+  );
+  @override
+  late final GeneratedColumn<String> syncStatus = GeneratedColumn<String>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('pending'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    operation,
+    transactionJson,
+    timestamp,
+    syncStatus,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'transaction_diff_d_b';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TransactionDiffDBData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('operation')) {
+      context.handle(
+        _operationMeta,
+        operation.isAcceptableOrUnknown(data['operation']!, _operationMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_operationMeta);
+    }
+    if (data.containsKey('transaction_json')) {
+      context.handle(
+        _transactionJsonMeta,
+        transactionJson.isAcceptableOrUnknown(
+          data['transaction_json']!,
+          _transactionJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('timestamp')) {
+      context.handle(
+        _timestampMeta,
+        timestamp.isAcceptableOrUnknown(data['timestamp']!, _timestampMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_timestampMeta);
+    }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+        _syncStatusMeta,
+        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TransactionDiffDBData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TransactionDiffDBData(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      operation:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}operation'],
+          )!,
+      transactionJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}transaction_json'],
+      ),
+      timestamp:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}timestamp'],
+          )!,
+      syncStatus:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}sync_status'],
+          )!,
+    );
+  }
+
+  @override
+  $TransactionDiffDBTable createAlias(String alias) {
+    return $TransactionDiffDBTable(attachedDatabase, alias);
+  }
+}
+
+class TransactionDiffDBData extends DataClass
+    implements Insertable<TransactionDiffDBData> {
+  final int id;
+  final String operation;
+  final String? transactionJson;
+  final DateTime timestamp;
+  final String syncStatus;
+  const TransactionDiffDBData({
+    required this.id,
+    required this.operation,
+    this.transactionJson,
+    required this.timestamp,
+    required this.syncStatus,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['operation'] = Variable<String>(operation);
+    if (!nullToAbsent || transactionJson != null) {
+      map['transaction_json'] = Variable<String>(transactionJson);
+    }
+    map['timestamp'] = Variable<DateTime>(timestamp);
+    map['sync_status'] = Variable<String>(syncStatus);
+    return map;
+  }
+
+  TransactionDiffDBCompanion toCompanion(bool nullToAbsent) {
+    return TransactionDiffDBCompanion(
+      id: Value(id),
+      operation: Value(operation),
+      transactionJson:
+          transactionJson == null && nullToAbsent
+              ? const Value.absent()
+              : Value(transactionJson),
+      timestamp: Value(timestamp),
+      syncStatus: Value(syncStatus),
+    );
+  }
+
+  factory TransactionDiffDBData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TransactionDiffDBData(
+      id: serializer.fromJson<int>(json['id']),
+      operation: serializer.fromJson<String>(json['operation']),
+      transactionJson: serializer.fromJson<String?>(json['transactionJson']),
+      timestamp: serializer.fromJson<DateTime>(json['timestamp']),
+      syncStatus: serializer.fromJson<String>(json['syncStatus']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'operation': serializer.toJson<String>(operation),
+      'transactionJson': serializer.toJson<String?>(transactionJson),
+      'timestamp': serializer.toJson<DateTime>(timestamp),
+      'syncStatus': serializer.toJson<String>(syncStatus),
+    };
+  }
+
+  TransactionDiffDBData copyWith({
+    int? id,
+    String? operation,
+    Value<String?> transactionJson = const Value.absent(),
+    DateTime? timestamp,
+    String? syncStatus,
+  }) => TransactionDiffDBData(
+    id: id ?? this.id,
+    operation: operation ?? this.operation,
+    transactionJson:
+        transactionJson.present ? transactionJson.value : this.transactionJson,
+    timestamp: timestamp ?? this.timestamp,
+    syncStatus: syncStatus ?? this.syncStatus,
+  );
+  TransactionDiffDBData copyWithCompanion(TransactionDiffDBCompanion data) {
+    return TransactionDiffDBData(
+      id: data.id.present ? data.id.value : this.id,
+      operation: data.operation.present ? data.operation.value : this.operation,
+      transactionJson:
+          data.transactionJson.present
+              ? data.transactionJson.value
+              : this.transactionJson,
+      timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
+      syncStatus:
+          data.syncStatus.present ? data.syncStatus.value : this.syncStatus,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TransactionDiffDBData(')
+          ..write('id: $id, ')
+          ..write('operation: $operation, ')
+          ..write('transactionJson: $transactionJson, ')
+          ..write('timestamp: $timestamp, ')
+          ..write('syncStatus: $syncStatus')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, operation, transactionJson, timestamp, syncStatus);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TransactionDiffDBData &&
+          other.id == this.id &&
+          other.operation == this.operation &&
+          other.transactionJson == this.transactionJson &&
+          other.timestamp == this.timestamp &&
+          other.syncStatus == this.syncStatus);
+}
+
+class TransactionDiffDBCompanion
+    extends UpdateCompanion<TransactionDiffDBData> {
+  final Value<int> id;
+  final Value<String> operation;
+  final Value<String?> transactionJson;
+  final Value<DateTime> timestamp;
+  final Value<String> syncStatus;
+  const TransactionDiffDBCompanion({
+    this.id = const Value.absent(),
+    this.operation = const Value.absent(),
+    this.transactionJson = const Value.absent(),
+    this.timestamp = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+  });
+  TransactionDiffDBCompanion.insert({
+    this.id = const Value.absent(),
+    required String operation,
+    this.transactionJson = const Value.absent(),
+    required DateTime timestamp,
+    this.syncStatus = const Value.absent(),
+  }) : operation = Value(operation),
+       timestamp = Value(timestamp);
+  static Insertable<TransactionDiffDBData> custom({
+    Expression<int>? id,
+    Expression<String>? operation,
+    Expression<String>? transactionJson,
+    Expression<DateTime>? timestamp,
+    Expression<String>? syncStatus,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (operation != null) 'operation': operation,
+      if (transactionJson != null) 'transaction_json': transactionJson,
+      if (timestamp != null) 'timestamp': timestamp,
+      if (syncStatus != null) 'sync_status': syncStatus,
+    });
+  }
+
+  TransactionDiffDBCompanion copyWith({
+    Value<int>? id,
+    Value<String>? operation,
+    Value<String?>? transactionJson,
+    Value<DateTime>? timestamp,
+    Value<String>? syncStatus,
+  }) {
+    return TransactionDiffDBCompanion(
+      id: id ?? this.id,
+      operation: operation ?? this.operation,
+      transactionJson: transactionJson ?? this.transactionJson,
+      timestamp: timestamp ?? this.timestamp,
+      syncStatus: syncStatus ?? this.syncStatus,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (operation.present) {
+      map['operation'] = Variable<String>(operation.value);
+    }
+    if (transactionJson.present) {
+      map['transaction_json'] = Variable<String>(transactionJson.value);
+    }
+    if (timestamp.present) {
+      map['timestamp'] = Variable<DateTime>(timestamp.value);
+    }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(syncStatus.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TransactionDiffDBCompanion(')
+          ..write('id: $id, ')
+          ..write('operation: $operation, ')
+          ..write('transactionJson: $transactionJson, ')
+          ..write('timestamp: $timestamp, ')
+          ..write('syncStatus: $syncStatus')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1142,6 +1505,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $TransactionResponseDBTable(this);
   late final $AccountBriefDBTable accountBriefDB = $AccountBriefDBTable(this);
   late final $CategoryDBTable categoryDB = $CategoryDBTable(this);
+  late final $TransactionDiffDBTable transactionDiffDB =
+      $TransactionDiffDBTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1150,6 +1515,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     transactionResponseDB,
     accountBriefDB,
     categoryDB,
+    transactionDiffDB,
   ];
 }
 
@@ -1808,6 +2174,230 @@ typedef $$CategoryDBTableProcessedTableManager =
       CategoryDBData,
       PrefetchHooks Function()
     >;
+typedef $$TransactionDiffDBTableCreateCompanionBuilder =
+    TransactionDiffDBCompanion Function({
+      Value<int> id,
+      required String operation,
+      Value<String?> transactionJson,
+      required DateTime timestamp,
+      Value<String> syncStatus,
+    });
+typedef $$TransactionDiffDBTableUpdateCompanionBuilder =
+    TransactionDiffDBCompanion Function({
+      Value<int> id,
+      Value<String> operation,
+      Value<String?> transactionJson,
+      Value<DateTime> timestamp,
+      Value<String> syncStatus,
+    });
+
+class $$TransactionDiffDBTableFilterComposer
+    extends Composer<_$AppDatabase, $TransactionDiffDBTable> {
+  $$TransactionDiffDBTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get operation => $composableBuilder(
+    column: $table.operation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get transactionJson => $composableBuilder(
+    column: $table.transactionJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get timestamp => $composableBuilder(
+    column: $table.timestamp,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$TransactionDiffDBTableOrderingComposer
+    extends Composer<_$AppDatabase, $TransactionDiffDBTable> {
+  $$TransactionDiffDBTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get operation => $composableBuilder(
+    column: $table.operation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get transactionJson => $composableBuilder(
+    column: $table.transactionJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get timestamp => $composableBuilder(
+    column: $table.timestamp,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TransactionDiffDBTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TransactionDiffDBTable> {
+  $$TransactionDiffDBTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get operation =>
+      $composableBuilder(column: $table.operation, builder: (column) => column);
+
+  GeneratedColumn<String> get transactionJson => $composableBuilder(
+    column: $table.transactionJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get timestamp =>
+      $composableBuilder(column: $table.timestamp, builder: (column) => column);
+
+  GeneratedColumn<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => column,
+  );
+}
+
+class $$TransactionDiffDBTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TransactionDiffDBTable,
+          TransactionDiffDBData,
+          $$TransactionDiffDBTableFilterComposer,
+          $$TransactionDiffDBTableOrderingComposer,
+          $$TransactionDiffDBTableAnnotationComposer,
+          $$TransactionDiffDBTableCreateCompanionBuilder,
+          $$TransactionDiffDBTableUpdateCompanionBuilder,
+          (
+            TransactionDiffDBData,
+            BaseReferences<
+              _$AppDatabase,
+              $TransactionDiffDBTable,
+              TransactionDiffDBData
+            >,
+          ),
+          TransactionDiffDBData,
+          PrefetchHooks Function()
+        > {
+  $$TransactionDiffDBTableTableManager(
+    _$AppDatabase db,
+    $TransactionDiffDBTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$TransactionDiffDBTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$TransactionDiffDBTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$TransactionDiffDBTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> operation = const Value.absent(),
+                Value<String?> transactionJson = const Value.absent(),
+                Value<DateTime> timestamp = const Value.absent(),
+                Value<String> syncStatus = const Value.absent(),
+              }) => TransactionDiffDBCompanion(
+                id: id,
+                operation: operation,
+                transactionJson: transactionJson,
+                timestamp: timestamp,
+                syncStatus: syncStatus,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String operation,
+                Value<String?> transactionJson = const Value.absent(),
+                required DateTime timestamp,
+                Value<String> syncStatus = const Value.absent(),
+              }) => TransactionDiffDBCompanion.insert(
+                id: id,
+                operation: operation,
+                transactionJson: transactionJson,
+                timestamp: timestamp,
+                syncStatus: syncStatus,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$TransactionDiffDBTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TransactionDiffDBTable,
+      TransactionDiffDBData,
+      $$TransactionDiffDBTableFilterComposer,
+      $$TransactionDiffDBTableOrderingComposer,
+      $$TransactionDiffDBTableAnnotationComposer,
+      $$TransactionDiffDBTableCreateCompanionBuilder,
+      $$TransactionDiffDBTableUpdateCompanionBuilder,
+      (
+        TransactionDiffDBData,
+        BaseReferences<
+          _$AppDatabase,
+          $TransactionDiffDBTable,
+          TransactionDiffDBData
+        >,
+      ),
+      TransactionDiffDBData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1818,4 +2408,6 @@ class $AppDatabaseManager {
       $$AccountBriefDBTableTableManager(_db, _db.accountBriefDB);
   $$CategoryDBTableTableManager get categoryDB =>
       $$CategoryDBTableTableManager(_db, _db.categoryDB);
+  $$TransactionDiffDBTableTableManager get transactionDiffDB =>
+      $$TransactionDiffDBTableTableManager(_db, _db.transactionDiffDB);
 }

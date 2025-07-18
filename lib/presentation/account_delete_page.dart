@@ -9,6 +9,7 @@ import 'package:shmr_finance/presentation/widgets/animated_balance_tile.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 
 import '../domain/cubit/account/account_cubit.dart';
+import 'package:shmr_finance/data/repositories/account_repo_impl.dart';
 
 class AccountDeletePage extends StatelessWidget {
   final AccountResponse account;
@@ -23,7 +24,7 @@ class AccountDeletePage extends StatelessWidget {
       builder: (context, myAccountState) {
         return Scaffold(
           appBar: CustomAppBar(
-            title: myAccountState.accountName,
+            title: account.name,
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.check),
@@ -121,19 +122,14 @@ class AccountDeletePage extends StatelessWidget {
     );
   }
 
-  void _deleteAccount(BuildContext context) {
-    // TODO: Реализовать удаление счета через репозиторий
-    log('Удаление счета ${account.id}');
-
-    // Показываем уведомление об успешном удалении
+  void _deleteAccount(BuildContext context) async {
+    // Удаление счета не поддерживается
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Счет "${account.name}" удален'),
-        backgroundColor: Colors.green,
+        content: Text('Удаление счета не поддерживается'),
+        backgroundColor: Colors.orange,
       ),
     );
-
-    // Возвращаемся на предыдущий экран
     Navigator.of(context).pop();
   }
 }
