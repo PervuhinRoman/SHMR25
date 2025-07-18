@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shmr_finance/app_theme.dart';
+import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transactions/datepicker_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transactions/sort_type_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
@@ -26,11 +27,16 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final datePickerState = context.read<DatePickerCubit>().state;
-      context.read<TransactionCubit>().fetchTransactions(
-        startDate: datePickerState.startDate!,
-        endDate: datePickerState.endDate!,
-        isIncome: widget.isIncome,
-      );
+      final accountState = context.read<MyAccountCubit>().state;
+      final accountId = accountState.accountId ?? 1;
+      if (accountId != null) {
+        context.read<TransactionCubit>().fetchTransactions(
+          accountId: accountId,
+          startDate: datePickerState.startDate!,
+          endDate: datePickerState.endDate!,
+          isIncome: widget.isIncome,
+        );
+      }
     });
   }
 
@@ -39,11 +45,16 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.isIncome != widget.isIncome) {
       final datePickerState = context.read<DatePickerCubit>().state;
-      context.read<TransactionCubit>().fetchTransactions(
-        startDate: datePickerState.startDate!,
-        endDate: datePickerState.endDate!,
-        isIncome: widget.isIncome,
-      );
+      final accountState = context.read<MyAccountCubit>().state;
+      final accountId = accountState.accountId ?? 1;
+      if (accountId != null) {
+        context.read<TransactionCubit>().fetchTransactions(
+          accountId: accountId,
+          startDate: datePickerState.startDate!,
+          endDate: datePickerState.endDate!,
+          isIncome: widget.isIncome,
+        );
+      }
     }
   }
 
@@ -111,11 +122,16 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                               );
                           if (resultStartDate != null) {
                             datePickerCubit.setStartDate(resultStartDate);
-                            transactionCubit.fetchTransactions(
-                              startDate: resultStartDate,
-                              endDate: datePickerState.endDate,
-                              isIncome: widget.isIncome,
-                            );
+                            final accountState = context.read<MyAccountCubit>().state;
+                            final accountId = accountState.accountId ?? 1;
+                            if (accountId != null) {
+                              transactionCubit.fetchTransactions(
+                                accountId: accountId,
+                                startDate: resultStartDate,
+                                endDate: datePickerState.endDate,
+                                isIncome: widget.isIncome,
+                              );
+                            }
                           }
                         },
                         child: Container(
@@ -169,11 +185,16 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                           );
                           if (resultEndDate != null) {
                             datePickerCubit.setEndDate(resultEndDate);
-                            transactionCubit.fetchTransactions(
-                              startDate: datePickerState.startDate,
-                              endDate: resultEndDate,
-                              isIncome: widget.isIncome,
-                            );
+                            final accountState = context.read<MyAccountCubit>().state;
+                            final accountId = accountState.accountId ?? 1;
+                            if (accountId != null) {
+                              transactionCubit.fetchTransactions(
+                                accountId: accountId,
+                                startDate: datePickerState.startDate,
+                                endDate: resultEndDate,
+                                isIncome: widget.isIncome,
+                              );
+                            }
                           }
                         },
                         child: Container(

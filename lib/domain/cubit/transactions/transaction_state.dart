@@ -4,6 +4,8 @@ enum TransactionStatus { loading, loaded, error }
 
 enum DataSource { network, cache }
 
+enum SyncStatus { idle, syncing, error, success }
+
 class TransactionState {
   final List<TransactionResponse> transactions;
   final List<Category> transactionsCategories;
@@ -12,6 +14,7 @@ class TransactionState {
   final TransactionStatus status;
   final DataSource? dataSource;
   final bool isIncome;
+  final SyncStatus syncStatus;
 
   const TransactionState({
     required this.transactions,
@@ -21,6 +24,7 @@ class TransactionState {
     required this.status,
     this.dataSource,
     this.isIncome = false,
+    this.syncStatus = SyncStatus.idle,
   });
 
   TransactionState copyWith({
@@ -31,6 +35,7 @@ class TransactionState {
     TransactionStatus? status,
     DataSource? dataSource,
     bool? isIncome,
+    SyncStatus? syncStatus,
   }) => TransactionState(
     transactions: transactions ?? this.transactions,
     transactionsCategories: transactionsCategories ?? this.transactionsCategories,
@@ -39,5 +44,6 @@ class TransactionState {
     status: status ?? this.status,
     dataSource: dataSource ?? this.dataSource,
     isIncome: isIncome ?? this.isIncome,
+    syncStatus: syncStatus ?? this.syncStatus,
   );
 }

@@ -4,6 +4,11 @@ import 'package:intl/intl.dart';
 import 'package:shmr_finance/domain/cubit/categories/category_cubit.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:flutter/services.dart';
+import 'dart:developer';
+import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
+import 'package:shmr_finance/domain/models/transaction/transaction.dart';
+import 'package:shmr_finance/data/repositories/account_repo_impl.dart';
+import 'package:shmr_finance/domain/models/account/account.dart';
 
 import '../app_theme.dart';
 
@@ -49,10 +54,13 @@ class _TransactionPageState extends State<TransactionPage> {
   String? _title;
   final _titleController = TextEditingController();
   final _titleFocusNode = FocusNode();
+  List<Account> _accounts = [];
+  bool _accountsLoading = false;
 
   @override
   void initState() {
     super.initState();
+    _loadAccounts();
 
     // Инициализация полей данными из существующей транзакции
     _selectedCategoryInd = widget.categoryIndex;
@@ -86,6 +94,60 @@ class _TransactionPageState extends State<TransactionPage> {
     });
   }
 
+  Future<void> _loadAccounts() async {
+    setState(() {
+      _accountsLoading = true;
+    });
+    try {
+      final repo = AccountRepoImp();
+      final accounts = await repo.getAllAccounts();
+      setState(() {
+        _accounts = accounts;
+        _accountsLoading = false;
+      });
+
+      // Если это новая транзакция и аккаунт не выбран, выбираем первый
+      if (widget.isAdd && _selectedAccountInd == null && accounts.isNotEmpty) {
+        setState(() {
+          _selectedAccountInd = accounts.first.id;
+          _selectedAccountName = accounts.first.name;
+        });
+        log(
+          'Автоматически выбран первый аккаунт: ${accounts.first.name} (id: ${accounts.first.id})',
+          name: 'TransactionDialog',
+        );
+      }
+
+      // Если это новая транзакция и категория не выбрана, выбираем первую соответствующего типа
+      if (widget.isAdd && _selectedCategoryInd == null) {
+        final categoryCubit = context.read<CategoryCubit>();
+        // Убеждаемся, что категории загружены
+        if (categoryCubit.state.categories.isEmpty) {
+          await categoryCubit.loadCategoriesByType(widget.isIncome);
+        }
+        final categories =
+            categoryCubit.state.categories
+                .where((c) => c.isIncome == widget.isIncome)
+                .toList();
+        if (categories.isNotEmpty) {
+          setState(() {
+            _selectedCategoryInd = categories.first.id;
+            _selectedCategoryName = categories.first.name;
+          });
+          log(
+            'Автоматически выбрана первая категория: ${categories.first.name} (id: ${categories.first.id})',
+            name: 'TransactionDialog',
+          );
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _accountsLoading = false;
+      });
+      log('Ошибка загрузки счетов: $e', name: 'TransactionDialog');
+    }
+  }
+
   void _saveAmount() {
     final text = _amountController.text.replaceAll(',', '.');
     final parsed = double.tryParse(text);
@@ -110,11 +172,11 @@ class _TransactionPageState extends State<TransactionPage> {
   }
 
   bool _validateFields() {
-    if (_selectedAccountName == null) {
+    if (_selectedAccountInd == null) {
       _showValidationDialog("Выберите счёт");
       return false;
     }
-    if (_selectedCategoryName == null) {
+    if (_selectedCategoryInd == null) {
       _showValidationDialog("Выберите категорию");
       return false;
     }
@@ -130,6 +192,7 @@ class _TransactionPageState extends State<TransactionPage> {
   }
 
   void _showValidationDialog(String message) {
+    log('Ошибка валидации: $message', name: 'TransactionDialog');
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -149,10 +212,75 @@ class _TransactionPageState extends State<TransactionPage> {
     );
   }
 
-  void _saveTransaction() {
+  Future<void> _saveTransaction() async {
+    log('Пользователь нажал сохранить транзакцию', name: 'TransactionDialog');
+    log('_selectedAccountInd: $_selectedAccountInd', name: 'TransactionDialog');
+    log(
+      '_selectedCategoryInd: $_selectedCategoryInd',
+      name: 'TransactionDialog',
+    );
+    log('_amount: $_amount', name: 'TransactionDialog');
+    log('_title: $_title', name: 'TransactionDialog');
+    log('_selectedDateTime: $_selectedDateTime', name: 'TransactionDialog');
+    log('_accounts.length: ${_accounts.length}', name: 'TransactionDialog');
+    if (_accounts.isNotEmpty) {
+      log(
+        '_accounts.first.id: ${_accounts.first.id}',
+        name: 'TransactionDialog',
+      );
+    }
+
     if (_validateFields()) {
-      // TODO: Здесь будет логика сохранения транзакции
-      Navigator.of(context).pop();
+      try {
+        final cubit = context.read<TransactionCubit>();
+
+        // Используем только валидные данные (fallback убраны, так как валидация уже прошла)
+        final accountId = _selectedAccountInd!;
+        final categoryId = _selectedCategoryInd!;
+        final amount = _amount!.toString();
+        final comment = _title!;
+
+        log(
+          'Создание TransactionRequest с параметрами:',
+          name: 'TransactionDialog',
+        );
+        log('accountId: $accountId', name: 'TransactionDialog');
+        log('categoryId: $categoryId', name: 'TransactionDialog');
+        log('amount: $amount', name: 'TransactionDialog');
+        log('transactionDate: $_selectedDateTime', name: 'TransactionDialog');
+        log('comment: $comment', name: 'TransactionDialog');
+
+        final request = TransactionRequest(
+          accountId: accountId,
+          categoryId: categoryId,
+          amount: amount,
+          transactionDate: _selectedDateTime,
+          comment: comment,
+        );
+
+        log(
+          'TransactionRequest создан: ${request.toString()}',
+          name: 'TransactionDialog',
+        );
+
+        if (widget.isAdd) {
+          log('Создание новой транзакции', name: 'TransactionDialog');
+          await cubit.createTransaction(request);
+          log('Транзакция успешно создана', name: 'TransactionDialog');
+        } else {
+          log('Обновление транзакции', name: 'TransactionDialog');
+          // Для update нужен id транзакции, здесь предполагается, что он есть в widget
+          await cubit.updateTransaction(
+            widget.categoryIndex ?? 1,
+            request,
+          ); // TODO: заменить на реальный id транзакции
+          log('Транзакция успешно обновлена', name: 'TransactionDialog');
+        }
+        Navigator.of(context).pop();
+      } catch (e) {
+        log('Ошибка при сохранении транзакции: $e', name: 'TransactionDialog');
+        _showValidationDialog('Ошибка при сохранении транзакции: $e');
+      }
     }
   }
 
@@ -213,13 +341,35 @@ class _TransactionPageState extends State<TransactionPage> {
           actions: [
             TextButton(
               onPressed: () {
+                log(
+                  'Пользователь отменил удаление транзакции',
+                  name: 'TransactionDialog',
+                );
                 Navigator.of(context).pop();
               },
               child: const Text('Отмена'),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
+              onPressed: () async {
+                log(
+                  'Пользователь подтвердил удаление транзакции',
+                  name: 'TransactionDialog',
+                );
+                try {
+                  final cubit = context.read<TransactionCubit>();
+                  await cubit.deleteTransaction(
+                    widget.categoryIndex ?? 1,
+                  ); // TODO: заменить на реальный id транзакции
+                  log('Транзакция успешно удалена', name: 'TransactionDialog');
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  log(
+                    'Ошибка при удалении транзакции: $e',
+                    name: 'TransactionDialog',
+                  );
+                  _showValidationDialog('Ошибка при удалении транзакции: $e');
+                }
               },
               child: const Text('Удалить'),
             ),
@@ -280,99 +430,110 @@ class _TransactionPageState extends State<TransactionPage> {
                 color: Colors.grey,
               ),
               onTap: () async {
-                // TODO: будем получать то как-то?
-                final accounts = [
-                  {'name': 'Мой счёт', 'currency': '₽'},
-                ];
-                final selected =
-                    await showModalBottomSheet<Map<String, dynamic>>(
-                      context: context,
-                      isScrollControlled: true,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(20),
-                        ),
-                      ),
-                      builder:
-                          (context) => Padding(
-                            padding: MediaQuery.of(context).viewInsets,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 40,
-                                  height: 4,
-                                  margin: const EdgeInsets.only(
-                                    bottom: 16,
-                                    top: 16,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[300],
-                                    borderRadius: BorderRadius.circular(2),
-                                  ),
-                                ),
-                                const Text(
-                                  'Выберите счёт',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  itemCount: accounts.length,
-                                  itemBuilder: (context, index) {
-                                    final account = accounts[index];
-                                    return Column(
-                                      children: [
-                                        ListTile(
-                                          title: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: Text(account['name']!),
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                  left: 8.0,
-                                                ),
-                                                child: Text(
-                                                  account['currency']!,
-                                                  style: TextStyle(
-                                                    fontSize: 24,
+                if (_accountsLoading) return;
+                final selected = await showModalBottomSheet<
+                  Map<String, dynamic>
+                >(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  builder:
+                      (context) => Padding(
+                        padding: MediaQuery.of(context).viewInsets,
+                        child:
+                            _accountsLoading
+                                ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                                : Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      width: 40,
+                                      height: 4,
+                                      margin: const EdgeInsets.only(
+                                        bottom: 16,
+                                        top: 16,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
+                                    ),
+                                    const Text(
+                                      'Выберите счёт',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    ListView.builder(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemCount: _accounts.length,
+                                      itemBuilder: (context, index) {
+                                        final account = _accounts[index];
+                                        return Column(
+                                          children: [
+                                            ListTile(
+                                              title: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(account.name),
                                                   ),
-                                                ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                          left: 8.0,
+                                                        ),
+                                                    child: Text(
+                                                      account.currency,
+                                                      style: TextStyle(
+                                                        fontSize: 24,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ],
-                                          ),
-                                          trailing:
-                                              _selectedAccountInd == index
-                                                  ? Icon(
-                                                    Icons.check,
-                                                    color:
-                                                        CustomAppTheme
-                                                            .figmaMainColor,
-                                                  )
-                                                  : null,
-                                          onTap: () {
-                                            Navigator.of(context).pop({
-                                              'index': index,
-                                              'name': account['name'],
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  },
+                                              trailing:
+                                                  _selectedAccountInd ==
+                                                          account.id
+                                                      ? Icon(
+                                                        Icons.check,
+                                                        color:
+                                                            CustomAppTheme
+                                                                .figmaMainColor,
+                                                      )
+                                                      : null,
+                                              onTap: () {
+                                                log(
+                                                  'Пользователь выбрал счёт: ${account.name}',
+                                                  name: 'TransactionDialog',
+                                                );
+                                                Navigator.of(context).pop({
+                                                  'index': account.id,
+                                                  'name': account.name,
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(height: 24),
+                                  ],
                                 ),
-                                const SizedBox(height: 24),
-                              ],
-                            ),
-                          ),
-                    );
+                      ),
+                );
                 if (!context.mounted) return;
                 if (selected != null) {
                   setState(() {
@@ -473,6 +634,10 @@ class _TransactionPageState extends State<TransactionPage> {
                                                     )
                                                     : null,
                                             onTap: () {
+                                              log(
+                                                'Пользователь выбрал категорию: ${category.name}',
+                                                name: 'TransactionDialog',
+                                              );
                                               Navigator.of(context).pop({
                                                 'index': index,
                                                 'name': category.name,
@@ -632,11 +797,15 @@ class _TransactionPageState extends State<TransactionPage> {
               padding: const EdgeInsets.only(top: 32.0, left: 16, right: 16),
               child: ElevatedButton(
                 onPressed: () {
+                  log(
+                    widget.isAdd
+                        ? 'Пользователь отменил создание транзакции'
+                        : 'Пользователь инициировал удаление транзакции',
+                    name: 'TransactionDialog',
+                  );
                   if (widget.isAdd) {
-                    // Для новой транзакции - просто закрываем диалог
                     Navigator.of(context).pop();
                   } else {
-                    // Для редактирования - показываем диалог подтверждения удаления
                     _showDeleteConfirmationDialog();
                   }
                 },

@@ -11,6 +11,7 @@ import 'package:shmr_finance/data/repositories/category_repo_impl.dart';
 import 'package:shmr_finance/data/repositories/transaction_repo_impl.dart';
 import 'package:shmr_finance/domain/models/transaction/transaction.dart';
 import 'package:shmr_finance/data/database/transaction_database.dart';
+import 'package:shmr_finance/data/services/transaction_sync_service.dart';
 
 part 'transaction_state.dart';
 
@@ -18,15 +19,23 @@ class TransactionCubit extends Cubit<TransactionState> {
   TransactionCubit()
     : super(
         TransactionState(transactions: [], status: TransactionStatus.loading),
-      );
+      ) {
+    // Подписка на изменения статуса сети
+    Connectivity().onConnectivityChanged.listen((result) {
+      if (result != ConnectivityResult.none) {
+        _syncDiffsWithStatus();
+      }
+    });
+  }
 
   Future<void> fetchTransactions({
+    required int accountId,
     DateTime? startDate,
     DateTime? endDate,
     required bool isIncome,
   }) async {
     log(
-      '🎯 fetchTransactions вызван: isIncome=$isIncome, startDate=$startDate, endDate=$endDate',
+      '🎯 fetchTransactions вызван: isIncome=$isIncome, startDate=$startDate, endDate=$endDate, accountId=$accountId',
       name: 'Transaction',
     );
     // Проверка наличия соединения с интернетом
@@ -51,7 +60,7 @@ class TransactionCubit extends Cubit<TransactionState> {
       log('📡 Выполняем сетевой запрос...', name: 'Transaction');
       final List<TransactionResponse> rawResponses = await transactionRepo
           .getPeriodTransactionsByAccount(
-            1, // TODO: захардкоженный аккаунт
+            accountId,
             startDate: startDate,
             endDate: endDate,
           );
@@ -289,6 +298,64 @@ class TransactionCubit extends Cubit<TransactionState> {
           }).toList();
 
       emit(state.copyWith(combineCategories: combineCategories));
+    }
+  }
+
+  void _syncDiffsWithStatus() async {
+    emit(state.copyWith(syncStatus: SyncStatus.syncing));
+    try {
+      await TransactionSyncService().syncPendingDiffs();
+      emit(state.copyWith(syncStatus: SyncStatus.success));
+    } catch (e) {
+      emit(state.copyWith(syncStatus: SyncStatus.error));
+    }
+  }
+
+  Future<void> createTransaction(TransactionRequest request) async {
+    log('TransactionCubit: createTransaction вызван', name: 'TransactionCubit');
+    try {
+      final accountRepo = AccountRepoImp();
+      final categoryRepo = CategoryRepoImpl();
+      final transactionRepo = TransactionRepoImp(accountRepo, categoryRepo);
+      await transactionRepo.createTransaction(request);
+      log('TransactionCubit: транзакция успешно создана', name: 'TransactionCubit');
+      // Можно обновить список транзакций, если нужно
+      // await fetchTransactions(...);
+    } catch (e) {
+      log('TransactionCubit: ошибка при создании транзакции: $e', name: 'TransactionCubit');
+      rethrow;
+    }
+  }
+
+  Future<void> updateTransaction(int id, TransactionRequest request) async {
+    log('TransactionCubit: updateTransaction вызван', name: 'TransactionCubit');
+    try {
+      final accountRepo = AccountRepoImp();
+      final categoryRepo = CategoryRepoImpl();
+      final transactionRepo = TransactionRepoImp(accountRepo, categoryRepo);
+      await transactionRepo.updateTransaction(id, request);
+      log('TransactionCubit: транзакция успешно обновлена', name: 'TransactionCubit');
+      // Можно обновить список транзакций, если нужно
+      // await fetchTransactions(...);
+    } catch (e) {
+      log('TransactionCubit: ошибка при обновлении транзакции: $e', name: 'TransactionCubit');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteTransaction(int id) async {
+    log('TransactionCubit: deleteTransaction вызван', name: 'TransactionCubit');
+    try {
+      final accountRepo = AccountRepoImp();
+      final categoryRepo = CategoryRepoImpl();
+      final transactionRepo = TransactionRepoImp(accountRepo, categoryRepo);
+      await transactionRepo.deleteTransaction(id);
+      log('TransactionCubit: транзакция успешно удалена', name: 'TransactionCubit');
+      // Можно обновить список транзакций, если нужно
+      // await fetchTransactions(...);
+    } catch (e) {
+      log('TransactionCubit: ошибка при удалении транзакции: $e', name: 'TransactionCubit');
+      rethrow;
     }
   }
 }

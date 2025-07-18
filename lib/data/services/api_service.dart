@@ -140,12 +140,23 @@ class ApiService {
   /// Создать новую транзакцию
   Future<Transaction> createTransaction(TransactionRequest request) async {
     try {
+      log('🌐 Отправка запроса на создание транзакции:', name: 'ApiService');
+      log('🌐 URL: $_baseUrl/transactions', name: 'ApiService');
+      log('🌐 Данные: ${request.toJson()}', name: 'ApiService');
+      
       final response = await _dio.post(
         '/transactions',
         data: request.toJson(),
       );
+      
+      log('✅ Транзакция успешно создана, ответ: ${response.data}', name: 'ApiService');
       return Transaction.fromJson(response.data);
     } on DioException catch (e) {
+      log('❌ DioException в createTransaction:', name: 'ApiService');
+      log('❌ Тип ошибки: ${e.type}', name: 'ApiService');
+      log('❌ Сообщение: ${e.message}', name: 'ApiService');
+      log('❌ Статус код: ${e.response?.statusCode}', name: 'ApiService');
+      log('❌ Данные ответа: ${e.response?.data}', name: 'ApiService');
       _handleDioError(e, 'createTransaction');
       rethrow;
     }

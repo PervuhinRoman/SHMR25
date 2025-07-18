@@ -10,6 +10,7 @@ import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/domain/cubit/transactions/datepicker_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
 import 'package:shmr_finance/domain/models/category/category.dart';
+import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
 
 class SelectedCategoryPage extends StatefulWidget {
   final Category selectedCategory;
@@ -38,12 +39,16 @@ class _SelectedCategoryPageState extends State<SelectedCategoryPage> {
       );
       final transactionCubit = context.read<TransactionCubit>();
       final datePickerCubit = context.read<DatePickerCubit>();
-
-      transactionCubit.fetchTransactions(
-        startDate: datePickerCubit.state.startDate,
-        endDate: datePickerCubit.state.endDate,
-        isIncome: widget.isIncome,
-      );
+      final accountState = context.read<MyAccountCubit>().state;
+      final accountId = accountState.accountId ?? 1;
+      if (accountId != null) {
+        transactionCubit.fetchTransactions(
+          accountId: accountId,
+          startDate: datePickerCubit.state.startDate,
+          endDate: datePickerCubit.state.endDate,
+          isIncome: widget.isIncome,
+        );
+      }
     });
   }
 

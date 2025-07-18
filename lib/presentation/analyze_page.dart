@@ -11,6 +11,7 @@ import 'package:shmr_finance/presentation/selected_category_page.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_analyze_category.dart';
 import 'package:pie_chart_widget/pie_chart_widget.dart';
+import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
 
 class AnalyzePage extends StatefulWidget {
   final bool isIncome;
@@ -29,19 +30,24 @@ class _AnalyzePageState extends State<AnalyzePage> {
 
     final datePickerCubit = context.read<DatePickerCubit>();
     final transactionCubit = context.read<TransactionCubit>();
+    final accountState = context.read<MyAccountCubit>().state;
     final startDate = datePickerCubit.state.startDate;
     final endDate = datePickerCubit.state.endDate;
-    transactionCubit.fetchTransactions(
-      isIncome: widget.isIncome,
-      startDate: startDate,
-      endDate: endDate,
-    );
+    final accountId = accountState.accountId ?? 1;
+    if (accountId != null) {
+      transactionCubit.fetchTransactions(
+        accountId: accountId,
+        isIncome: widget.isIncome,
+        startDate: startDate,
+        endDate: endDate,
+      );
+    }
   }
 
   Widget _buildPieChart(List<CombineCategory> categories, double totalSum) {
     // Отладочная информация
     log(
-      "📊 График: количество категорий = ${categories.length}",
+      "�� График: количество категорий = ${categories.length}",
       name: 'PieChart',
     );
     log("📊 График: общая сумма = $totalSum", name: 'PieChart');
@@ -106,12 +112,16 @@ class _AnalyzePageState extends State<AnalyzePage> {
     return BlocListener<DatePickerCubit, DatePickerState>(
       listener: (context, datePickerState) {
         final transactionCubit = context.read<TransactionCubit>();
-        transactionCubit.fetchTransactions(
-          isIncome: widget.isIncome,
-          startDate: datePickerState.startDate,
-          endDate: datePickerState.endDate,
-        );
-
+        final accountState = context.read<MyAccountCubit>().state;
+        final accountId = accountState.accountId ?? 1;
+        if (accountId != null) {
+          transactionCubit.fetchTransactions(
+            accountId: accountId,
+            isIncome: widget.isIncome,
+            startDate: datePickerState.startDate,
+            endDate: datePickerState.endDate,
+          );
+        }
       },
       child: BlocBuilder<DatePickerCubit, DatePickerState>(
         builder: (context, datePickerState) {

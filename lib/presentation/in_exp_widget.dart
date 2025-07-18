@@ -12,6 +12,7 @@ import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/domain/cubit/transactions/datepicker_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transactions/sort_type_cubit.dart';
 import 'in_exp_history_widget.dart';
+import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
 
 class InExpWidget extends StatefulWidget {
   final bool isIncome;
@@ -26,11 +27,16 @@ class _InExpWidgetState extends State<InExpWidget> {
   void initState() {
     super.initState();
     final transactionCubit = context.read<TransactionCubit>();
-    transactionCubit.fetchTransactions(
-      startDate: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
-      endDate: DateTime.now().copyWith(hour: 23, minute: 59, second: 59),
-      isIncome: widget.isIncome,
-    );
+    final accountState = context.read<MyAccountCubit>().state;
+    final accountId = accountState.accountId ?? 1;
+    if (accountId != null) {
+      transactionCubit.fetchTransactions(
+        accountId: accountId,
+        startDate: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
+        endDate: DateTime.now().copyWith(hour: 23, minute: 59, second: 59),
+        isIncome: widget.isIncome,
+      );
+    }
     log(
       '🚀 InExpWidget initState вызван для ${widget.isIncome ? "доходов" : "расходов"}',
       name: "InExpWidget",
@@ -47,11 +53,16 @@ class _InExpWidgetState extends State<InExpWidget> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       log('🔄 InExpWidget: вызываю fetchTransactions', name: "InExpWidget");
       final transactionCubit = context.read<TransactionCubit>();
-      transactionCubit.fetchTransactions(
-        startDate: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
-        endDate: DateTime.now().copyWith(hour: 23, minute: 59, second: 59),
-        isIncome: widget.isIncome,
-      );
+      final accountState = context.read<MyAccountCubit>().state;
+      final accountId = accountState.accountId ?? 1;
+      if (accountId != null) {
+        transactionCubit.fetchTransactions(
+          accountId: accountId,
+          startDate: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
+          endDate: DateTime.now().copyWith(hour: 23, minute: 59, second: 59),
+          isIncome: widget.isIncome,
+        );
+      }
     });
   }
 

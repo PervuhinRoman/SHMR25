@@ -40,6 +40,7 @@ class _AccountPageState extends State<AccountPage> {
   int _selectedPeriodIndex = 0; // 0 - дни, 1 - месяцы
   List<BarData> _chartData = [];
   bool _isChartLoading = false;
+  List<Account> _accounts = [];
 
   @override
   void didChangeDependencies() {
@@ -75,11 +76,20 @@ class _AccountPageState extends State<AccountPage> {
         _error = null;
       });
 
-      // Загружаем данные основного счета (ID = 1)
-      final accountData = await _accountRepo.getAccountById(1);
-
+      // Загружаем все счета пользователя
+      final accounts = await _accountRepo.getAllAccounts();
       setState(() {
-        _accountData = accountData;
+        _accounts = accounts;
+        _accountData = accounts.isNotEmpty ? AccountResponse(
+          id: accounts.first.id,
+          name: accounts.first.name,
+          balance: accounts.first.balance,
+          currency: accounts.first.currency,
+          incomeStats: [],
+          expenseStats: [],
+          createdAt: accounts.first.createdAt,
+          updatedAt: accounts.first.updatedAt,
+        ) : null;
         _isLoading = false;
       });
     } catch (e) {
@@ -168,10 +178,7 @@ class _AccountPageState extends State<AccountPage> {
       builder: (context, accountState) {
         return Scaffold(
           appBar: CustomAppBar(
-            title:
-                accountState.accountName.isNotEmpty
-                    ? accountState.accountName
-                    : "Мой счёт",
+            title: _accountData?.name ?? "Мой счёт",
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.mode_edit_outlined),
@@ -194,7 +201,7 @@ class _AccountPageState extends State<AccountPage> {
                   : _error != null
                   ? Center(child: Text('Ошибка: $_error'))
                   : _accountData == null
-                  ? const Center(child: Text('Нет данных'))
+                  ? const Center(child: Text('Нет счетов'))
                   : _buildAccountContent(),
         );
       },
@@ -370,8 +377,12 @@ class _AccountPageState extends State<AccountPage> {
               ? endDate.subtract(const Duration(days: 30)) // 30 дней
               : DateTime(endDate.year - 1, endDate.month, 1); // 12 месяцев
 
+      final accountId = _accountData?.id;
+      if (accountId == null) return;
+
       // Загружаем все транзакции за период
       await context.read<TransactionCubit>().fetchTransactions(
+        accountId: accountId,
         startDate: startDate,
         endDate: endDate,
         isIncome: true, // Доходы
@@ -383,6 +394,7 @@ class _AccountPageState extends State<AccountPage> {
 
       // Загружаем расходы
       await context.read<TransactionCubit>().fetchTransactions(
+        accountId: accountId,
         startDate: startDate,
         endDate: endDate,
         isIncome: false, // Расходы

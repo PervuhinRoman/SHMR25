@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shmr_finance/domain/models/currency/currency.dart';
+import 'package:shmr_finance/data/repositories/account_repo_impl.dart';
+import 'package:shmr_finance/domain/models/account/account.dart';
 
 part 'account_state.dart';
 
@@ -37,12 +39,20 @@ class MyAccountCubit extends Cubit<MyAccountState> {
       final accountName = prefs.getString(_accountNameKey) ?? 'Мой счёт';
       log('📱 Загружено имя счета: $accountName', name: "Имя счёта");
       
+      // Загружаем id первого аккаунта пользователя
+      int? accountId;
+      try {
+        final repo = AccountRepoImp();
+        final accounts = await repo.getAllAccounts();
+        accountId = accounts.isNotEmpty ? accounts.first.id : null;
+      } catch (_) {}
       emit(state.copyWith(
         selectedCurrency: currency,
         accountName: accountName,
         isLoading: false,
+        accountId: accountId,
       ));
-      log('📡 Состояние обновлено после загрузки: ${state.selectedCurrency.code}, ${state.accountName}');
+      log('📡 Состояние обновлено после загрузки: ${state.selectedCurrency.code}, ${state.accountName}, id=$accountId');
     } catch (e) {
       log('❌ Ошибка при загрузке данных аккаунта: $e');
       emit(state.copyWith(isLoading: false));

@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:convert';
 
 import 'package:shmr_finance/data/repositories/category_repo.dart';
 import 'package:shmr_finance/data/repositories/transaction_repo.dart';
@@ -151,7 +152,29 @@ class TransactionRepoImp implements TransactionRepository {
     TransactionRequest request,
   ) async {
     try {
+      // Детальное логирование запроса для диагностики
+      log('📤 Создание транзакции - данные запроса:', name: 'TransactionRepo');
+      log('📤 accountId: ${request.accountId}', name: 'TransactionRepo');
+      log('📤 categoryId: ${request.categoryId}', name: 'TransactionRepo');
+      log('📤 amount: ${request.amount}', name: 'TransactionRepo');
+      log('📤 transactionDate: ${request.transactionDate}', name: 'TransactionRepo');
+      log('📤 comment: ${request.comment}', name: 'TransactionRepo');
+      log('📤 JSON запроса: ${jsonEncode(request.toJson())}', name: 'TransactionRepo');
+      
+      // Сохраняем diff-операцию в backup-БД
+      final now = DateTime.now();
+      final tempId = now.microsecondsSinceEpoch; // временный id до sync
+      await _transactionDatabase.upsertTransactionDiff(
+        id: tempId,
+        operation: 'create',
+        transactionJson: jsonEncode(request.toJson()),
+        timestamp: now,
+      );
+      // Можно сразу обновить UI, не дожидаясь sync
+      // Далее пробуем sync с сервером (по offline-first логике)
       final transaction = await _apiService.createTransaction(request);
+      // После успешного sync удаляем diff
+      await _transactionDatabase.deleteDiffById(tempId);
       // Преобразуем Transaction в TransactionResponse
       final category = await _getCategoryById(transaction.categoryId);
       final account = await _getAccountBriefById(transaction.accountId);
@@ -181,7 +204,16 @@ class TransactionRepoImp implements TransactionRepository {
     TransactionRequest request,
   ) async {
     try {
-      return await _apiService.updateTransaction(id, request);
+      final now = DateTime.now();
+      await _transactionDatabase.upsertTransactionDiff(
+        id: id,
+        operation: 'update',
+        transactionJson: jsonEncode(request.toJson()),
+        timestamp: now,
+      );
+      final response = await _apiService.updateTransaction(id, request);
+      await _transactionDatabase.deleteDiffById(id);
+      return response;
     } catch (e) {
       log(
         '❌ Error in updateTransaction: $e',
@@ -194,7 +226,15 @@ class TransactionRepoImp implements TransactionRepository {
   @override
   Future<void> deleteTransaction(int id) async {
     try {
+      final now = DateTime.now();
+      await _transactionDatabase.upsertTransactionDiff(
+        id: id,
+        operation: 'delete',
+        transactionJson: null,
+        timestamp: now,
+      );
       await _apiService.deleteTransaction(id);
+      await _transactionDatabase.deleteDiffById(id);
     } catch (e) {
       log(
         '❌ Error in deleteTransaction: $e',
