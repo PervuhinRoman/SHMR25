@@ -17,11 +17,15 @@ import 'package:shmr_finance/presentation/settings_page.dart';
 import 'package:shmr_finance/presentation/security_screen.dart';
 import 'package:shmr_finance/presentation/widgets/app_blur_wrapper.dart';
 import 'package:shmr_finance/app_theme.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shmr_finance/data/services/theme_service.dart';
 import 'package:shmr_finance/data/services/haptic_service.dart';
 import 'package:shmr_finance/data/services/security_service.dart';
+import 'package:shmr_finance/data/services/locale_service.dart';
 import 'package:shmr_finance/presentation/services/app_blur_service.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() async {
   // Устанавливаем цвета для статус бара и навигационной панели
@@ -81,6 +85,9 @@ void main() async {
   
   final appBlurService = AppBlurService();
   await appBlurService.initialize();
+  
+  final localeService = LocaleService();
+  await localeService.initialize();
 
   runApp(
     MultiBlocProvider(
@@ -94,6 +101,7 @@ void main() async {
         providers: [
           ChangeNotifierProvider.value(value: themeService),
           ChangeNotifierProvider.value(value: securityService),
+          ChangeNotifierProvider.value(value: localeService),
         ],
         child: const MyApp(),
       ),
@@ -137,15 +145,27 @@ class _MyAppState extends State<MyApp> {
     return Consumer<ThemeService>(
       builder: (context, themeService, child) {
         return SafeArea(
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'SHMR Finance',
-            themeMode: themeService.getThemeMode(),
-            theme: themeService.getLightTheme(),
-            darkTheme: themeService.getDarkTheme(),
-            home: _isAuthenticated 
-                ? AppBlurWrapper(child: const BaseScreen())
-                : SecurityScreen(onAuthenticated: _onAuthenticated),
+          child: Consumer<LocaleService>(
+            builder: (context, localeService, child) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'SHMR Finance',
+                locale: localeService.currentLocale,
+                supportedLocales: LocaleService.supportedLocales,
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                themeMode: themeService.getThemeMode(),
+                theme: themeService.getLightTheme(),
+                darkTheme: themeService.getDarkTheme(),
+                home: _isAuthenticated 
+                    ? AppBlurWrapper(child: const BaseScreen())
+                    : SecurityScreen(onAuthenticated: _onAuthenticated),
+              );
+            },
           ),
         );
       },
@@ -166,6 +186,7 @@ class _BaseScreenState extends State<BaseScreen> {
   @override
   Widget build(BuildContext context) {
     final themeService = Provider.of<ThemeService>(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Scaffold(
       bottomNavigationBar: NavigationBar(
@@ -180,23 +201,23 @@ class _BaseScreenState extends State<BaseScreen> {
         destinations: <Widget>[
           NavigationDestination(
             icon: Image.asset('assets/icons/downtrend.png', width: 32),
-            label: 'Расходы',
+            label: l10n.expense,
           ),
           NavigationDestination(
             icon: Image.asset('assets/icons/uptrend.png', width: 32),
-            label: 'Доходы',
+            label: l10n.income,
           ),
           NavigationDestination(
             icon: Image.asset('assets/icons/calc.png', width: 32),
-            label: 'Счет',
+            label: l10n.accounts,
           ),
           NavigationDestination(
             icon: Image.asset('assets/icons/linear_chart.png', width: 32),
-            label: 'Статьи',
+            label: l10n.categories,
           ),
           NavigationDestination(
             icon: Image.asset('assets/icons/settings.png', width: 32),
-            label: 'Настройки',
+            label: l10n.settings,
           ),
         ],
       ),

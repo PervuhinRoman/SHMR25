@@ -1,0 +1,870 @@
+{
+  "@@locale": "en",
+  "appTitle": "SHMR Finance",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings page title"
+  },
+  
+  "theme": "Theme",
+  "@theme": {
+    "description": "Theme settings"
+  },
+  
+  "systemTheme": "System theme",
+  "@systemTheme": {
+    "description": "Use system theme setting"
+  },
+  
+  "primaryColor": "Primary color",
+  "@primaryColor": {
+    "description": "Primary color picker"
+  },
+  
+  "hapticFeedback": "Haptic feedback",
+  "@hapticFeedback": {
+    "description": "Haptic feedback toggle"
+  },
+  
+  "language": "Language",
+  "@language": {
+    "description": "Language setting"
+  },
+  
+  "security": "Security",
+  "@security": {
+    "description": "Security settings"
+  },
+  
+  "pinCode": "PIN code",
+  "@pinCode": {
+    "description": "PIN code setting"
+  },
+  
+  "pinCodeRequired": "Please enable PIN code first",
+  "@pinCodeRequired": {
+    "description": "PIN code required message"
+  },
+  
+  "biometrics": "Biometrics",
+  "@biometrics": {
+    "description": "Biometric authentication"
+  },
+  
+  "appBlur": "App blur",
+  "@appBlur": {
+    "description": "App blur when minimized"
+  },
+  
+  "appBlurDescription": "Blur screen in multitasking mode",
+  "@appBlurDescription": {
+    "description": "App blur description"
+  },
+  
+  "testPinCode": "Test PIN code",
+  "@testPinCode": {
+    "description": "Test PIN code button"
+  },
+  
+  "testPinCodeDescription": "Check PIN code input",
+  "@testPinCodeDescription": {
+    "description": "Test PIN code description"
+  },
+  
+  "testBlur": "Test blur",
+  "@testBlur": {
+    "description": "Test blur button"
+  },
+  
+  "testBlurDescription": "Force apply blur",
+  "@testBlurDescription": {
+    "description": "Test blur description"
+  },
+  
+  "pinCodeSetup": "PIN code setup",
+  "@pinCodeSetup": {
+    "description": "PIN code setup title"
+  },
+  
+  "pinCodeInput": "PIN code input",
+  "@pinCodeInput": {
+    "description": "PIN code input title"
+  },
+  
+  "enterPinCode": "Enter PIN code",
+  "@enterPinCode": {
+    "description": "Enter PIN code prompt"
+  },
+  
+  "confirmPinCode": "Confirm PIN code",
+  "@confirmPinCode": {
+    "description": "Confirm PIN code prompt"
+  },
+  
+  "pinCodesDoNotMatch": "PIN codes do not match",
+  "@pinCodesDoNotMatch": {
+    "description": "PIN codes do not match error"
+  },
+  
+  "pinCodeSetSuccessfully": "PIN code set successfully",
+  "@pinCodeSetSuccessfully": {
+    "description": "PIN code set successfully message"
+  },
+  
+  "pinCodeEnteredCorrectly": "PIN code entered correctly!",
+  "@pinCodeEnteredCorrectly": {
+    "description": "PIN code entered correctly message"
+  },
+  
+  "blurApplied": "Blur applied! Minimize the app to check.",
+  "@blurApplied": {
+    "description": "Blur applied message"
+  },
+  
+  "appLocked": "App locked",
+  "@appLocked": {
+    "description": "App locked message"
+  },
+  
+  "minimizeToUnlock": "Minimize the app to unlock",
+  "@minimizeToUnlock": {
+    "description": "Minimize to unlock message"
+  },
+  
+  "accounts": "Accounts",
+  "@accounts": {
+    "description": "Accounts page title"
+  },
+  
+  "addAccount": "Add account",
+  "@addAccount": {
+    "description": "Add account button"
+  },
+  
+  "editAccount": "Edit account",
+  "@editAccount": {
+    "description": "Edit account title"
+  },
+  
+  "deleteAccount": "Delete account",
+  "@deleteAccount": {
+    "description": "Delete account title"
+  },
+  
+  "accountName": "Account name",
+  "@accountName": {
+    "description": "Account name field"
+  },
+  
+  "accountBalance": "Account balance",
+  "@accountBalance": {
+    "description": "Account balance field"
+  },
+  
+  "save": "Save",
+  "@save": {
+    "description": "Save button"
+  },
+  
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button"
+  },
+  
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button"
+  },
+  
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button"
+  },
+  
+  "deleteAccountConfirmation": "Are you sure you want to delete this account?",
+  "@deleteAccountConfirmation": {
+    "description": "Delete account confirmation message"
+  },
+  
+  "categories": "Categories",
+  "@categories": {
+    "description": "Categories page title"
+  },
+  
+  "addCategory": "Add category",
+  "@addCategory": {
+    "description": "Add category button"
+  },
+  
+  "categoryName": "Category name",
+  "@categoryName": {
+    "description": "Category name field"
+  },
+  
+  "income": "Income",
+  "@income": {
+    "description": "Income category"
+  },
+  
+  "expense": "Expense",
+  "@expense": {
+    "description": "Expense category"
+  },
+  
+  "transactions": "Transactions",
+  "@transactions": {
+    "description": "Transactions page title"
+  },
+  
+  "addTransaction": "Add transaction",
+  "@addTransaction": {
+    "description": "Add transaction button"
+  },
+  
+  "transactionAmount": "Amount",
+  "@transactionAmount": {
+    "description": "Transaction amount field"
+  },
+  
+  "transactionDescription": "Description",
+  "@transactionDescription": {
+    "description": "Transaction description field"
+  },
+  
+  "transactionDate": "Date",
+  "@transactionDate": {
+    "description": "Transaction date field"
+  },
+  
+  "transactionCategory": "Category",
+  "@transactionCategory": {
+    "description": "Transaction category field"
+  },
+  
+  "transactionAccount": "Account",
+  "@transactionAccount": {
+    "description": "Transaction account field"
+  },
+  
+  "analysis": "Analysis",
+  "@analysis": {
+    "description": "Analysis page title"
+  },
+  
+  "totalBalance": "Total balance",
+  "@totalBalance": {
+    "description": "Total balance label"
+  },
+  
+  "totalIncome": "Total income",
+  "@totalIncome": {
+    "description": "Total income label"
+  },
+  
+  "totalExpense": "Total expense",
+  "@totalExpense": {
+    "description": "Total expense label"
+  },
+  
+  "thisMonth": "This month",
+  "@thisMonth": {
+    "description": "This month label"
+  },
+  
+  "lastMonth": "Last month",
+  "@lastMonth": {
+    "description": "Last month label"
+  },
+  
+  "thisYear": "This year",
+  "@thisYear": {
+    "description": "This year label"
+  },
+  
+  "noData": "No data",
+  "@noData": {
+    "description": "No data message"
+  },
+  
+  "error": "Error",
+  "@error": {
+    "description": "Error message"
+  },
+  
+  "success": "Success",
+  "@success": {
+    "description": "Success message"
+  },
+  
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading message"
+  },
+  
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button"
+  },
+  
+  "close": "Close",
+  "@close": {
+    "description": "Close button"
+  },
+  
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button"
+  },
+  
+  "reset": "Reset",
+  "@reset": {
+    "description": "Reset button"
+  },
+  
+  "yes": "Yes",
+  "@yes": {
+    "description": "Yes button"
+  },
+  
+  "no": "No",
+  "@no": {
+    "description": "No button"
+  },
+  
+  "back": "Back",
+  "@back": {
+    "description": "Back button"
+  },
+  
+  "next": "Next",
+  "@next": {
+    "description": "Next button"
+  },
+  
+  "previous": "Previous",
+  "@previous": {
+    "description": "Previous button"
+  },
+  
+  "search": "Search",
+  "@search": {
+    "description": "Search field"
+  },
+  
+  "filter": "Filter",
+  "@filter": {
+    "description": "Filter button"
+  },
+  
+  "sort": "Sort",
+  "@sort": {
+    "description": "Sort button"
+  },
+  
+  "all": "All",
+  "@all": {
+    "description": "All filter"
+  },
+  
+  "today": "Today",
+  "@today": {
+    "description": "Today filter"
+  },
+  
+  "yesterday": "Yesterday",
+  "@yesterday": {
+    "description": "Yesterday filter"
+  },
+  
+  "thisWeek": "This week",
+  "@thisWeek": {
+    "description": "This week filter"
+  },
+  
+  "lastWeek": "Last week",
+  "@lastWeek": {
+    "description": "Last week filter"
+  },
+  
+  "currency": "Currency",
+  "@currency": {
+    "description": "Currency field"
+  },
+  
+  "rub": "RUB",
+  "@rub": {
+    "description": "Russian ruble"
+  },
+  
+  "usd": "USD",
+  "@usd": {
+    "description": "US dollar"
+  },
+  
+  "eur": "EUR",
+  "@eur": {
+    "description": "Euro"
+  },
+  
+  "amount": "Amount",
+  "@amount": {
+    "description": "Amount field"
+  },
+  
+  "description": "Description",
+  "@description": {
+    "description": "Description field"
+  },
+  
+  "date": "Date",
+  "@date": {
+    "description": "Date field"
+  },
+  
+  "time": "Time",
+  "@time": {
+    "description": "Time field"
+  },
+  
+  "name": "Name",
+  "@name": {
+    "description": "Name field"
+  },
+  
+  "type": "Type",
+  "@type": {
+    "description": "Type field"
+  },
+  
+  "status": "Status",
+  "@status": {
+    "description": "Status field"
+  },
+  
+  "active": "Active",
+  "@active": {
+    "description": "Active status"
+  },
+  
+  "inactive": "Inactive",
+  "@inactive": {
+    "description": "Inactive status"
+  },
+  
+  "enabled": "Enabled",
+  "@enabled": {
+    "description": "Enabled status"
+  },
+  
+  "disabled": "Disabled",
+  "@disabled": {
+    "description": "Disabled status"
+  },
+  
+  "on": "On",
+  "@on": {
+    "description": "On status"
+  },
+  
+  "off": "Off",
+  "@off": {
+    "description": "Off status"
+  },
+  
+  "biometricNotAvailable": "Biometric authentication is not available",
+  "@biometricNotAvailable": {
+    "description": "Biometric not available message"
+  },
+  
+  "biometricNotConfigured": "Biometric authentication is not configured on this device",
+  "@biometricNotConfigured": {
+    "description": "Biometric not configured message"
+  },
+  
+  "biometricSetupRequired": "Please set up biometric authentication in your device settings",
+  "@biometricSetupRequired": {
+    "description": "Biometric setup required message"
+  },
+  
+  "usePinCode": "Use PIN code",
+  "@usePinCode": {
+    "description": "Use PIN code button"
+  },
+  
+  "useBiometrics": "Use biometrics",
+  "@useBiometrics": {
+    "description": "Use biometrics button"
+  },
+  
+  "faceId": "Face ID",
+  "@faceId": {
+    "description": "Face ID authentication"
+  },
+  
+  "touchId": "Touch ID",
+  "@touchId": {
+    "description": "Touch ID authentication"
+  },
+  
+  "fingerprint": "Fingerprint",
+  "@fingerprint": {
+    "description": "Fingerprint authentication"
+  },
+  
+  "authenticationRequired": "Authentication required",
+  "@authenticationRequired": {
+    "description": "Authentication required message"
+  },
+  
+  "pleaseAuthenticate": "Please authenticate to continue",
+  "@pleaseAuthenticate": {
+    "description": "Please authenticate message"
+  },
+  
+  "authenticationFailed": "Authentication failed",
+  "@authenticationFailed": {
+    "description": "Authentication failed message"
+  },
+  
+  "tryAgain": "Try again",
+  "@tryAgain": {
+    "description": "Try again button"
+  },
+  
+  "transactionCount": "{count, plural, =0{No transactions} =1{1 transaction} other{{count} transactions}}",
+  "@transactionCount": {
+    "description": "Transaction count with pluralization",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  
+  "accountCount": "{count, plural, =0{No accounts} =1{1 account} other{{count} accounts}}",
+  "@accountCount": {
+    "description": "Account count with pluralization",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  
+  "categoryCount": "{count, plural, =0{No categories} =1{1 category} other{{count} categories}}",
+  "@categoryCount": {
+    "description": "Category count with pluralization",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  
+  "fillAllFields": "Fill all fields",
+  "@fillAllFields": {
+    "description": "Fill all fields error message"
+  },
+  
+  "confirmDelete": "Confirm deletion",
+  "@confirmDelete": {
+    "description": "Confirm deletion dialog title"
+  },
+  
+  "confirmDeleteTransaction": "Are you sure you want to delete this transaction?",
+  "@confirmDeleteTransaction": {
+    "description": "Confirm delete transaction message"
+  },
+  
+  "pinCodeSetup": "PIN code setup",
+  "@pinCodeSetup": {
+    "description": "PIN code setup title"
+  },
+  
+  "enterPinCode": "Enter PIN code",
+  "@enterPinCode": {
+    "description": "Enter PIN code title"
+  },
+  
+  "total": "Total",
+  "@total": {
+    "description": "Total label"
+  },
+  
+  "noDataForPeriod": "No data for period",
+  "@noDataForPeriod": {
+    "description": "No data for period message"
+  },
+  
+  "error": "Error",
+  "@error": {
+    "description": "Error message"
+  },
+  
+  "unlock": "Unlock",
+  "@unlock": {
+    "description": "Unlock button"
+  },
+  
+  "sortByDate": "By date",
+  "@sortByDate": {
+    "description": "Sort by date option"
+  },
+  
+  "sortByAmount": "By amount",
+  "@sortByAmount": {
+    "description": "Sort by amount option"
+  },
+  
+  "accountNameUpdated": "Account name updated",
+  "@accountNameUpdated": {
+    "description": "Account name updated message"
+  },
+  
+  "updateError": "Update error",
+  "@updateError": {
+    "description": "Update error message"
+  },
+  
+  "noCategories": "No categories",
+  "@noCategories": {
+    "description": "No categories message"
+  },
+  
+  "periodStart": "Period: start",
+  "@periodStart": {
+    "description": "Period start label"
+  },
+  
+  "periodEnd": "Period: end",
+  "@periodEnd": {
+    "description": "Period end label"
+  },
+  
+  "noAccounts": "No accounts",
+  "@noAccounts": {
+    "description": "No accounts message"
+  },
+  
+  "deleteConfirmation": "Delete confirmation",
+  "@deleteConfirmation": {
+    "description": "Delete confirmation title"
+  },
+  
+  "deleteNotSupported": "Account deletion is not supported",
+  "@deleteNotSupported": {
+    "description": "Delete not supported message"
+  },
+  
+  "myCategories": "My categories",
+  "@myCategories": {
+    "description": "My categories title"
+  },
+  
+  "time": "Time",
+  "@time": {
+    "description": "Time field"
+  },
+  
+  "required": " *",
+  "@required": {
+    "description": "Required field indicator"
+  },
+  
+  "myAccount": "My account",
+  "@myAccount": {
+    "description": "My account title"
+  },
+  
+  "balance": "Balance",
+  "@balance": {
+    "description": "Balance label"
+  },
+  
+  "currency": "Currency",
+  "@currency": {
+    "description": "Currency label"
+  },
+  
+  "noDataToDisplay": "No data to display",
+  "@noDataToDisplay": {
+    "description": "No data to display message"
+  },
+  
+  "days30": "30 days",
+  "@days30": {
+    "description": "30 days period"
+  },
+  
+  "months12": "12 months",
+  "@months12": {
+    "description": "12 months period"
+  },
+  
+  "dataFromCache": "Data from cache",
+  "@dataFromCache": {
+    "description": "Data from cache message"
+  },
+  
+  "dataFromNetwork": "Data from network",
+  "@dataFromNetwork": {
+    "description": "Data from network message"
+  },
+  
+  "incomeToday": "Income today",
+  "@incomeToday": {
+    "description": "Income today title"
+  },
+  
+  "expenseToday": "Expense today",
+  "@expenseToday": {
+    "description": "Expense today title"
+  },
+  
+  "incomeHistory": "Income history",
+  "@incomeHistory": {
+    "description": "Income history title"
+  },
+  
+  "expenseHistory": "Expense history",
+  "@expenseHistory": {
+    "description": "Expense history title"
+  },
+  
+  "start": "Start",
+  "@start": {
+    "description": "Start date label"
+  },
+  
+  "end": "End",
+  "@end": {
+    "description": "End date label"
+  },
+  
+  "selectDate": "Select date",
+  "@selectDate": {
+    "description": "Select date placeholder"
+  },
+  
+  "selectStartDate": "Select start date",
+  "@selectStartDate": {
+    "description": "Select start date help text"
+  },
+  
+  "selectEndDate": "Select end date",
+  "@selectEndDate": {
+    "description": "Select end date help text"
+  },
+  
+  "analysis": "Analysis",
+  "@analysis": {
+    "description": "Analysis page title"
+  },
+  
+  "findArticle": "Find article...",
+  "@findArticle": {
+    "description": "Find article placeholder"
+  },
+  
+  "articleNotFound": "Article not found",
+  "@articleNotFound": {
+    "description": "Article not found message"
+  },
+  
+  "selectCurrency": "Select currency",
+  "@selectCurrency": {
+    "description": "Select currency dialog title"
+  },
+  
+  "sorting": "Sorting",
+  "@sorting": {
+    "description": "Sorting label"
+  },
+  
+  "addTransaction": "Add transaction",
+  "@addTransaction": {
+    "description": "Add transaction title"
+  },
+  
+  "editTransaction": "Edit transaction",
+  "@editTransaction": {
+    "description": "Edit transaction title"
+  },
+  
+  "transactionName": "Name / description",
+  "@transactionName": {
+    "description": "Transaction name placeholder"
+  },
+  
+  "deleteTransaction": "Delete transaction",
+  "@deleteTransaction": {
+    "description": "Delete transaction button"
+  },
+  
+  "selectAccount": "Select account",
+  "@selectAccount": {
+    "description": "Select account dialog title"
+  },
+  
+  "appLocked": "App is locked",
+  "@appLocked": {
+    "description": "App locked message"
+  },
+  
+  "confirmIdentity": "Confirm your identity",
+  "@confirmIdentity": {
+    "description": "Confirm identity message"
+  },
+  
+  "biometricUnavailable": "Biometric authentication is unavailable or not configured. Use PIN code.",
+  "@biometricUnavailable": {
+    "description": "Biometric unavailable message"
+  },
+  
+  "faceId": "Face ID",
+  "@faceId": {
+    "description": "Face ID label"
+  },
+  
+  "touchId": "Touch ID",
+  "@touchId": {
+    "description": "Touch ID label"
+  },
+  
+  "faceIdTouchId": "Face ID / Touch ID",
+  "@faceIdTouchId": {
+    "description": "Face ID / Touch ID label"
+  },
+  
+  "confirmPinCode": "Confirm PIN code",
+  "@confirmPinCode": {
+    "description": "Confirm PIN code title"
+  },
+  
+  "setupPinCode": "Setup PIN code",
+  "@setupPinCode": {
+    "description": "Setup PIN code title"
+  },
+  
+  "pinCodeSaveError": "Error saving PIN code",
+  "@pinCodeSaveError": {
+    "description": "PIN code save error message"
+  },
+  
+  "pinCodesDontMatch": "PIN codes don't match",
+  "@pinCodesDontMatch": {
+    "description": "PIN codes don't match message"
+  },
+  
+  "incorrectPinCode": "Incorrect PIN code",
+  "@incorrectPinCode": {
+    "description": "Incorrect PIN code message"
+  }
+} 

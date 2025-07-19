@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:shmr_finance/data/services/security_service.dart';
 import 'package:shmr_finance/data/services/haptic_service.dart';
 import 'package:shmr_finance/app_theme.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PinCodeScreen extends StatefulWidget {
   final bool isSetup; // true - установка PIN, false - ввод PIN
@@ -31,10 +32,11 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
   
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: widget.isSetup ? AppBar(
-        title: const Text('Установка PIN-кода'),
+        title: Text(l10n.pinCodeSetup),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -44,7 +46,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
           },
         ),
       ) : AppBar(
-        title: const Text('Введите PIN-код'),
+        title: Text(l10n.enterPinCode),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -73,11 +75,12 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
   }
   
   Widget _buildTitle() {
+    final l10n = AppLocalizations.of(context)!;
     String title;
     if (widget.isSetup) {
-      title = _isConfirming ? 'Подтвердите PIN-код' : 'Установите PIN-код';
+      title = _isConfirming ? l10n.confirmPinCode : l10n.setupPinCode;
     } else {
-      title = 'Введите PIN-код';
+      title = l10n.enterPinCode;
     }
     
     return Text(
@@ -272,6 +275,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
   }
   
   Future<void> _verifyConfirmPin() async {
+    final l10n = AppLocalizations.of(context)!;
     final pin = _pinCode.join();
     final confirmPin = _confirmPinCode.join();
     
@@ -284,13 +288,13 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
       } catch (e) {
         setState(() {
           _isError = true;
-          _errorMessage = 'Ошибка сохранения PIN-кода';
+          _errorMessage = l10n.pinCodeSaveError;
         });
       }
     } else {
       setState(() {
         _isError = true;
-        _errorMessage = 'PIN-коды не совпадают';
+        _errorMessage = l10n.pinCodesDontMatch;
         _confirmPinCode.clear();
       });
       HapticService().heavyImpact();
@@ -298,6 +302,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
   }
   
   Future<void> _verifyPin() async {
+    final l10n = AppLocalizations.of(context)!;
     final pin = _pinCode.join();
     final isValid = await SecurityService().verifyPinCode(pin);
     
@@ -308,7 +313,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
     } else {
       setState(() {
         _isError = true;
-        _errorMessage = 'Неверный PIN-код';
+        _errorMessage = l10n.incorrectPinCode;
         _pinCode.clear();
       });
       HapticService().heavyImpact();

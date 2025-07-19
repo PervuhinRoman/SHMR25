@@ -3,6 +3,7 @@ import 'package:shmr_finance/data/services/security_service.dart';
 import 'package:shmr_finance/data/services/haptic_service.dart';
 import 'package:shmr_finance/presentation/pin_code_screen.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SecurityScreen extends StatefulWidget {
   final VoidCallback onAuthenticated;
@@ -85,9 +86,10 @@ class _SecurityScreenState extends State<SecurityScreen> {
   }
   
   void _showBiometricError() {
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Биометрия недоступна или не настроена. Используйте PIN-код.'),
+      SnackBar(
+        content: Text(l10n.biometricUnavailable),
         duration: Duration(seconds: 3),
         backgroundColor: Colors.orange,
       ),
@@ -116,6 +118,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
   
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Center(
@@ -128,16 +131,16 @@ class _SecurityScreenState extends State<SecurityScreen> {
               color: Theme.of(context).primaryColor,
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Приложение заблокировано',
+            Text(
+              l10n.appLocked,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Подтвердите вашу личность',
+            Text(
+              l10n.confirmIdentity,
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
@@ -151,7 +154,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
             else
               ElevatedButton(
                 onPressed: _checkAuthOptions,
-                child: const Text('Разблокировать'),
+                child: Text(l10n.unlock),
               ),
           ],
         ),
@@ -160,6 +163,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
   }
   
   Widget _buildAuthOptions() {
+    final l10n = AppLocalizations.of(context)!;
     return FutureBuilder<bool>(
       future: SecurityService().isBiometricAvailable(),
       builder: (context, snapshot) {
@@ -176,7 +180,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 _showPinCodeScreen();
               },
               icon: const Icon(Icons.pin),
-              label: const Text('PIN-код'),
+              label: Text(l10n.pinCode),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).primaryColor,
                 foregroundColor: Colors.white,
@@ -189,16 +193,16 @@ class _SecurityScreenState extends State<SecurityScreen> {
         return FutureBuilder<List<BiometricType>>(
           future: SecurityService().getAvailableBiometrics(),
           builder: (context, biometricSnapshot) {
-            String biometricLabel = 'Face ID / Touch ID';
+            String biometricLabel = l10n.faceIdTouchId;
             IconData biometricIcon = Icons.fingerprint;
             
             if (biometricSnapshot.hasData) {
               final biometrics = biometricSnapshot.data!;
               if (biometrics.contains(BiometricType.face)) {
-                biometricLabel = 'Face ID';
+                biometricLabel = l10n.faceId;
                 biometricIcon = Icons.face;
               } else if (biometrics.contains(BiometricType.fingerprint)) {
-                biometricLabel = 'Touch ID';
+                biometricLabel = l10n.touchId;
                 biometricIcon = Icons.fingerprint;
               }
             }
@@ -231,7 +235,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                       _showPinCodeScreen();
                     },
                     icon: const Icon(Icons.pin),
-                    label: const Text('PIN-код'),
+                    label: Text(l10n.pinCode),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Theme.of(context).primaryColor,
                       side: BorderSide(color: Theme.of(context).primaryColor),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:shmr_finance/presentation/services/app_blur_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AppBlurWrapper extends StatefulWidget {
   final Widget child;
@@ -56,6 +57,8 @@ class _AppBlurWrapperState extends State<AppBlurWrapper> with WidgetsBindingObse
       return widget.child;
     }
 
+    final l10n = AppLocalizations.of(context)!;
+
     return Stack(
       textDirection: TextDirection.ltr,
       children: [
@@ -85,7 +88,7 @@ class _AppBlurWrapperState extends State<AppBlurWrapper> with WidgetsBindingObse
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Приложение заблокировано',
+                        l10n.appLocked,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -94,7 +97,7 @@ class _AppBlurWrapperState extends State<AppBlurWrapper> with WidgetsBindingObse
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Сверните приложение для разблокировки',
+                        l10n.minimizeToUnlock,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.white.withOpacity(0.7),

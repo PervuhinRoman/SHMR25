@@ -10,6 +10,7 @@ import 'package:shmr_finance/domain/models/category/combine_category.dart';
 import 'package:shmr_finance/presentation/selected_category_page.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_analyze_category.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:pie_chart_widget/pie_chart_widget.dart';
 import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
 
@@ -125,6 +126,7 @@ class _AnalyzePageState extends State<AnalyzePage> {
       },
       child: BlocBuilder<DatePickerCubit, DatePickerState>(
         builder: (context, datePickerState) {
+          final l10n = AppLocalizations.of(context)!;
           return BlocBuilder<TransactionCubit, TransactionState>(
             builder: (context, transactionState) {
               final categories = transactionState.combineCategories;
@@ -139,7 +141,7 @@ class _AnalyzePageState extends State<AnalyzePage> {
                 name: 'Category',
               );
               return Scaffold(
-                appBar: CustomAppBar(title: "Анализ", bgColor: Colors.white),
+                appBar: CustomAppBar(title: l10n.analysis, bgColor: Colors.white),
                 body: Column(
                   children: [
                     Padding(
@@ -151,14 +153,14 @@ class _AnalyzePageState extends State<AnalyzePage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Период: начало"),
+                          Text(l10n.periodStart),
                           InputChip(
                             label: Text(
                               datePickerState.startDate != null
                                   ? DateFormat(
                                     'dd.MM.yyyy',
                                   ).format(datePickerState.startDate!)
-                                  : "Выберите дату",
+                                  : l10n.selectDate,
                               textAlign: TextAlign.end,
                             ),
                             backgroundColor: CustomAppTheme.figmaMainColor,
@@ -175,9 +177,9 @@ class _AnalyzePageState extends State<AnalyzePage> {
                                         DateTime.now(),
                                     firstDate: DateTime(2000),
                                     lastDate: DateTime(2100),
-                                    helpText: 'Выберите дату начала',
-                                    cancelText: 'Отмена',
-                                    confirmText: 'ОК',
+                                    helpText: l10n.selectStartDate,
+                                    cancelText: l10n.cancel,
+                                    confirmText: l10n.ok,
                                   );
                               if (resultStartDate != null) {
                                 datePickerCubit.setStartDate(resultStartDate);
@@ -202,14 +204,14 @@ class _AnalyzePageState extends State<AnalyzePage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Период: конец"),
+                          Text(l10n.periodEnd),
                           InputChip(
                             label: Text(
                               datePickerState.endDate != null
                                   ? DateFormat(
                                     'dd.MM.yyyy',
                                   ).format(datePickerState.endDate!)
-                                  : "Выберите дату",
+                                  : l10n.selectDate,
                               textAlign: TextAlign.end,
                             ),
                             backgroundColor: CustomAppTheme.figmaMainColor,
@@ -226,9 +228,9 @@ class _AnalyzePageState extends State<AnalyzePage> {
                                         DateTime.now(),
                                     firstDate: DateTime(2000),
                                     lastDate: DateTime(2100),
-                                    helpText: 'Выберите дату конца',
-                                    cancelText: 'Отмена',
-                                    confirmText: 'ОК',
+                                    helpText: l10n.selectEndDate,
+                                    cancelText: l10n.cancel,
+                                    confirmText: l10n.ok,
                                   );
                               if (resultEndDate != null) {
                                 datePickerCubit.setEndDate(resultEndDate);
@@ -253,7 +255,7 @@ class _AnalyzePageState extends State<AnalyzePage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Сумма"),
+                          Text(l10n.transactionAmount),
                           Text(
                             "${NumberFormat('#,##0.00', 'ru_RU').format(totalSum)} ₽",
                           ),
@@ -280,12 +282,12 @@ class _AnalyzePageState extends State<AnalyzePage> {
                         if (transactionState.status ==
                             TransactionStatus.error) {
                           return Center(
-                            child: Text('Ошибка: ${transactionState.error}'),
+                            child: Text('${l10n.error}: ${transactionState.error}'),
                           );
                         }
                         if (categories.isEmpty) {
-                          return const Center(
-                            child: Text('Нет данных за период'),
+                          return Center(
+                            child: Text(l10n.noDataForPeriod),
                           );
                         } else {
                           return ListView.builder(

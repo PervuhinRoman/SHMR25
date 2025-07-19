@@ -4,28 +4,78 @@ import 'package:provider/provider.dart';
 import 'package:shmr_finance/data/services/theme_service.dart';
 import 'package:shmr_finance/data/services/haptic_service.dart';
 import 'package:shmr_finance/data/services/security_service.dart';
+import 'package:shmr_finance/data/services/locale_service.dart';
 import 'package:shmr_finance/presentation/services/app_blur_service.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/presentation/pin_code_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:developer';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
+  void _showLanguageDialog(BuildContext context, LocaleService localeService) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        final l10n = AppLocalizations.of(dialogContext)!;
+        return AlertDialog(
+          title: Text(l10n.language),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children:
+                localeService.availableLocales.map((entry) {
+                  final locale = entry.key;
+                  final name = entry.value;
+                  final isSelected =
+                      locale.languageCode ==
+                      localeService.currentLocale.languageCode;
+
+                  return ListTile(
+                    title: Text(name),
+                    trailing:
+                        isSelected
+                            ? const Icon(Icons.check, color: Colors.green)
+                            : null,
+                    onTap: () async {
+                      await localeService.setLocale(locale);
+                      Navigator.of(dialogContext).pop();
+                    },
+                  );
+                }).toList(),
+          ),
+          actions: [
+            TextButton(
+              child: Text(l10n.cancel),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Настройки"),
+        title: Text(l10n.settings),
         centerTitle: true,
         toolbarHeight: 116,
       ),
-      body: Consumer2<ThemeService, SecurityService>(
-        builder: (context, themeService, securityService, child) {
+      body: Consumer3<ThemeService, SecurityService, LocaleService>(
+        builder: (
+          context,
+          themeService,
+          securityService,
+          localeService,
+          child,
+        ) {
           return ListView(
             children: [
               ListTile(
-                title: const Text("Системная тема"),
+                title: Text(l10n.systemTheme),
                 trailing: Switch(
                   value: themeService.useSystemTheme,
                   onChanged: (value) {
@@ -43,14 +93,14 @@ class SettingsPage extends StatelessWidget {
                 color: CustomAppTheme.figmaBgGrayColor,
               ),
               ListTile(
-                title: const Text("Основной цвет"),
+                title: Text(l10n.primaryColor),
                 trailing: GestureDetector(
                   onTap: () {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          title: const Text('Выберите цвет'),
+                          title: Text(l10n.primaryColor),
                           content: SingleChildScrollView(
                             child: ColorPicker(
                               pickerColor: themeService.primaryColor,
@@ -62,13 +112,13 @@ class SettingsPage extends StatelessWidget {
                           ),
                           actions: <Widget>[
                             TextButton(
-                              child: const Text('Отмена'),
+                              child: Text(l10n.cancel),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
                             ),
                             TextButton(
-                              child: const Text('Сбросить'),
+                              child: Text(l10n.reset),
                               onPressed: () {
                                 themeService.setPrimaryColor(
                                   const Color(0xff2ae881),
@@ -77,7 +127,7 @@ class SettingsPage extends StatelessWidget {
                               },
                             ),
                             TextButton(
-                              child: const Text('OK'),
+                              child: Text(l10n.ok),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
@@ -104,9 +154,10 @@ class SettingsPage extends StatelessWidget {
                   HapticService().lightImpact();
                   showDialog(
                     context: context,
-                    builder: (BuildContext context) {
+                    builder: (BuildContext dialogContext) {
+                      final dialogL10n = AppLocalizations.of(dialogContext)!;
                       return AlertDialog(
-                        title: const Text('Выберите цвет'),
+                        title: Text(dialogL10n.primaryColor),
                         content: SingleChildScrollView(
                           child: ColorPicker(
                             pickerColor: themeService.primaryColor,
@@ -118,24 +169,24 @@ class SettingsPage extends StatelessWidget {
                         ),
                         actions: <Widget>[
                           TextButton(
-                            child: const Text('Отмена'),
+                            child: Text(dialogL10n.cancel),
                             onPressed: () {
-                              Navigator.of(context).pop();
+                              Navigator.of(dialogContext).pop();
                             },
                           ),
                           TextButton(
-                            child: const Text('Сбросить'),
+                            child: Text(dialogL10n.reset),
                             onPressed: () {
                               themeService.setPrimaryColor(
                                 const Color(0xff2ae881),
                               );
-                              Navigator.of(context).pop();
+                              Navigator.of(dialogContext).pop();
                             },
                           ),
                           TextButton(
-                            child: const Text('OK'),
+                            child: Text(dialogL10n.ok),
                             onPressed: () {
-                              Navigator.of(context).pop();
+                              Navigator.of(dialogContext).pop();
                             },
                           ),
                         ],
@@ -152,7 +203,7 @@ class SettingsPage extends StatelessWidget {
               StatefulBuilder(
                 builder: (context, setState) {
                   return ListTile(
-                    title: const Text("Хаптик фидбек"),
+                    title: Text(l10n.hapticFeedback),
                     trailing: Switch(
                       value: HapticService().isEnabled,
                       onChanged: (value) async {
@@ -176,7 +227,7 @@ class SettingsPage extends StatelessWidget {
                 color: CustomAppTheme.figmaBgGrayColor,
               ),
               ListTile(
-                title: const Text("PIN-код"),
+                title: Text(l10n.pinCode),
                 trailing: Switch(
                   value: securityService.isPinCodeEnabled,
                   onChanged: (value) async {
@@ -261,7 +312,7 @@ class SettingsPage extends StatelessWidget {
                     }
 
                     return ListTile(
-                      title: const Text("Face ID / Touch ID"),
+                      title: Text(l10n.biometrics),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -271,26 +322,30 @@ class SettingsPage extends StatelessWidget {
                               onPressed: () {
                                 showDialog(
                                   context: context,
-                                  builder:
-                                      (context) => AlertDialog(
-                                        title: const Text(
-                                          'Настройка биометрии',
-                                        ),
-                                        content: const Text(
-                                          'Для использования Face ID/Touch ID необходимо:\n\n'
-                                          '1. Открыть Настройки → Face ID и пароль\n'
-                                          '2. Настроить Face ID или Touch ID\n'
-                                          '3. Вернуться в приложение\n\n'
-                                          'После настройки биометрия станет доступной.',
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed:
-                                                () => Navigator.pop(context),
-                                            child: const Text('Понятно'),
-                                          ),
-                                        ],
+                                  builder: (BuildContext dialogContext) {
+                                    final dialogL10n =
+                                        AppLocalizations.of(dialogContext)!;
+                                    return AlertDialog(
+                                      title: Text(
+                                        dialogL10n.biometricSetupRequired,
                                       ),
+                                      content: Text(
+                                        'Для использования Face ID/Touch ID необходимо:\n\n'
+                                        '1. Открыть Настройки → Face ID и пароль\n'
+                                        '2. Настроить Face ID или Touch ID\n'
+                                        '3. Вернуться в приложение\n\n'
+                                        'После настройки биометрия станет доступной.',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed:
+                                              () =>
+                                                  Navigator.pop(dialogContext),
+                                          child: Text(dialogL10n.ok),
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 );
                               },
                             ),
@@ -302,8 +357,8 @@ class SettingsPage extends StatelessWidget {
                                     !securityService.isPinCodeEnabled) {
                                   // Нужно сначала включить PIN-код
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Сначала включите PIN-код'),
+                                    SnackBar(
+                                      content: Text(l10n.pinCodeRequired),
                                     ),
                                   );
                                   return;
@@ -319,20 +374,16 @@ class SettingsPage extends StatelessWidget {
                         HapticService().lightImpact();
                         if (!isConfigured) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Настройте Face ID/Touch ID в системных настройках',
-                              ),
-                              duration: Duration(seconds: 3),
+                            SnackBar(
+                              content: Text(l10n.biometricSetupRequired),
+                              duration: const Duration(seconds: 3),
                             ),
                           );
                           return;
                         }
                         if (!securityService.isPinCodeEnabled) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Сначала включите PIN-код'),
-                            ),
+                            SnackBar(content: Text(l10n.pinCodeRequired)),
                           );
                           return;
                         }
@@ -353,10 +404,8 @@ class SettingsPage extends StatelessWidget {
               StatefulBuilder(
                 builder: (context, setState) {
                   return ListTile(
-                    title: const Text("Блюр при сворачивании"),
-                    subtitle: const Text(
-                      "Добавлено для наглядности пока что, вырежу, чтобы к Figma привести",
-                    ),
+                    title: Text(l10n.appBlur),
+                    subtitle: Text(l10n.appBlurDescription),
                     trailing: Switch(
                       value: AppBlurService().isBlurEnabled,
                       onChanged: (value) async {
@@ -371,6 +420,20 @@ class SettingsPage extends StatelessWidget {
                       setState(() {});
                     },
                   );
+                },
+              ),
+              const Divider(
+                height: 1,
+                thickness: 1,
+                color: CustomAppTheme.figmaBgGrayColor,
+              ),
+              ListTile(
+                title: Text(l10n.language),
+                subtitle: Text(localeService.currentLocaleName),
+                trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+                onTap: () {
+                  HapticService().lightImpact();
+                  _showLanguageDialog(context, localeService);
                 },
               ),
               const Divider(

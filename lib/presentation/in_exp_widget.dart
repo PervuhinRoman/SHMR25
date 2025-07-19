@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shmr_finance/presentation/transaction_dialog.dart';
 
 import 'package:shmr_finance/app_theme.dart';
@@ -69,9 +70,10 @@ class _InExpWidgetState extends State<InExpWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: CustomAppBar(
-        title: widget.isIncome ? "Доходы сегодня" : "Расходы сегодня",
+        title: widget.isIncome ? l10n.incomeToday : l10n.expenseToday,
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.history),
@@ -136,10 +138,10 @@ class _InExpWidgetState extends State<InExpWidget> {
                 height: 56,
                 child: Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Padding(
-                        padding: EdgeInsets.only(left: 16),
-                        child: Text("Всего", textAlign: TextAlign.start),
+                        padding: const EdgeInsets.only(left: 16),
+                        child: Text(l10n.total, textAlign: TextAlign.start),
                       ),
                     ),
                     Expanded(
@@ -179,8 +181,8 @@ class _InExpWidgetState extends State<InExpWidget> {
                       const SizedBox(width: 8),
                       Text(
                         state.dataSource == DataSource.cache
-                            ? "Данные из кэша"
-                            : "Данные из сети",
+                            ? l10n.dataFromCache
+                            : l10n.dataFromNetwork,
                         style: TextStyle(
                           fontSize: 12,
                           color:
@@ -207,11 +209,11 @@ class _InExpWidgetState extends State<InExpWidget> {
                       '❌ Показываю ошибку: ${state.error}',
                       name: "InExpWidget",
                     );
-                    return Center(child: Text('Ошибка: ${state.error}'));
+                    return Center(child: Text('${l10n.error}: ${state.error}'));
                   }
                   if (transactions.isEmpty) {
                     log('📭 Показываю "Нет данных"', name: "InExpWidget");
-                    return const Center(child: Text('Нет данных за период'));
+                    return Center(child: Text(l10n.noDataForPeriod));
                   } else {
                     log(
                       '📋 Показываю список из ${transactions.length} транзакций',
@@ -289,10 +291,7 @@ class _InExpWidgetState extends State<InExpWidget> {
             pageBuilder: (context, animation, secondaryAnimation) {
               return BlocProvider(
                 create: (context) => TransactionCubit(),
-                child: TransactionPage(
-                  isAdd: true,
-                  isIncome: widget.isIncome,
-                ),
+                child: TransactionPage(isAdd: true, isIncome: widget.isIncome),
               );
             },
           );
