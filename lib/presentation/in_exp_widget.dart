@@ -13,6 +13,7 @@ import 'package:shmr_finance/domain/cubit/transactions/datepicker_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transactions/sort_type_cubit.dart';
 import 'in_exp_history_widget.dart';
 import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
+import 'package:shmr_finance/data/services/haptic_service.dart';
 
 class InExpWidget extends StatefulWidget {
   final bool isIncome;
@@ -75,6 +76,7 @@ class _InExpWidgetState extends State<InExpWidget> {
           IconButton(
             icon: const Icon(Icons.history),
             onPressed: () {
+              HapticService().lightImpact();
               Navigator.push(
                 context,
                 MaterialPageRoute<void>(
@@ -238,6 +240,7 @@ class _InExpWidgetState extends State<InExpWidget> {
                             time: item.transactionDate,
                             comment: item.comment,
                             onTap: () {
+                              HapticService().lightImpact();
                               showGeneralDialog(
                                 context: context,
                                 pageBuilder: (
@@ -279,19 +282,21 @@ class _InExpWidgetState extends State<InExpWidget> {
       floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
         child: Icon(Icons.add),
-        onPressed:
-            () => showGeneralDialog(
-              context: context,
-              pageBuilder: (context, animation, secondaryAnimation) {
-                return BlocProvider(
-                  create: (context) => TransactionCubit(),
-                  child: TransactionPage(
-                    isAdd: true,
-                    isIncome: widget.isIncome,
-                  ),
-                );
-              },
-            ),
+        onPressed: () {
+          HapticService().mediumImpact();
+          showGeneralDialog(
+            context: context,
+            pageBuilder: (context, animation, secondaryAnimation) {
+              return BlocProvider(
+                create: (context) => TransactionCubit(),
+                child: TransactionPage(
+                  isAdd: true,
+                  isIncome: widget.isIncome,
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }

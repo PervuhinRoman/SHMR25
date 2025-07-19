@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:worker_manager/worker_manager.dart';
@@ -13,7 +14,11 @@ import 'package:shmr_finance/presentation/account_page.dart';
 import 'package:shmr_finance/presentation/categories_page.dart';
 import 'package:shmr_finance/presentation/in_exp_widget.dart';
 import 'package:shmr_finance/presentation/settings_page.dart';
+import 'package:shmr_finance/presentation/security_screen.dart';
 import 'package:shmr_finance/app_theme.dart';
+import 'package:shmr_finance/data/services/theme_service.dart';
+import 'package:shmr_finance/data/services/haptic_service.dart';
+import 'package:shmr_finance/data/services/security_service.dart';
 import 'package:flutter/services.dart';
 
 void main() async {
@@ -62,6 +67,16 @@ void main() async {
     );
   }
 
+  // Инициализируем сервисы
+  final themeService = ThemeService();
+  await themeService.initialize();
+  
+  final hapticService = HapticService();
+  await hapticService.initialize();
+  
+  final securityService = SecurityService();
+  await securityService.initialize();
+
   runApp(
     MultiBlocProvider(
       providers: [
@@ -70,36 +85,65 @@ void main() async {
         BlocProvider(create: (_) => BlurCubit()),
         BlocProvider(create: (_) => CategoryCubit()),
       ],
-      child: const MyApp(),
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: themeService),
+          ChangeNotifierProvider.value(value: securityService),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isAuthenticated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthentication();
+  }
+
+  Future<void> _checkAuthentication() async {
+    final shouldShowSecurity = await SecurityService().shouldShowSecurityScreen();
+    if (!shouldShowSecurity) {
+      setState(() {
+        _isAuthenticated = true;
+      });
+    }
+  }
+
+  void _onAuthenticated() {
+    setState(() {
+      _isAuthenticated = true;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          useMaterial3: true,
-          textTheme: TextTheme(bodyMedium: TextStyle(fontSize: 16)),
-          colorScheme: ColorScheme.light(
-            primary: CustomAppTheme.figmaMainColor,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return SafeArea(
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'SHMR Finance',
+            themeMode: themeService.getThemeMode(),
+            theme: themeService.getLightTheme(),
+            darkTheme: themeService.getDarkTheme(),
+            home: _isAuthenticated 
+                ? const BaseScreen() 
+                : SecurityScreen(onAuthenticated: _onAuthenticated),
           ),
-          appBarTheme: AppBarTheme(
-            backgroundColor: CustomAppTheme.figmaMainColor,
-          ),
-          navigationBarTheme: NavigationBarThemeData(
-            indicatorColor: CustomAppTheme.figmaMainLightColor,
-            backgroundColor: CustomAppTheme.figmaNavBarColor,
-          ),
-        ),
-        home: const BaseScreen(),
-      ),
+        );
+      },
     );
   }
 }
@@ -116,9 +160,12 @@ class _BaseScreenState extends State<BaseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeService = Provider.of<ThemeService>(context);
+    
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
+          HapticService().selectionClick();
           setState(() {
             currentPageIndex = index;
           });
