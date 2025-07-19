@@ -15,10 +15,12 @@ import 'package:shmr_finance/presentation/categories_page.dart';
 import 'package:shmr_finance/presentation/in_exp_widget.dart';
 import 'package:shmr_finance/presentation/settings_page.dart';
 import 'package:shmr_finance/presentation/security_screen.dart';
+import 'package:shmr_finance/presentation/widgets/app_blur_wrapper.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/data/services/theme_service.dart';
 import 'package:shmr_finance/data/services/haptic_service.dart';
 import 'package:shmr_finance/data/services/security_service.dart';
+import 'package:shmr_finance/presentation/services/app_blur_service.dart';
 import 'package:flutter/services.dart';
 
 void main() async {
@@ -76,6 +78,9 @@ void main() async {
   
   final securityService = SecurityService();
   await securityService.initialize();
+  
+  final appBlurService = AppBlurService();
+  await appBlurService.initialize();
 
   runApp(
     MultiBlocProvider(
@@ -139,7 +144,7 @@ class _MyAppState extends State<MyApp> {
             theme: themeService.getLightTheme(),
             darkTheme: themeService.getDarkTheme(),
             home: _isAuthenticated 
-                ? const BaseScreen() 
+                ? AppBlurWrapper(child: const BaseScreen())
                 : SecurityScreen(onAuthenticated: _onAuthenticated),
           ),
         );

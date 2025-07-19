@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shmr_finance/data/services/theme_service.dart';
 import 'package:shmr_finance/data/services/haptic_service.dart';
 import 'package:shmr_finance/data/services/security_service.dart';
+import 'package:shmr_finance/presentation/services/app_blur_service.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/presentation/pin_code_screen.dart';
 import 'dart:developer';
@@ -176,33 +177,27 @@ class SettingsPage extends StatelessWidget {
               ),
               ListTile(
                 title: const Text("PIN-код"),
-                subtitle: Text(
-                  securityService.isPinCodeEnabled 
-                      ? "Включен" 
-                      : "Отключен"
-                ),
                 trailing: Switch(
                   value: securityService.isPinCodeEnabled,
-                                  onChanged: (value) async {
-                  if (value) {
-                    // Включаем PIN-код - показываем экран установки
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PinCodeScreen(
-                          isSetup: true,
+                  onChanged: (value) async {
+                    if (value) {
+                      // Включаем PIN-код - показываем экран установки
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => const PinCodeScreen(isSetup: true),
                         ),
-                      ),
-                    );
-                    if (result == true) {
-                      // PIN-код установлен, включаем его
-                      await securityService.setPinCodeEnabled(true);
+                      );
+                      if (result == true) {
+                        // PIN-код установлен, включаем его
+                        await securityService.setPinCodeEnabled(true);
+                      }
+                    } else {
+                      // Отключаем PIN-код
+                      await securityService.setPinCodeEnabled(false);
                     }
-                  } else {
-                    // Отключаем PIN-код
-                    await securityService.setPinCodeEnabled(false);
-                  }
-                },
+                  },
                 ),
                 onTap: () async {
                   HapticService().lightImpact();
@@ -211,23 +206,24 @@ class SettingsPage extends StatelessWidget {
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const PinCodeScreen(
-                          isSetup: true,
-                        ),
+                        builder:
+                            (context) => const PinCodeScreen(isSetup: true),
                       ),
                     );
                     if (result == true) {
                       // PIN-код обновлен, состояние обновится автоматически через Consumer
-                      log('🔐 PIN code updated successfully', name: 'SettingsPage');
+                      log(
+                        '🔐 PIN code updated successfully',
+                        name: 'SettingsPage',
+                      );
                     }
                   } else {
                     // Включаем PIN-код
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const PinCodeScreen(
-                          isSetup: true,
-                        ),
+                        builder:
+                            (context) => const PinCodeScreen(isSetup: true),
                       ),
                     );
                     if (result == true) {
@@ -237,6 +233,11 @@ class SettingsPage extends StatelessWidget {
                   }
                 },
               ),
+              const Divider(
+                height: 1,
+                thickness: 1,
+                color: CustomAppTheme.figmaBgGrayColor,
+              ),
               FutureBuilder<Map<String, dynamic>>(
                 future: securityService.getBiometricInfo(),
                 builder: (context, snapshot) {
@@ -245,27 +246,22 @@ class SettingsPage extends StatelessWidget {
                     final isDeviceSupported = info['isDeviceSupported'] as bool;
                     final isConfigured = info['isConfigured'] as bool;
                     final isEnabled = info['isEnabled'] as bool;
-                    
+
                     if (!isDeviceSupported) {
                       return const SizedBox.shrink(); // Устройство не поддерживает биометрию
                     }
-                    
-                    String subtitle;
+
                     bool canToggle = false;
-                    
+
                     if (!isConfigured) {
-                      subtitle = "Не настроена в системе";
                     } else if (isEnabled) {
-                      subtitle = "Включен";
                       canToggle = true;
                     } else {
-                      subtitle = "Отключен";
                       canToggle = true;
                     }
-                    
+
                     return ListTile(
                       title: const Text("Face ID / Touch ID"),
-                      subtitle: Text(subtitle),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -275,22 +271,26 @@ class SettingsPage extends StatelessWidget {
                               onPressed: () {
                                 showDialog(
                                   context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text('Настройка биометрии'),
-                                    content: const Text(
-                                      'Для использования Face ID/Touch ID необходимо:\n\n'
-                                      '1. Открыть Настройки → Face ID и пароль\n'
-                                      '2. Настроить Face ID или Touch ID\n'
-                                      '3. Вернуться в приложение\n\n'
-                                      'После настройки биометрия станет доступной.',
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: const Text('Понятно'),
+                                  builder:
+                                      (context) => AlertDialog(
+                                        title: const Text(
+                                          'Настройка биометрии',
+                                        ),
+                                        content: const Text(
+                                          'Для использования Face ID/Touch ID необходимо:\n\n'
+                                          '1. Открыть Настройки → Face ID и пароль\n'
+                                          '2. Настроить Face ID или Touch ID\n'
+                                          '3. Вернуться в приложение\n\n'
+                                          'После настройки биометрия станет доступной.',
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed:
+                                                () => Navigator.pop(context),
+                                            child: const Text('Понятно'),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
                                 );
                               },
                             ),
@@ -298,7 +298,8 @@ class SettingsPage extends StatelessWidget {
                             Switch(
                               value: isEnabled,
                               onChanged: (value) async {
-                                if (value && !securityService.isPinCodeEnabled) {
+                                if (value &&
+                                    !securityService.isPinCodeEnabled) {
                                   // Нужно сначала включить PIN-код
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
@@ -307,7 +308,9 @@ class SettingsPage extends StatelessWidget {
                                   );
                                   return;
                                 }
-                                await securityService.setBiometricEnabled(value);
+                                await securityService.setBiometricEnabled(
+                                  value,
+                                );
                               },
                             ),
                         ],
@@ -317,7 +320,9 @@ class SettingsPage extends StatelessWidget {
                         if (!isConfigured) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Настройте Face ID/Touch ID в системных настройках'),
+                              content: Text(
+                                'Настройте Face ID/Touch ID в системных настройках',
+                              ),
                               duration: Duration(seconds: 3),
                             ),
                           );
@@ -339,35 +344,40 @@ class SettingsPage extends StatelessWidget {
                   return const SizedBox.shrink();
                 },
               ),
-              if (securityService.isPinCodeEnabled) ...[
+              if (securityService.isPinCodeEnabled)
                 const Divider(
                   height: 1,
                   thickness: 1,
                   color: CustomAppTheme.figmaBgGrayColor,
                 ),
-                ListTile(
-                  title: const Text("Тест PIN-кода"),
-                  subtitle: const Text("Проверить ввод PIN-кода"),
-                  onTap: () async {
-                    HapticService().lightImpact();
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PinCodeScreen(
-                          isSetup: false,
-                        ),
-                      ),
-                    );
-                    if (result == true) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('PIN-код введен правильно!'),
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ],
+              StatefulBuilder(
+                builder: (context, setState) {
+                  return ListTile(
+                    title: const Text("Блюр при сворачивании"),
+                    subtitle: const Text(
+                      "Добавлено для наглядности пока что, вырежу, чтобы к Figma привести",
+                    ),
+                    trailing: Switch(
+                      value: AppBlurService().isBlurEnabled,
+                      onChanged: (value) async {
+                        await AppBlurService().setBlurEnabled(value);
+                        setState(() {});
+                      },
+                    ),
+                    onTap: () async {
+                      HapticService().lightImpact();
+                      final newValue = !AppBlurService().isBlurEnabled;
+                      await AppBlurService().setBlurEnabled(newValue);
+                      setState(() {});
+                    },
+                  );
+                },
+              ),
+              const Divider(
+                height: 1,
+                thickness: 1,
+                color: CustomAppTheme.figmaBgGrayColor,
+              ),
             ],
           );
         },
