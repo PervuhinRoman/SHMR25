@@ -130,7 +130,7 @@ class _InExpWidgetState extends State<InExpWidget> {
           return Column(
             children: [
               Container(
-                color: CustomAppTheme.figmaMainLightColor,
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
                 height: 56,
                 child: Row(
                   children: [

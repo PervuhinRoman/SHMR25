@@ -158,7 +158,9 @@ class _AccountPageState extends State<AccountPage> {
                           isSelected
                               ? Icon(
                                 Icons.check,
-                                color: CustomAppTheme.figmaMainColor,
+                                color: Theme.of(
+                                  context,
+                                ).primaryColor.withValues(alpha: 0.3),
                               )
                               : null,
                       onTap: () {
@@ -348,7 +350,7 @@ class _AccountPageState extends State<AccountPage> {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
           color:
-              isSelected ? CustomAppTheme.figmaMainColor : Colors.transparent,
+              isSelected ? Theme.of(context).primaryColor : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
@@ -553,7 +555,7 @@ class _AccountListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: CustomAppTheme.figmaMainLightColor,
+      color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
       child: InkWell(
         onTap: onTap,
         child: Padding(

@@ -67,7 +67,7 @@ class ThemeService extends ChangeNotifier {
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: _primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.black87,
         elevation: 0,
       ),
       navigationBarTheme: NavigationBarThemeData(

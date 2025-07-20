@@ -11,6 +11,8 @@ import 'package:shmr_finance/presentation/pin_code_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:developer';
 
+import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
+
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
@@ -59,11 +61,7 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settings),
-        centerTitle: true,
-        toolbarHeight: 116,
-      ),
+      appBar: CustomAppBar(title: l10n.settings),
       body: Consumer3<ThemeService, SecurityService, LocaleService>(
         builder: (
           context,

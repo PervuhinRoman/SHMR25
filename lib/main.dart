@@ -26,14 +26,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await ThemeService().initialize();
+
+  final primaryColor = ThemeService().primaryColor;
+
   // Устанавливаем цвета для статус бара и навигационной панели
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
       systemNavigationBarColor: CustomAppTheme.figmaNavBarColor,
-      statusBarColor: CustomAppTheme.figmaMainColor,
+      statusBarColor: primaryColor,
     ),
   );
-  WidgetsFlutterBinding.ensureInitialized();
 
   // Задержка для стабильности инициализации
   await Future.delayed(const Duration(milliseconds: 100));

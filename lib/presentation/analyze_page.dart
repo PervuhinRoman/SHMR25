@@ -160,7 +160,7 @@ class _AnalyzePageState extends State<AnalyzePage> {
                                   : l10n.selectDate,
                               textAlign: TextAlign.end,
                             ),
-                            backgroundColor: CustomAppTheme.figmaMainColor,
+                            backgroundColor: Theme.of(context).primaryColor,
                             side: BorderSide.none,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(1000),
@@ -211,7 +211,7 @@ class _AnalyzePageState extends State<AnalyzePage> {
                                   : l10n.selectDate,
                               textAlign: TextAlign.end,
                             ),
-                            backgroundColor: CustomAppTheme.figmaMainColor,
+                            backgroundColor: Theme.of(context).primaryColor,
                             side: BorderSide.none,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(1000),

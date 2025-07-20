@@ -132,7 +132,9 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                           }
                         },
                         child: Container(
-                          color: CustomAppTheme.figmaMainLightColor,
+                          color: Theme.of(
+                            context,
+                          ).primaryColor.withValues(alpha: 0.3),
                           height: 56,
                           child: Row(
                             children: [
@@ -194,7 +196,9 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                           }
                         },
                         child: Container(
-                          color: CustomAppTheme.figmaMainLightColor,
+                          color: Theme.of(
+                            context,
+                          ).primaryColor.withValues(alpha: 0.3),
                           height: 56,
                           child: Row(
                             children: [
@@ -264,7 +268,9 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                           );
                         },
                         child: Container(
-                          color: CustomAppTheme.figmaMainLightColor,
+                          color: Theme.of(
+                            context,
+                          ).primaryColor.withValues(alpha: 0.3),
                           height: 56,
                           child: Row(
                             children: [
@@ -299,7 +305,9 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                       ),
                       // Сумма
                       Container(
-                        color: CustomAppTheme.figmaMainLightColor,
+                        color: Theme.of(
+                          context,
+                        ).primaryColor.withValues(alpha: 0.3),
                         height: 56,
                         child: Row(
                           children: [
