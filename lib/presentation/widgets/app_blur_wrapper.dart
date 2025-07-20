@@ -6,7 +6,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class AppBlurWrapper extends StatefulWidget {
   final Widget child;
   final double blurIntensity;
-  
+
   const AppBlurWrapper({
     super.key,
     required this.child,
@@ -17,7 +17,8 @@ class AppBlurWrapper extends StatefulWidget {
   State<AppBlurWrapper> createState() => _AppBlurWrapperState();
 }
 
-class _AppBlurWrapperState extends State<AppBlurWrapper> with WidgetsBindingObserver {
+class _AppBlurWrapperState extends State<AppBlurWrapper>
+    with WidgetsBindingObserver {
   final AppBlurService _blurService = AppBlurService();
   bool _shouldShowBlur = false;
 
@@ -31,7 +32,7 @@ class _AppBlurWrapperState extends State<AppBlurWrapper> with WidgetsBindingObse
   Future<void> _initializeBlurService() async {
     await _blurService.initialize();
     _blurService.setBlurStateCallback(_onBlurStateChanged);
-    
+
     // Проверяем текущее состояние
     final state = _blurService.getCurrentState();
     setState(() {
@@ -74,7 +75,7 @@ class _AppBlurWrapperState extends State<AppBlurWrapper> with WidgetsBindingObse
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha: 0.3),
                   backgroundBlendMode: BlendMode.overlay,
                 ),
                 child: Center(
@@ -84,7 +85,7 @@ class _AppBlurWrapperState extends State<AppBlurWrapper> with WidgetsBindingObse
                       Icon(
                         Icons.lock_outline,
                         size: 60,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                       const SizedBox(height: 16),
                       Text(
@@ -92,7 +93,7 @@ class _AppBlurWrapperState extends State<AppBlurWrapper> with WidgetsBindingObse
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -100,7 +101,7 @@ class _AppBlurWrapperState extends State<AppBlurWrapper> with WidgetsBindingObse
                         l10n.minimizeToUnlock,
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -120,4 +121,4 @@ class _AppBlurWrapperState extends State<AppBlurWrapper> with WidgetsBindingObse
     _blurService.dispose();
     super.dispose();
   }
-} 
+}

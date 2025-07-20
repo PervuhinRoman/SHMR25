@@ -81,16 +81,19 @@ class _AccountPageState extends State<AccountPage> {
       final accounts = await _accountRepo.getAllAccounts();
       setState(() {
         _accounts = accounts;
-        _accountData = accounts.isNotEmpty ? AccountResponse(
-          id: accounts.first.id,
-          name: accounts.first.name,
-          balance: accounts.first.balance,
-          currency: accounts.first.currency,
-          incomeStats: [],
-          expenseStats: [],
-          createdAt: accounts.first.createdAt,
-          updatedAt: accounts.first.updatedAt,
-        ) : null;
+        _accountData =
+            accounts.isNotEmpty
+                ? AccountResponse(
+                  id: accounts.first.id,
+                  name: accounts.first.name,
+                  balance: accounts.first.balance,
+                  currency: accounts.first.currency,
+                  incomeStats: [],
+                  expenseStats: [],
+                  createdAt: accounts.first.createdAt,
+                  updatedAt: accounts.first.updatedAt,
+                )
+                : null;
         _isLoading = false;
       });
     } catch (e) {
@@ -269,7 +272,7 @@ class _AccountPageState extends State<AccountPage> {
           // Segmented Control
           Container(
             decoration: BoxDecoration(
-              color: CustomAppTheme.figmaBgGrayColor.withOpacity(0.3),
+              color: CustomAppTheme.figmaBgGrayColor.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -470,8 +473,8 @@ class _AccountPageState extends State<AccountPage> {
           BarData.fromData(
             date: date,
             value: balance,
-            positiveColor: CustomAppTheme.figmaMainColor.value,
-            negativeColor: CustomAppTheme.figmaRedColor.value,
+            positiveColor: CustomAppTheme.figmaMainColor.toARGB32(),
+            negativeColor: CustomAppTheme.figmaRedColor.toARGB32(),
             dateFormat: 'dd.MM',
           ),
         );
@@ -511,8 +514,8 @@ class _AccountPageState extends State<AccountPage> {
           BarData.fromData(
             date: date,
             value: balance,
-            positiveColor: CustomAppTheme.figmaMainColor.value,
-            negativeColor: CustomAppTheme.figmaRedColor.value,
+            positiveColor: CustomAppTheme.figmaMainColor.toARGB32(),
+            negativeColor: CustomAppTheme.figmaRedColor.toARGB32(),
             dateFormat: 'MM.yy',
           ),
         );

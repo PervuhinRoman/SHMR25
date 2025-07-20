@@ -41,14 +41,12 @@ class _SelectedCategoryPageState extends State<SelectedCategoryPage> {
       final datePickerCubit = context.read<DatePickerCubit>();
       final accountState = context.read<MyAccountCubit>().state;
       final accountId = accountState.accountId ?? 1;
-      if (accountId != null) {
-        transactionCubit.fetchTransactions(
-          accountId: accountId,
-          startDate: datePickerCubit.state.startDate,
-          endDate: datePickerCubit.state.endDate,
-          isIncome: widget.isIncome,
-        );
-      }
+      transactionCubit.fetchTransactions(
+        accountId: accountId,
+        startDate: datePickerCubit.state.startDate,
+        endDate: datePickerCubit.state.endDate,
+        isIncome: widget.isIncome,
+      );
     });
   }
 

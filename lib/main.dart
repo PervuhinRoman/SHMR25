@@ -185,7 +185,6 @@ class _BaseScreenState extends State<BaseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeService = Provider.of<ThemeService>(context);
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(

@@ -17,28 +17,6 @@ class TransactionRepoImp implements TransactionRepository {
   final AccountRepository _accountRepo;
   final AppDatabase _transactionDatabase;
   final ApiService _apiService;
-  final List<Transaction> _transactions = [
-    Transaction(
-      id: 1,
-      accountId: 1,
-      categoryId: 1,
-      amount: '50000.00',
-      transactionDate: DateTime.now(),
-      comment: 'Зарплата',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    Transaction(
-      id: 2,
-      accountId: 1,
-      categoryId: 2,
-      amount: '1000.00',
-      transactionDate: DateTime.now(),
-      comment: 'Продукты',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-  ];
 
   TransactionRepoImp(
     this._accountRepo,
@@ -77,25 +55,6 @@ class TransactionRepoImp implements TransactionRepository {
     );
   }
 
-  // Метод для преобразования Transaction в TransactionResponse
-  Future<TransactionResponse> _toTransactionResponse(
-    Transaction transaction,
-  ) async {
-    final category = await _getCategoryById(transaction.categoryId);
-    final account = await _getAccountBriefById(transaction.accountId);
-
-    return TransactionResponse(
-      id: transaction.id,
-      account: account,
-      category: category,
-      amount: transaction.amount,
-      transactionDate: transaction.transactionDate,
-      comment: transaction.comment,
-      createdAt: transaction.createdAt,
-      updatedAt: transaction.updatedAt,
-    );
-  }
-
   @override
   Future<List<TransactionResponse>> getPeriodTransactionsByAccount(
     int accountId, {
@@ -107,7 +66,7 @@ class TransactionRepoImp implements TransactionRepository {
         '🌐 Выполняем сетевой запрос для аккаунта $accountId, период: ${startDate?.toIso8601String().substring(0, 10)} - ${endDate?.toIso8601String().substring(0, 10)}',
         name: 'TransactionRepo',
       );
-      
+
       // Используем API сервис вместо прямых вызовов DIO
       final responses = await _apiService.getPeriodTransactionsByAccount(
         accountId,
@@ -139,10 +98,7 @@ class TransactionRepoImp implements TransactionRepository {
     try {
       return await _apiService.getTransaction(id);
     } catch (e) {
-      log(
-        '❌ Error in getTransaction: $e',
-        name: 'TransactionRepo',
-      );
+      log('❌ Error in getTransaction: $e', name: 'TransactionRepo');
       rethrow;
     }
   }
@@ -157,10 +113,16 @@ class TransactionRepoImp implements TransactionRepository {
       log('📤 accountId: ${request.accountId}', name: 'TransactionRepo');
       log('📤 categoryId: ${request.categoryId}', name: 'TransactionRepo');
       log('📤 amount: ${request.amount}', name: 'TransactionRepo');
-      log('📤 transactionDate: ${request.transactionDate}', name: 'TransactionRepo');
+      log(
+        '📤 transactionDate: ${request.transactionDate}',
+        name: 'TransactionRepo',
+      );
       log('📤 comment: ${request.comment}', name: 'TransactionRepo');
-      log('📤 JSON запроса: ${jsonEncode(request.toJson())}', name: 'TransactionRepo');
-      
+      log(
+        '📤 JSON запроса: ${jsonEncode(request.toJson())}',
+        name: 'TransactionRepo',
+      );
+
       // Сохраняем diff-операцию в backup-БД
       final now = DateTime.now();
       final tempId = now.microsecondsSinceEpoch; // временный id до sync
@@ -178,7 +140,7 @@ class TransactionRepoImp implements TransactionRepository {
       // Преобразуем Transaction в TransactionResponse
       final category = await _getCategoryById(transaction.categoryId);
       final account = await _getAccountBriefById(transaction.accountId);
-      
+
       return TransactionResponse(
         id: transaction.id,
         account: account,
@@ -190,10 +152,7 @@ class TransactionRepoImp implements TransactionRepository {
         updatedAt: transaction.updatedAt,
       );
     } catch (e) {
-      log(
-        '❌ Error in createTransaction: $e',
-        name: 'TransactionRepo',
-      );
+      log('❌ Error in createTransaction: $e', name: 'TransactionRepo');
       rethrow;
     }
   }
@@ -215,10 +174,7 @@ class TransactionRepoImp implements TransactionRepository {
       await _transactionDatabase.deleteDiffById(id);
       return response;
     } catch (e) {
-      log(
-        '❌ Error in updateTransaction: $e',
-        name: 'TransactionRepo',
-      );
+      log('❌ Error in updateTransaction: $e', name: 'TransactionRepo');
       rethrow;
     }
   }
@@ -236,10 +192,7 @@ class TransactionRepoImp implements TransactionRepository {
       await _apiService.deleteTransaction(id);
       await _transactionDatabase.deleteDiffById(id);
     } catch (e) {
-      log(
-        '❌ Error in deleteTransaction: $e',
-        name: 'TransactionRepo',
-      );
+      log('❌ Error in deleteTransaction: $e', name: 'TransactionRepo');
       rethrow;
     }
   }

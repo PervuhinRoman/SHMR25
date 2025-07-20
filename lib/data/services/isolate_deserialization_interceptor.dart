@@ -9,8 +9,7 @@ import '../../domain/models/transaction/transaction.dart';
 
 /// Интерцептор для десериализации ответов через пул изолятов
 class IsolateDeserializationInterceptor extends Interceptor {
-  static const int _threshold = 50 * 1024; // 50KB порог
-  static const Duration _timeout = Duration(seconds: 5);
+  static const int _threshold = 500 * 1024; // 50KB порог
 
   // Критичные эндпоинты для использования изолятов
   static const Set<String> _criticalEndpoints = {

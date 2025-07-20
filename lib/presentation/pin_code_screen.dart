@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shmr_finance/presentation/services/security_service.dart';
 import 'package:shmr_finance/presentation/services/haptic_service.dart';
-import 'package:shmr_finance/app_theme.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PinCodeScreen extends StatefulWidget {
@@ -112,7 +110,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
                     ? Colors.red
                     : isFilled
                     ? Theme.of(context).primaryColor
-                    : Colors.grey.withOpacity(0.3),
+                    : Colors.grey.withValues(alpha: 0.3),
           ),
         );
       }),
@@ -176,7 +174,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
               shape: BoxShape.circle,
               color:
                   onPressed != null
-                      ? Colors.grey.withOpacity(0.1)
+                      ? Colors.grey.withValues(alpha: 0.1)
                       : Colors.transparent,
             ),
             child: Center(

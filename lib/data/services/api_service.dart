@@ -9,34 +9,39 @@ import 'isolate_deserialization_interceptor.dart';
 
 class ApiService {
   static const String _baseUrl = 'https://shmr-finance.ru/api/v1';
-  static const String _authToken = 'Bearer BpSpdGeoNdjhGmR79DByflxf'; // TODO: Вынести в конфигурацию
-  
+  static const String _authToken =
+      'Bearer BpSpdGeoNdjhGmR79DByflxf'; // TODO: Вынести в конфигурацию
+
   late final Dio _dio;
-  
+
   ApiService() {
-    _dio = Dio(BaseOptions(
-      baseUrl: _baseUrl,
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 30),
-      headers: {
-        'Authorization': _authToken,
-        'Content-Type': 'application/json',
-      },
-    ));
-    
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: _baseUrl,
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 30),
+        headers: {
+          'Authorization': _authToken,
+          'Content-Type': 'application/json',
+        },
+      ),
+    );
+
     // Добавляем интерцепторы
-    _dio.interceptors.add(LogInterceptor(
-      requestBody: true,
-      responseBody: true,
-      logPrint: (obj) => log(obj.toString(), name: 'API'),
-    ));
-    
+    _dio.interceptors.add(
+      LogInterceptor(
+        requestBody: true,
+        responseBody: true,
+        logPrint: (obj) => log(obj.toString(), name: 'API'),
+      ),
+    );
+
     // Добавляем интерцептор десериализации через изоляты
     _dio.addIsolateDeserializationInterceptor();
   }
 
   // ==================== ACCOUNTS ====================
-  
+
   /// Получить все счета пользователя
   Future<List<Account>> getAccounts() async {
     try {
@@ -52,10 +57,7 @@ class ApiService {
   /// Создать новый счет
   Future<Account> createAccount(AccountCreateRequest request) async {
     try {
-      final response = await _dio.post(
-        '/accounts',
-        data: request.toJson(),
-      );
+      final response = await _dio.post('/accounts', data: request.toJson());
       return Account.fromJson(response.data);
     } on DioException catch (e) {
       _handleDioError(e, 'createAccount');
@@ -77,10 +79,7 @@ class ApiService {
   /// Обновить счет
   Future<Account> updateAccount(int id, AccountUpdateRequest request) async {
     try {
-      final response = await _dio.put(
-        '/accounts/$id',
-        data: request.toJson(),
-      );
+      final response = await _dio.put('/accounts/$id', data: request.toJson());
       return Account.fromJson(response.data);
     } on DioException catch (e) {
       _handleDioError(e, 'updateAccount');
@@ -110,7 +109,7 @@ class ApiService {
   }
 
   // ==================== CATEGORIES ====================
-  
+
   /// Получить все категории
   Future<List<Category>> getCategories() async {
     try {
@@ -136,20 +135,20 @@ class ApiService {
   }
 
   // ==================== TRANSACTIONS ====================
-  
+
   /// Создать новую транзакцию
   Future<Transaction> createTransaction(TransactionRequest request) async {
     try {
       log('🌐 Отправка запроса на создание транзакции:', name: 'ApiService');
       log('🌐 URL: $_baseUrl/transactions', name: 'ApiService');
       log('🌐 Данные: ${request.toJson()}', name: 'ApiService');
-      
-      final response = await _dio.post(
-        '/transactions',
-        data: request.toJson(),
+
+      final response = await _dio.post('/transactions', data: request.toJson());
+
+      log(
+        '✅ Транзакция успешно создана, ответ: ${response.data}',
+        name: 'ApiService',
       );
-      
-      log('✅ Транзакция успешно создана, ответ: ${response.data}', name: 'ApiService');
       return Transaction.fromJson(response.data);
     } on DioException catch (e) {
       log('❌ DioException в createTransaction:', name: 'ApiService');
@@ -174,7 +173,10 @@ class ApiService {
   }
 
   /// Обновить транзакцию
-  Future<TransactionResponse> updateTransaction(int id, TransactionRequest request) async {
+  Future<TransactionResponse> updateTransaction(
+    int id,
+    TransactionRequest request,
+  ) async {
     try {
       final response = await _dio.put(
         '/transactions/$id',
@@ -205,7 +207,7 @@ class ApiService {
   }) async {
     try {
       final queryParams = <String, dynamic>{};
-      
+
       if (startDate != null) {
         queryParams['startDate'] = DateFormat('yyyy-MM-dd').format(startDate);
       }
@@ -227,13 +229,13 @@ class ApiService {
   }
 
   // ==================== ERROR HANDLING ====================
-  
+
   void _handleDioError(DioException e, String methodName) {
     log(
       '❌ API Error in $methodName: ${e.type} - ${e.message}',
       name: 'ApiService',
     );
-    
+
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
@@ -274,41 +276,41 @@ class ApiService {
 class ApiException implements Exception {
   final String message;
   final dynamic data;
-  
+
   ApiException(this.message, [this.data]);
-  
+
   @override
   String toString() => 'ApiException: $message';
 }
 
 class TimeoutException extends ApiException {
-  TimeoutException(String message, [dynamic data]) : super(message, data);
+  TimeoutException(super.message, [super.data]);
 }
 
 class NetworkException extends ApiException {
-  NetworkException(String message, [dynamic data]) : super(message, data);
+  NetworkException(super.message, [super.data]);
 }
 
 class BadRequestException extends ApiException {
-  BadRequestException(String message, [dynamic data]) : super(message, data);
+  BadRequestException(super.message, [super.data]);
 }
 
 class UnauthorizedException extends ApiException {
-  UnauthorizedException(String message, [dynamic data]) : super(message, data);
+  UnauthorizedException(super.message, [super.data]);
 }
 
 class NotFoundException extends ApiException {
-  NotFoundException(String message, [dynamic data]) : super(message, data);
+  NotFoundException(super.message, [super.data]);
 }
 
 class ConflictException extends ApiException {
-  ConflictException(String message, [dynamic data]) : super(message, data);
+  ConflictException(super.message, [super.data]);
 }
 
 class ServerException extends ApiException {
-  ServerException(String message, [dynamic data]) : super(message, data);
+  ServerException(super.message, [super.data]);
 }
 
 class RequestCancelledException extends ApiException {
-  RequestCancelledException(String message, [dynamic data]) : super(message, data);
-} 
+  RequestCancelledException(super.message, [super.data]);
+}

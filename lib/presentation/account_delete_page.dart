@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -9,7 +7,6 @@ import 'package:shmr_finance/presentation/widgets/animated_balance_tile.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 
 import '../domain/cubit/account/account_cubit.dart';
-import 'package:shmr_finance/data/repositories/account_repo_impl.dart';
 
 class AccountDeletePage extends StatelessWidget {
   final AccountResponse account;

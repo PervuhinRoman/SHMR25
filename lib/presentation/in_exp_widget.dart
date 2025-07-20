@@ -31,14 +31,12 @@ class _InExpWidgetState extends State<InExpWidget> {
     final transactionCubit = context.read<TransactionCubit>();
     final accountState = context.read<MyAccountCubit>().state;
     final accountId = accountState.accountId ?? 1;
-    if (accountId != null) {
-      transactionCubit.fetchTransactions(
-        accountId: accountId,
-        startDate: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
-        endDate: DateTime.now().copyWith(hour: 23, minute: 59, second: 59),
-        isIncome: widget.isIncome,
-      );
-    }
+    transactionCubit.fetchTransactions(
+      accountId: accountId,
+      startDate: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
+      endDate: DateTime.now().copyWith(hour: 23, minute: 59, second: 59),
+      isIncome: widget.isIncome,
+    );
     log(
       '🚀 InExpWidget initState вызван для ${widget.isIncome ? "доходов" : "расходов"}',
       name: "InExpWidget",
@@ -57,14 +55,12 @@ class _InExpWidgetState extends State<InExpWidget> {
       final transactionCubit = context.read<TransactionCubit>();
       final accountState = context.read<MyAccountCubit>().state;
       final accountId = accountState.accountId ?? 1;
-      if (accountId != null) {
-        transactionCubit.fetchTransactions(
-          accountId: accountId,
-          startDate: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
-          endDate: DateTime.now().copyWith(hour: 23, minute: 59, second: 59),
-          isIncome: widget.isIncome,
-        );
-      }
+      transactionCubit.fetchTransactions(
+        accountId: accountId,
+        startDate: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
+        endDate: DateTime.now().copyWith(hour: 23, minute: 59, second: 59),
+        isIncome: widget.isIncome,
+      );
     });
   }
 

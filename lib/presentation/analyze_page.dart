@@ -24,7 +24,6 @@ class AnalyzePage extends StatefulWidget {
 }
 
 class _AnalyzePageState extends State<AnalyzePage> {
-
   @override
   void initState() {
     super.initState();
@@ -35,14 +34,12 @@ class _AnalyzePageState extends State<AnalyzePage> {
     final startDate = datePickerCubit.state.startDate;
     final endDate = datePickerCubit.state.endDate;
     final accountId = accountState.accountId ?? 1;
-    if (accountId != null) {
-      transactionCubit.fetchTransactions(
-        accountId: accountId,
-        isIncome: widget.isIncome,
-        startDate: startDate,
-        endDate: endDate,
-      );
-    }
+    transactionCubit.fetchTransactions(
+      accountId: accountId,
+      isIncome: widget.isIncome,
+      startDate: startDate,
+      endDate: endDate,
+    );
   }
 
   Widget _buildPieChart(List<CombineCategory> categories, double totalSum) {
@@ -61,16 +58,17 @@ class _AnalyzePageState extends State<AnalyzePage> {
     }
 
     // Конвертируем данные в формат для пакета
-    final chartSections = categories.map((category) {
-      return ChartSection.fromData(
-        id: category.category.id.toString(),
-        name: category.category.name,
-        emoji: category.category.emoji,
-        value: category.totalAmount.toDouble(),
-        totalValue: totalSum,
-        additionalInfo: category.lastTransaction?.comment,
-      );
-    }).toList();
+    final chartSections =
+        categories.map((category) {
+          return ChartSection.fromData(
+            id: category.category.id.toString(),
+            name: category.category.name,
+            emoji: category.category.emoji,
+            value: category.totalAmount.toDouble(),
+            totalValue: totalSum,
+            additionalInfo: category.lastTransaction?.comment,
+          );
+        }).toList();
 
     // Конфигурация графика
     final config = PieChartConfig(
@@ -104,8 +102,6 @@ class _AnalyzePageState extends State<AnalyzePage> {
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     DatePickerCubit datePickerCubit = context.read<DatePickerCubit>();
@@ -115,14 +111,12 @@ class _AnalyzePageState extends State<AnalyzePage> {
         final transactionCubit = context.read<TransactionCubit>();
         final accountState = context.read<MyAccountCubit>().state;
         final accountId = accountState.accountId ?? 1;
-        if (accountId != null) {
-          transactionCubit.fetchTransactions(
-            accountId: accountId,
-            isIncome: widget.isIncome,
-            startDate: datePickerState.startDate,
-            endDate: datePickerState.endDate,
-          );
-        }
+        transactionCubit.fetchTransactions(
+          accountId: accountId,
+          isIncome: widget.isIncome,
+          startDate: datePickerState.startDate,
+          endDate: datePickerState.endDate,
+        );
       },
       child: BlocBuilder<DatePickerCubit, DatePickerState>(
         builder: (context, datePickerState) {
@@ -141,7 +135,10 @@ class _AnalyzePageState extends State<AnalyzePage> {
                 name: 'Category',
               );
               return Scaffold(
-                appBar: CustomAppBar(title: l10n.analysis, bgColor: Colors.white),
+                appBar: CustomAppBar(
+                  title: l10n.analysis,
+                  bgColor: Colors.white,
+                ),
                 body: Column(
                   children: [
                     Padding(
@@ -282,13 +279,13 @@ class _AnalyzePageState extends State<AnalyzePage> {
                         if (transactionState.status ==
                             TransactionStatus.error) {
                           return Center(
-                            child: Text('${l10n.error}: ${transactionState.error}'),
+                            child: Text(
+                              '${l10n.error}: ${transactionState.error}',
+                            ),
                           );
                         }
                         if (categories.isEmpty) {
-                          return Center(
-                            child: Text(l10n.noDataForPeriod),
-                          );
+                          return Center(child: Text(l10n.noDataForPeriod));
                         } else {
                           return ListView.builder(
                             itemCount: categories.length * 2 + 1,
