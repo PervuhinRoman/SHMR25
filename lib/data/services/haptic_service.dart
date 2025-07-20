@@ -42,7 +42,8 @@ class HapticService {
       if (_isEnabled) {
         final hasVibrator = await Vibration.hasVibrator();
         if (hasVibrator == true) {
-          HapticFeedback.lightImpact();
+          // HapticFeedback.lightImpact();
+          Vibration.vibrate(duration: 50, amplitude: 50);
           log('🔊 Light impact triggered', name: 'HapticService');
         } else {
           log(
@@ -63,7 +64,8 @@ class HapticService {
       if (_isEnabled) {
         final hasVibrator = await Vibration.hasVibrator();
         if (hasVibrator == true) {
-          HapticFeedback.mediumImpact();
+          // HapticFeedback.mediumImpact();
+          Vibration.vibrate(duration: 50, amplitude: 100);
           log('🔊 Medium impact triggered', name: 'HapticService');
         } else {
           log(
@@ -84,7 +86,8 @@ class HapticService {
       if (_isEnabled) {
         final hasVibrator = await Vibration.hasVibrator();
         if (hasVibrator == true) {
-          HapticFeedback.heavyImpact();
+          // HapticFeedback.heavyImpact();
+          Vibration.vibrate(duration: 400, amplitude: 100);
           log('🔊 Heavy impact triggered', name: 'HapticService');
         } else {
           log(
@@ -105,7 +108,8 @@ class HapticService {
       if (_isEnabled) {
         final hasVibrator = await Vibration.hasVibrator();
         if (hasVibrator == true) {
-          HapticFeedback.selectionClick();
+          // HapticFeedback.selectionClick();
+          Vibration.vibrate(duration: 50, amplitude: 100);
           log('🔊 Selection click triggered', name: 'HapticService');
         } else {
           log(
@@ -118,24 +122,6 @@ class HapticService {
       }
     } catch (e) {
       log('❌ Error in selectionClick: $e', name: 'HapticService');
-    }
-  }
-
-  Future<void> vibrate() async {
-    try {
-      if (_isEnabled) {
-        final hasVibrator = await Vibration.hasVibrator();
-        if (hasVibrator == true) {
-          Vibration.vibrate(duration: 50);
-          log('🔊 Vibration triggered', name: 'HapticService');
-        } else {
-          log('❌ No vibrator available for vibration', name: 'HapticService');
-        }
-      } else {
-        log('❌ Haptics disabled for vibration', name: 'HapticService');
-      }
-    } catch (e) {
-      log('❌ Error in vibrate: $e', name: 'HapticService');
     }
   }
 }
