@@ -14,6 +14,7 @@ import 'package:shmr_finance/presentation/edit_account_page.dart';
 import 'package:shmr_finance/presentation/widgets/animated_balance_tile.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:bar_chart_widget/bar_chart_widget.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../domain/models/transaction/transaction.dart';
 import 'services/balance_visibility_service.dart';
@@ -112,6 +113,7 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Widget _buildCurrencySelector() {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<MyAccountCubit, MyAccountState>(
       builder: (context, state) {
         return Container(
@@ -128,8 +130,8 @@ class _AccountPageState extends State<AccountPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Выберите валюту',
+              Text(
+                l10n.selectCurrency,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 20),
@@ -174,11 +176,12 @@ class _AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<MyAccountCubit, MyAccountState>(
       builder: (context, accountState) {
         return Scaffold(
           appBar: CustomAppBar(
-            title: _accountData?.name ?? "Мой счёт",
+            title: _accountData?.name ?? l10n.myAccount,
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.mode_edit_outlined),
@@ -199,9 +202,9 @@ class _AccountPageState extends State<AccountPage> {
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _error != null
-                  ? Center(child: Text('Ошибка: $_error'))
+                  ? Center(child: Text('${l10n.error}: $_error'))
                   : _accountData == null
-                  ? const Center(child: Text('Нет счетов'))
+                  ? Center(child: Text(l10n.noAccounts))
                   : _buildAccountContent(),
         );
       },
@@ -209,6 +212,7 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Widget _buildAccountContent() {
+    final l10n = AppLocalizations.of(context)!;
     final account = _accountData!;
     final balance = double.tryParse(account.balance) ?? 0.0;
 
@@ -225,7 +229,7 @@ class _AccountPageState extends State<AccountPage> {
                   // Баланс с анимацией скрытия
                   AnimatedBalanceTile(
                     icon: '💰',
-                    title: 'Баланс',
+                    title: l10n.balance,
                     value:
                         "${NumberFormat('#,##0.00', 'ru_RU').format(balance)} ${currencyState.selectedCurrency.symbol}",
                     onTap: _navigateToEditPage,
@@ -238,7 +242,7 @@ class _AccountPageState extends State<AccountPage> {
                   // Валюта
                   _AccountListTile(
                     icon: currencyState.selectedCurrency.icon,
-                    title: 'Валюта',
+                    title: l10n.currency,
                     value: currencyState.selectedCurrency.symbol,
                     onTap: _showCurrencySelector,
                   ),
@@ -256,6 +260,7 @@ class _AccountPageState extends State<AccountPage> {
 
   /// Строит виджет графика баланса
   Widget _buildBalanceChart() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -271,14 +276,14 @@ class _AccountPageState extends State<AccountPage> {
               children: [
                 Expanded(
                   child: _buildPeriodButton(
-                    title: '30 дней',
+                    title: l10n.days30,
                     isSelected: _selectedPeriodIndex == 0,
                     onTap: () => _onPeriodChanged(0),
                   ),
                 ),
                 Expanded(
                   child: _buildPeriodButton(
-                    title: '12 месяцев',
+                    title: l10n.months12,
                     isSelected: _selectedPeriodIndex == 1,
                     onTap: () => _onPeriodChanged(1),
                   ),
@@ -294,9 +299,9 @@ class _AccountPageState extends State<AccountPage> {
                 _isChartLoading
                     ? const Center(child: CircularProgressIndicator())
                     : _chartData.isEmpty
-                    ? const Center(
+                    ? Center(
                       child: Text(
-                        'Нет данных для отображения',
+                        l10n.noDataToDisplay,
                         style: TextStyle(color: Colors.grey, fontSize: 16),
                       ),
                     )

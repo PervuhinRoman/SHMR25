@@ -4,6 +4,7 @@ import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/domain/cubit/categories/category_cubit.dart';
 import 'package:shmr_finance/presentation/widgets/item_category.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
@@ -29,8 +30,9 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: CustomAppBar(title: "Мои статьи"),
+      appBar: CustomAppBar(title: l10n.myCategories),
       body: BlocBuilder<CategoryCubit, CategoryState>(
         builder: (context, state) {
           if (state.isLoading) {
@@ -38,11 +40,11 @@ class _CategoriesPageState extends State<CategoriesPage> {
           }
 
           if (state.error != null) {
-            return Center(child: Text('Ошибка: ${state.error}'));
+            return Center(child: Text('${l10n.error}: ${state.error}'));
           }
 
           if (state.categories.isEmpty) {
-            return const Center(child: Text('Нет категорий'));
+            return Center(child: Text(l10n.noCategories));
           }
 
           return Column(
@@ -56,7 +58,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                     context.read<CategoryCubit>().searchCategories(query);
                   },
                   decoration: InputDecoration(
-                    hintText: 'Найти статью...',
+                    hintText: l10n.findArticle,
                     suffixIcon:
                         _searchController.text.isNotEmpty
                             ? IconButton(
@@ -84,19 +86,19 @@ class _CategoriesPageState extends State<CategoriesPage> {
               Expanded(
                 child:
                     state.filteredCategories.isEmpty
-                        ? const Center(
+                        ? Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.search_off,
                                 size: 64,
                                 color: Colors.grey,
                               ),
-                              SizedBox(height: 16),
+                              const SizedBox(height: 16),
                               Text(
-                                'Статья не найдена',
-                                style: TextStyle(
+                                l10n.articleNotFound,
+                                style: const TextStyle(
                                   fontSize: 18,
                                   color: Colors.grey,
                                 ),

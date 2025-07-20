@@ -9,6 +9,7 @@ import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
 import 'package:shmr_finance/domain/models/transaction/transaction.dart';
 import 'package:shmr_finance/data/repositories/account_repo_impl.dart';
 import 'package:shmr_finance/domain/models/account/account.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../app_theme.dart';
 
@@ -195,16 +196,17 @@ class _TransactionPageState extends State<TransactionPage> {
     log('Ошибка валидации: $message', name: 'TransactionDialog');
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
+        final l10n = AppLocalizations.of(dialogContext)!;
         return AlertDialog(
-          title: const Text('Заполните все поля'),
+          title: Text(l10n.fillAllFields),
           content: Text(message),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(dialogContext).pop();
               },
-              child: const Text('OK'),
+              child: Text(l10n.ok),
             ),
           ],
         );
@@ -334,10 +336,11 @@ class _TransactionPageState extends State<TransactionPage> {
   void _showDeleteConfirmationDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
+        final l10n = AppLocalizations.of(dialogContext)!;
         return AlertDialog(
-          title: const Text('Подтвердите удаление'),
-          content: const Text('Вы уверены, что хотите удалить эту транзакцию?'),
+          title: Text(l10n.confirmDelete),
+          content: Text(l10n.confirmDeleteTransaction),
           actions: [
             TextButton(
               onPressed: () {
@@ -345,9 +348,9 @@ class _TransactionPageState extends State<TransactionPage> {
                   'Пользователь отменил удаление транзакции',
                   name: 'TransactionDialog',
                 );
-                Navigator.of(context).pop();
+                Navigator.of(dialogContext).pop();
               },
-              child: const Text('Отмена'),
+              child: Text(l10n.cancel),
             ),
             TextButton(
               onPressed: () async {
@@ -361,7 +364,7 @@ class _TransactionPageState extends State<TransactionPage> {
                     widget.categoryIndex ?? 1,
                   ); // TODO: заменить на реальный id транзакции
                   log('Транзакция успешно удалена', name: 'TransactionDialog');
-                  Navigator.of(context).pop();
+                  Navigator.of(dialogContext).pop();
                   Navigator.of(context).pop();
                 } catch (e) {
                   log(
@@ -371,7 +374,7 @@ class _TransactionPageState extends State<TransactionPage> {
                   _showValidationDialog('Ошибка при удалении транзакции: $e');
                 }
               },
-              child: const Text('Удалить'),
+              child: Text(l10n.delete),
             ),
           ],
         );
@@ -381,10 +384,11 @@ class _TransactionPageState extends State<TransactionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: CustomAppBar(
         title:
-            widget.isAdd ? 'Добавить транзакцию' : 'Редактировать транзакцию',
+            widget.isAdd ? l10n.addTransaction : l10n.editTransaction,
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.check),
@@ -417,11 +421,11 @@ class _TransactionPageState extends State<TransactionPage> {
                 children: [
                   Row(
                     children: [
-                      Text("Счёт"),
-                      Text(" *", style: TextStyle(color: Colors.red)),
+                      Text(l10n.transactionAccount),
+                      Text(l10n.required, style: TextStyle(color: Colors.red)),
                     ],
                   ),
-                  Text(_selectedAccountName ?? "Выберите счёт"),
+                  Text(_selectedAccountName ?? l10n.transactionAccount),
                 ],
               ),
               trailing: Icon(
@@ -464,8 +468,8 @@ class _TransactionPageState extends State<TransactionPage> {
                                         borderRadius: BorderRadius.circular(2),
                                       ),
                                     ),
-                                    const Text(
-                                      'Выберите счёт',
+                                    Text(
+                                      l10n.selectAccount,
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600,
@@ -557,11 +561,11 @@ class _TransactionPageState extends State<TransactionPage> {
                 children: [
                   Row(
                     children: [
-                      Text("Категория"),
-                      Text(" *", style: TextStyle(color: Colors.red)),
+                      Text(l10n.transactionCategory),
+                      Text(l10n.required, style: TextStyle(color: Colors.red)),
                     ],
                   ),
-                  Text(_selectedCategoryName ?? "Выберите категорию"),
+                  Text(_selectedCategoryName ?? l10n.transactionCategory),
                 ],
               ),
               trailing: Icon(
@@ -684,8 +688,8 @@ class _TransactionPageState extends State<TransactionPage> {
                 children: [
                   Row(
                     children: [
-                      const Text("Сумма"),
-                      Text(" *", style: TextStyle(color: Colors.red)),
+                      Text(l10n.transactionAmount),
+                      Text(l10n.required, style: TextStyle(color: Colors.red)),
                     ],
                   ),
                   Expanded(
@@ -742,7 +746,7 @@ class _TransactionPageState extends State<TransactionPage> {
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Время"),
+                  Text(l10n.time),
                   Text(DateFormat('HH:mm').format(_selectedDateTime)),
                 ],
               ),
@@ -766,9 +770,9 @@ class _TransactionPageState extends State<TransactionPage> {
                   TextField(
                     controller: _titleController,
                     focusNode: _titleFocusNode,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       border: InputBorder.none,
-                      hintText: 'Название / описание',
+                      hintText: l10n.transactionName,
                     ),
                     onChanged: (value) {
                       setState(() {
@@ -818,7 +822,7 @@ class _TransactionPageState extends State<TransactionPage> {
                   ),
                 ),
                 child: Text(
-                  widget.isAdd ? 'Отмена' : 'Удалить транзакцию',
+                  widget.isAdd ? l10n.cancel : l10n.deleteTransaction,
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),

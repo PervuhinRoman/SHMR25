@@ -2,6 +2,8 @@
     <!-- Разрешения для сенсоров -->
     <uses-permission
         android:name="android.permission.VIBRATE"/>
+    <uses-permission
+        android:name="android.permission.USE_BIOMETRIC"/>
     <uses-feature
         android:name="android.hardware.sensor.accelerometer"
         android:required="true"/>

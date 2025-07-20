@@ -2,8 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
 import 'package:shmr_finance/domain/cubit/account/blur_cubit.dart';
@@ -13,8 +13,17 @@ import 'package:shmr_finance/presentation/account_page.dart';
 import 'package:shmr_finance/presentation/categories_page.dart';
 import 'package:shmr_finance/presentation/in_exp_widget.dart';
 import 'package:shmr_finance/presentation/settings_page.dart';
+import 'package:shmr_finance/presentation/security_screen.dart';
+import 'package:shmr_finance/presentation/widgets/app_blur_wrapper.dart';
 import 'package:shmr_finance/app_theme.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shmr_finance/data/services/theme_service.dart';
+import 'package:shmr_finance/data/services/haptic_service.dart';
+import 'package:shmr_finance/data/services/security_service.dart';
+import 'package:shmr_finance/data/services/locale_service.dart';
+import 'package:shmr_finance/presentation/services/app_blur_service.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   // Устанавливаем цвета для статус бара и навигационной панели
@@ -62,6 +71,22 @@ void main() async {
     );
   }
 
+  // Инициализируем сервисы
+  final themeService = ThemeService();
+  await themeService.initialize();
+
+  final hapticService = HapticService();
+  await hapticService.initialize();
+
+  final securityService = SecurityService();
+  await securityService.initialize();
+
+  final appBlurService = AppBlurService();
+  await appBlurService.initialize();
+
+  final localeService = LocaleService();
+  await localeService.initialize();
+
   runApp(
     MultiBlocProvider(
       providers: [
@@ -70,36 +95,80 @@ void main() async {
         BlocProvider(create: (_) => BlurCubit()),
         BlocProvider(create: (_) => CategoryCubit()),
       ],
-      child: const MyApp(),
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: themeService),
+          ChangeNotifierProvider.value(value: securityService),
+          ChangeNotifierProvider.value(value: localeService),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isAuthenticated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthentication();
+  }
+
+  Future<void> _checkAuthentication() async {
+    final shouldShowSecurity =
+        await SecurityService().shouldShowSecurityScreen();
+    if (!shouldShowSecurity) {
+      setState(() {
+        _isAuthenticated = true;
+      });
+    }
+  }
+
+  void _onAuthenticated() {
+    setState(() {
+      _isAuthenticated = true;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          useMaterial3: true,
-          textTheme: TextTheme(bodyMedium: TextStyle(fontSize: 16)),
-          colorScheme: ColorScheme.light(
-            primary: CustomAppTheme.figmaMainColor,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return SafeArea(
+          child: Consumer<LocaleService>(
+            builder: (context, localeService, child) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'SHMR Finance',
+                locale: localeService.currentLocale,
+                supportedLocales: LocaleService.supportedLocales,
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                themeMode: themeService.getThemeMode(),
+                theme: themeService.getLightTheme(),
+                darkTheme: themeService.getDarkTheme(),
+                home:
+                    _isAuthenticated
+                        ? AppBlurWrapper(child: const BaseScreen())
+                        : SecurityScreen(onAuthenticated: _onAuthenticated),
+              );
+            },
           ),
-          appBarTheme: AppBarTheme(
-            backgroundColor: CustomAppTheme.figmaMainColor,
-          ),
-          navigationBarTheme: NavigationBarThemeData(
-            indicatorColor: CustomAppTheme.figmaMainLightColor,
-            backgroundColor: CustomAppTheme.figmaNavBarColor,
-          ),
-        ),
-        home: const BaseScreen(),
-      ),
+        );
+      },
     );
   }
 }
@@ -116,9 +185,13 @@ class _BaseScreenState extends State<BaseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeService = Provider.of<ThemeService>(context);
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
+          HapticService().selectionClick();
           setState(() {
             currentPageIndex = index;
           });
@@ -128,23 +201,23 @@ class _BaseScreenState extends State<BaseScreen> {
         destinations: <Widget>[
           NavigationDestination(
             icon: Image.asset('assets/icons/downtrend.png', width: 32),
-            label: 'Расходы',
+            label: l10n.expense,
           ),
           NavigationDestination(
             icon: Image.asset('assets/icons/uptrend.png', width: 32),
-            label: 'Доходы',
+            label: l10n.income,
           ),
           NavigationDestination(
             icon: Image.asset('assets/icons/calc.png', width: 32),
-            label: 'Счет',
+            label: l10n.accounts,
           ),
           NavigationDestination(
             icon: Image.asset('assets/icons/linear_chart.png', width: 32),
-            label: 'Статьи',
+            label: l10n.categories,
           ),
           NavigationDestination(
             icon: Image.asset('assets/icons/settings.png', width: 32),
-            label: 'Настройки',
+            label: l10n.settings,
           ),
         ],
       ),

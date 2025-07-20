@@ -10,6 +10,7 @@ import 'package:shmr_finance/presentation/analyze_page.dart';
 import 'package:shmr_finance/presentation/transaction_dialog.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class InExpHistoryWidget extends StatefulWidget {
   final bool isIncome;
@@ -60,13 +61,14 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     DatePickerCubit datePickerCubit = context.read<DatePickerCubit>();
     TransactionCubit transactionCubit = context.read<TransactionCubit>();
     SortTypeCubit sortTypeCubit = context.read<SortTypeCubit>();
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: widget.isIncome ? "История доходов" : "История расходов",
+        title: widget.isIncome ? l10n.incomeHistory : l10n.expenseHistory,
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.analytics_outlined),
@@ -116,13 +118,14 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                                     datePickerState.startDate ?? DateTime.now(),
                                 firstDate: DateTime(2000),
                                 lastDate: DateTime(2100),
-                                helpText: 'Выберите дату начала',
-                                cancelText: 'Отмена',
-                                confirmText: 'ОК',
+                                helpText: l10n.selectStartDate,
+                                cancelText: l10n.cancel,
+                                confirmText: l10n.ok,
                               );
                           if (resultStartDate != null) {
                             datePickerCubit.setStartDate(resultStartDate);
-                            final accountState = context.read<MyAccountCubit>().state;
+                            final accountState =
+                                context.read<MyAccountCubit>().state;
                             final accountId = accountState.accountId ?? 1;
                             if (accountId != null) {
                               transactionCubit.fetchTransactions(
@@ -139,11 +142,11 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                           height: 56,
                           child: Row(
                             children: [
-                              const Expanded(
+                              Expanded(
                                 child: Padding(
                                   padding: EdgeInsets.only(left: 16),
                                   child: Text(
-                                    "Начало",
+                                    l10n.start,
                                     textAlign: TextAlign.start,
                                   ),
                                 ),
@@ -156,7 +159,7 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                                         ? DateFormat(
                                           'dd.MM.yyyy',
                                         ).format(datePickerState.startDate!)
-                                        : "Выберите дату",
+                                        : l10n.selectDate,
                                     textAlign: TextAlign.end,
                                   ),
                                 ),
@@ -179,13 +182,14 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                                 datePickerState.endDate ?? DateTime.now(),
                             firstDate: DateTime(2000),
                             lastDate: DateTime(2100),
-                            helpText: 'Выберите дату конца',
-                            cancelText: 'Отмена',
-                            confirmText: 'ОК',
+                            helpText: l10n.selectEndDate,
+                            cancelText: l10n.cancel,
+                            confirmText: l10n.ok,
                           );
                           if (resultEndDate != null) {
                             datePickerCubit.setEndDate(resultEndDate);
-                            final accountState = context.read<MyAccountCubit>().state;
+                            final accountState =
+                                context.read<MyAccountCubit>().state;
                             final accountId = accountState.accountId ?? 1;
                             if (accountId != null) {
                               transactionCubit.fetchTransactions(
@@ -202,11 +206,11 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                           height: 56,
                           child: Row(
                             children: [
-                              const Expanded(
+                              Expanded(
                                 child: Padding(
-                                  padding: EdgeInsets.only(left: 16),
+                                  padding: const EdgeInsets.only(left: 16),
                                   child: Text(
-                                    "Конец",
+                                    l10n.end,
                                     textAlign: TextAlign.start,
                                   ),
                                 ),
@@ -219,7 +223,7 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                                         ? DateFormat(
                                           'dd.MM.yyyy',
                                         ).format(datePickerState.endDate!)
-                                        : "Выберите дату",
+                                        : l10n.selectDate,
                                     textAlign: TextAlign.end,
                                   ),
                                 ),
@@ -242,7 +246,7 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     ListTile(
-                                      title: const Text('По дате'),
+                                      title: Text(l10n.sortByDate),
                                       trailing: const Icon(Icons.date_range),
                                       onTap: () {
                                         sortTypeCubit.changeSortType(
@@ -253,7 +257,7 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                                       },
                                     ),
                                     ListTile(
-                                      title: const Text('По сумме'),
+                                      title: Text(l10n.sortByAmount),
                                       trailing: const Icon(Icons.attach_money),
                                       onTap: () {
                                         sortTypeCubit.changeSortType(
@@ -272,11 +276,11 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                           height: 56,
                           child: Row(
                             children: [
-                              const Expanded(
+                              Expanded(
                                 child: Padding(
                                   padding: EdgeInsets.only(left: 16),
                                   child: Text(
-                                    "Сортировка",
+                                    l10n.sorting,
                                     textAlign: TextAlign.start,
                                   ),
                                 ),
@@ -286,8 +290,8 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                                   padding: const EdgeInsets.only(right: 16),
                                   child: Text(
                                     sortState.sortType == SortType.date
-                                        ? "По дате"
-                                        : "По сумме",
+                                        ? l10n.sortByDate
+                                        : l10n.sortByAmount,
                                     textAlign: TextAlign.end,
                                   ),
                                 ),
@@ -307,11 +311,11 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                         height: 56,
                         child: Row(
                           children: [
-                            const Expanded(
+                            Expanded(
                               child: Padding(
                                 padding: EdgeInsets.only(left: 16),
                                 child: Text(
-                                  "Сумма",
+                                  l10n.transactionAmount,
                                   textAlign: TextAlign.start,
                                 ),
                               ),
@@ -381,13 +385,13 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                           if (transactionState.status ==
                               TransactionStatus.error) {
                             return Center(
-                              child: Text('Ошибка: ${transactionState.error}'),
+                              child: Text(
+                                '${l10n.error}: ${transactionState.error}',
+                              ),
                             );
                           }
                           if (transactions.isEmpty) {
-                            return const Center(
-                              child: Text('Нет данных за период'),
-                            );
+                            return Center(child: Text(l10n.noDataForPeriod));
                           } else {
                             return ListView.builder(
                               itemCount: transactions.length * 2 + 1,

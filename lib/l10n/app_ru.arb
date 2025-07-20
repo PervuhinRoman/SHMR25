@@ -1,0 +1,870 @@
+{
+  "@@locale": "ru",
+  "appTitle": "SHMR Finance",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  
+  "settings": "Настройки",
+  "@settings": {
+    "description": "Settings page title"
+  },
+  
+  "theme": "Тема",
+  "@theme": {
+    "description": "Theme settings"
+  },
+  
+  "systemTheme": "Системная тема",
+  "@systemTheme": {
+    "description": "Use system theme setting"
+  },
+  
+  "primaryColor": "Основной цвет",
+  "@primaryColor": {
+    "description": "Primary color picker"
+  },
+  
+  "hapticFeedback": "Тактильная обратная связь",
+  "@hapticFeedback": {
+    "description": "Haptic feedback toggle"
+  },
+  
+  "language": "Язык",
+  "@language": {
+    "description": "Language setting"
+  },
+  
+  "security": "Безопасность",
+  "@security": {
+    "description": "Security settings"
+  },
+  
+  "pinCode": "PIN-код",
+  "@pinCode": {
+    "description": "PIN code setting"
+  },
+  
+  "pinCodeRequired": "Сначала включите PIN-код",
+  "@pinCodeRequired": {
+    "description": "PIN code required message"
+  },
+  
+  "biometrics": "Биометрия",
+  "@biometrics": {
+    "description": "Biometric authentication"
+  },
+  
+  "appBlur": "Блюр приложения",
+  "@appBlur": {
+    "description": "App blur when minimized"
+  },
+  
+  "appBlurDescription": "Для теста!!! Размытие экрана в режиме мультизадачности",
+  "@appBlurDescription": {
+    "description": "App blur description"
+  },
+  
+  "testPinCode": "Тест PIN-кода",
+  "@testPinCode": {
+    "description": "Test PIN code button"
+  },
+  
+  "testPinCodeDescription": "Проверить ввод PIN-кода",
+  "@testPinCodeDescription": {
+    "description": "Test PIN code description"
+  },
+  
+  "testBlur": "Тест блюра",
+  "@testBlur": {
+    "description": "Test blur button"
+  },
+  
+  "testBlurDescription": "Принудительно применить блюр",
+  "@testBlurDescription": {
+    "description": "Test blur description"
+  },
+  
+  "pinCodeSetup": "Настройка PIN-кода",
+  "@pinCodeSetup": {
+    "description": "PIN code setup title"
+  },
+  
+  "pinCodeInput": "Ввод PIN-кода",
+  "@pinCodeInput": {
+    "description": "PIN code input title"
+  },
+  
+  "enterPinCode": "Введите PIN-код",
+  "@enterPinCode": {
+    "description": "Enter PIN code prompt"
+  },
+  
+  "confirmPinCode": "Подтвердите PIN-код",
+  "@confirmPinCode": {
+    "description": "Confirm PIN code prompt"
+  },
+  
+  "pinCodesDoNotMatch": "PIN-коды не совпадают",
+  "@pinCodesDoNotMatch": {
+    "description": "PIN codes do not match error"
+  },
+  
+  "pinCodeSetSuccessfully": "PIN-код успешно установлен",
+  "@pinCodeSetSuccessfully": {
+    "description": "PIN code set successfully message"
+  },
+  
+  "pinCodeEnteredCorrectly": "PIN-код введен правильно!",
+  "@pinCodeEnteredCorrectly": {
+    "description": "PIN code entered correctly message"
+  },
+  
+  "blurApplied": "Блюр применен! Сверните приложение для проверки.",
+  "@blurApplied": {
+    "description": "Blur applied message"
+  },
+  
+  "appLocked": "Приложение заблокировано",
+  "@appLocked": {
+    "description": "App locked message"
+  },
+  
+  "minimizeToUnlock": "Сверните приложение для разблокировки",
+  "@minimizeToUnlock": {
+    "description": "Minimize to unlock message"
+  },
+  
+  "accounts": "Счета",
+  "@accounts": {
+    "description": "Accounts page title"
+  },
+  
+  "addAccount": "Добавить счет",
+  "@addAccount": {
+    "description": "Add account button"
+  },
+  
+  "editAccount": "Редактировать счет",
+  "@editAccount": {
+    "description": "Edit account title"
+  },
+  
+  "deleteAccount": "Удалить счет",
+  "@deleteAccount": {
+    "description": "Delete account title"
+  },
+  
+  "accountName": "Название счета",
+  "@accountName": {
+    "description": "Account name field"
+  },
+  
+  "accountBalance": "Баланс счета",
+  "@accountBalance": {
+    "description": "Account balance field"
+  },
+  
+  "save": "Сохранить",
+  "@save": {
+    "description": "Save button"
+  },
+  
+  "cancel": "Отмена",
+  "@cancel": {
+    "description": "Cancel button"
+  },
+  
+  "delete": "Удалить",
+  "@delete": {
+    "description": "Delete button"
+  },
+  
+  "confirm": "Подтвердить",
+  "@confirm": {
+    "description": "Confirm button"
+  },
+  
+  "deleteAccountConfirmation": "Вы уверены, что хотите удалить этот счет?",
+  "@deleteAccountConfirmation": {
+    "description": "Delete account confirmation message"
+  },
+  
+  "categories": "Категории",
+  "@categories": {
+    "description": "Categories page title"
+  },
+  
+  "addCategory": "Добавить категорию",
+  "@addCategory": {
+    "description": "Add category button"
+  },
+  
+  "categoryName": "Название категории",
+  "@categoryName": {
+    "description": "Category name field"
+  },
+  
+  "income": "Доходы",
+  "@income": {
+    "description": "Income category"
+  },
+  
+  "expense": "Расходы",
+  "@expense": {
+    "description": "Expense category"
+  },
+  
+  "transactions": "Транзакции",
+  "@transactions": {
+    "description": "Transactions page title"
+  },
+  
+  "addTransaction": "Добавить транзакцию",
+  "@addTransaction": {
+    "description": "Add transaction button"
+  },
+  
+  "transactionAmount": "Сумма",
+  "@transactionAmount": {
+    "description": "Transaction amount field"
+  },
+  
+  "transactionDescription": "Описание",
+  "@transactionDescription": {
+    "description": "Transaction description field"
+  },
+  
+  "transactionDate": "Дата",
+  "@transactionDate": {
+    "description": "Transaction date field"
+  },
+  
+  "transactionCategory": "Категория",
+  "@transactionCategory": {
+    "description": "Transaction category field"
+  },
+  
+  "transactionAccount": "Счет",
+  "@transactionAccount": {
+    "description": "Transaction account field"
+  },
+  
+  "analysis": "Анализ",
+  "@analysis": {
+    "description": "Analysis page title"
+  },
+  
+  "totalBalance": "Общий баланс",
+  "@totalBalance": {
+    "description": "Total balance label"
+  },
+  
+  "totalIncome": "Общий доход",
+  "@totalIncome": {
+    "description": "Total income label"
+  },
+  
+  "totalExpense": "Общий расход",
+  "@totalExpense": {
+    "description": "Total expense label"
+  },
+  
+  "thisMonth": "Этот месяц",
+  "@thisMonth": {
+    "description": "This month label"
+  },
+  
+  "lastMonth": "Прошлый месяц",
+  "@lastMonth": {
+    "description": "Last month label"
+  },
+  
+  "thisYear": "Этот год",
+  "@thisYear": {
+    "description": "This year label"
+  },
+  
+  "noData": "Нет данных",
+  "@noData": {
+    "description": "No data message"
+  },
+  
+  "error": "Ошибка",
+  "@error": {
+    "description": "Error message"
+  },
+  
+  "success": "Успех",
+  "@success": {
+    "description": "Success message"
+  },
+  
+  "loading": "Загрузка...",
+  "@loading": {
+    "description": "Loading message"
+  },
+  
+  "retry": "Повторить",
+  "@retry": {
+    "description": "Retry button"
+  },
+  
+  "close": "Закрыть",
+  "@close": {
+    "description": "Close button"
+  },
+  
+  "ok": "ОК",
+  "@ok": {
+    "description": "OK button"
+  },
+  
+  "reset": "Сбросить",
+  "@reset": {
+    "description": "Reset button"
+  },
+  
+  "yes": "Да",
+  "@yes": {
+    "description": "Yes button"
+  },
+  
+  "no": "Нет",
+  "@no": {
+    "description": "No button"
+  },
+  
+  "back": "Назад",
+  "@back": {
+    "description": "Back button"
+  },
+  
+  "next": "Далее",
+  "@next": {
+    "description": "Next button"
+  },
+  
+  "previous": "Предыдущий",
+  "@previous": {
+    "description": "Previous button"
+  },
+  
+  "search": "Поиск",
+  "@search": {
+    "description": "Search field"
+  },
+  
+  "filter": "Фильтр",
+  "@filter": {
+    "description": "Filter button"
+  },
+  
+  "sort": "Сортировка",
+  "@sort": {
+    "description": "Sort button"
+  },
+  
+  "all": "Все",
+  "@all": {
+    "description": "All filter"
+  },
+  
+  "today": "Сегодня",
+  "@today": {
+    "description": "Today filter"
+  },
+  
+  "yesterday": "Вчера",
+  "@yesterday": {
+    "description": "Yesterday filter"
+  },
+  
+  "thisWeek": "Эта неделя",
+  "@thisWeek": {
+    "description": "This week filter"
+  },
+  
+  "lastWeek": "Прошлая неделя",
+  "@lastWeek": {
+    "description": "Last week filter"
+  },
+  
+  "currency": "Валюта",
+  "@currency": {
+    "description": "Currency field"
+  },
+  
+  "rub": "РУБ",
+  "@rub": {
+    "description": "Russian ruble"
+  },
+  
+  "usd": "USD",
+  "@usd": {
+    "description": "US dollar"
+  },
+  
+  "eur": "EUR",
+  "@eur": {
+    "description": "Euro"
+  },
+  
+  "amount": "Сумма",
+  "@amount": {
+    "description": "Amount field"
+  },
+  
+  "description": "Описание",
+  "@description": {
+    "description": "Description field"
+  },
+  
+  "date": "Дата",
+  "@date": {
+    "description": "Date field"
+  },
+  
+  "time": "Время",
+  "@time": {
+    "description": "Time field"
+  },
+  
+  "name": "Название",
+  "@name": {
+    "description": "Name field"
+  },
+  
+  "type": "Тип",
+  "@type": {
+    "description": "Type field"
+  },
+  
+  "status": "Статус",
+  "@status": {
+    "description": "Status field"
+  },
+  
+  "active": "Активный",
+  "@active": {
+    "description": "Active status"
+  },
+  
+  "inactive": "Неактивный",
+  "@inactive": {
+    "description": "Inactive status"
+  },
+  
+  "enabled": "Включено",
+  "@enabled": {
+    "description": "Enabled status"
+  },
+  
+  "disabled": "Отключено",
+  "@disabled": {
+    "description": "Disabled status"
+  },
+  
+  "on": "Вкл",
+  "@on": {
+    "description": "On status"
+  },
+  
+  "off": "Выкл",
+  "@off": {
+    "description": "Off status"
+  },
+  
+  "biometricNotAvailable": "Биометрическая аутентификация недоступна",
+  "@biometricNotAvailable": {
+    "description": "Biometric not available message"
+  },
+  
+  "biometricNotConfigured": "Биометрическая аутентификация не настроена на этом устройстве",
+  "@biometricNotConfigured": {
+    "description": "Biometric not configured message"
+  },
+  
+  "biometricSetupRequired": "Пожалуйста, настройте биометрическую аутентификацию в настройках устройства",
+  "@biometricSetupRequired": {
+    "description": "Biometric setup required message"
+  },
+  
+  "usePinCode": "Использовать PIN-код",
+  "@usePinCode": {
+    "description": "Use PIN code button"
+  },
+  
+  "useBiometrics": "Использовать биометрию",
+  "@useBiometrics": {
+    "description": "Use biometrics button"
+  },
+  
+  "faceId": "Face ID",
+  "@faceId": {
+    "description": "Face ID authentication"
+  },
+  
+  "touchId": "Touch ID",
+  "@touchId": {
+    "description": "Touch ID authentication"
+  },
+  
+  "fingerprint": "Отпечаток пальца",
+  "@fingerprint": {
+    "description": "Fingerprint authentication"
+  },
+  
+  "authenticationRequired": "Требуется аутентификация",
+  "@authenticationRequired": {
+    "description": "Authentication required message"
+  },
+  
+  "pleaseAuthenticate": "Пожалуйста, пройдите аутентификацию для продолжения",
+  "@pleaseAuthenticate": {
+    "description": "Please authenticate message"
+  },
+  
+  "authenticationFailed": "Аутентификация не удалась",
+  "@authenticationFailed": {
+    "description": "Authentication failed message"
+  },
+  
+  "tryAgain": "Попробовать снова",
+  "@tryAgain": {
+    "description": "Try again button"
+  },
+  
+  "transactionCount": "{count, plural, =0{Нет транзакций} =1{1 транзакция} few{{count} транзакции} many{{count} транзакций} other{{count} транзакций}}",
+  "@transactionCount": {
+    "description": "Transaction count with pluralization",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  
+  "accountCount": "{count, plural, =0{Нет счетов} =1{1 счет} few{{count} счета} many{{count} счетов} other{{count} счетов}}",
+  "@accountCount": {
+    "description": "Account count with pluralization",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  
+  "categoryCount": "{count, plural, =0{Нет категорий} =1{1 категория} few{{count} категории} many{{count} категорий} other{{count} категорий}}",
+  "@categoryCount": {
+    "description": "Category count with pluralization",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  
+  "fillAllFields": "Заполните все поля",
+  "@fillAllFields": {
+    "description": "Fill all fields error message"
+  },
+  
+  "confirmDelete": "Подтвердите удаление",
+  "@confirmDelete": {
+    "description": "Confirm deletion dialog title"
+  },
+  
+  "confirmDeleteTransaction": "Вы уверены, что хотите удалить эту транзакцию?",
+  "@confirmDeleteTransaction": {
+    "description": "Confirm delete transaction message"
+  },
+  
+  "pinCodeSetup": "Установка PIN-кода",
+  "@pinCodeSetup": {
+    "description": "PIN code setup title"
+  },
+  
+  "enterPinCode": "Введите PIN-код",
+  "@enterPinCode": {
+    "description": "Enter PIN code title"
+  },
+  
+  "total": "Всего",
+  "@total": {
+    "description": "Total label"
+  },
+  
+  "noDataForPeriod": "Нет данных за период",
+  "@noDataForPeriod": {
+    "description": "No data for period message"
+  },
+  
+  "error": "Ошибка",
+  "@error": {
+    "description": "Error message"
+  },
+  
+  "unlock": "Разблокировать",
+  "@unlock": {
+    "description": "Unlock button"
+  },
+  
+  "sortByDate": "По дате",
+  "@sortByDate": {
+    "description": "Sort by date option"
+  },
+  
+  "sortByAmount": "По сумме",
+  "@sortByAmount": {
+    "description": "Sort by amount option"
+  },
+  
+  "accountNameUpdated": "Имя счета обновлено",
+  "@accountNameUpdated": {
+    "description": "Account name updated message"
+  },
+  
+  "updateError": "Ошибка при обновлении",
+  "@updateError": {
+    "description": "Update error message"
+  },
+  
+  "noCategories": "Нет категорий",
+  "@noCategories": {
+    "description": "No categories message"
+  },
+  
+  "periodStart": "Период: начало",
+  "@periodStart": {
+    "description": "Period start label"
+  },
+  
+  "periodEnd": "Период: конец",
+  "@periodEnd": {
+    "description": "Period end label"
+  },
+  
+  "noAccounts": "Нет счетов",
+  "@noAccounts": {
+    "description": "No accounts message"
+  },
+  
+  "deleteConfirmation": "Подтверждение удаления",
+  "@deleteConfirmation": {
+    "description": "Delete confirmation title"
+  },
+  
+  "deleteNotSupported": "Удаление счета не поддерживается",
+  "@deleteNotSupported": {
+    "description": "Delete not supported message"
+  },
+  
+  "myCategories": "Мои статьи",
+  "@myCategories": {
+    "description": "My categories title"
+  },
+  
+  "time": "Время",
+  "@time": {
+    "description": "Time field"
+  },
+  
+  "required": " *",
+  "@required": {
+    "description": "Required field indicator"
+  },
+  
+  "myAccount": "Мой счёт",
+  "@myAccount": {
+    "description": "My account title"
+  },
+  
+  "balance": "Баланс",
+  "@balance": {
+    "description": "Balance label"
+  },
+  
+  "currency": "Валюта",
+  "@currency": {
+    "description": "Currency label"
+  },
+  
+  "noDataToDisplay": "Нет данных для отображения",
+  "@noDataToDisplay": {
+    "description": "No data to display message"
+  },
+  
+  "days30": "30 дней",
+  "@days30": {
+    "description": "30 days period"
+  },
+  
+  "months12": "12 месяцев",
+  "@months12": {
+    "description": "12 months period"
+  },
+  
+  "dataFromCache": "Данные из кэша",
+  "@dataFromCache": {
+    "description": "Data from cache message"
+  },
+  
+  "dataFromNetwork": "Данные из сети",
+  "@dataFromNetwork": {
+    "description": "Data from network message"
+  },
+  
+  "incomeToday": "Доходы сегодня",
+  "@incomeToday": {
+    "description": "Income today title"
+  },
+  
+  "expenseToday": "Расходы сегодня",
+  "@expenseToday": {
+    "description": "Expense today title"
+  },
+  
+  "incomeHistory": "История доходов",
+  "@incomeHistory": {
+    "description": "Income history title"
+  },
+  
+  "expenseHistory": "История расходов",
+  "@expenseHistory": {
+    "description": "Expense history title"
+  },
+  
+  "start": "Начало",
+  "@start": {
+    "description": "Start date label"
+  },
+  
+  "end": "Конец",
+  "@end": {
+    "description": "End date label"
+  },
+  
+  "selectDate": "Выберите дату",
+  "@selectDate": {
+    "description": "Select date placeholder"
+  },
+  
+  "selectStartDate": "Выберите дату начала",
+  "@selectStartDate": {
+    "description": "Select start date help text"
+  },
+  
+  "selectEndDate": "Выберите дату конца",
+  "@selectEndDate": {
+    "description": "Select end date help text"
+  },
+  
+  "analysis": "Анализ",
+  "@analysis": {
+    "description": "Analysis page title"
+  },
+  
+  "findArticle": "Найти статью...",
+  "@findArticle": {
+    "description": "Find article placeholder"
+  },
+  
+  "articleNotFound": "Статья не найдена",
+  "@articleNotFound": {
+    "description": "Article not found message"
+  },
+  
+  "selectCurrency": "Выберите валюту",
+  "@selectCurrency": {
+    "description": "Select currency dialog title"
+  },
+  
+  "sorting": "Сортировка",
+  "@sorting": {
+    "description": "Sorting label"
+  },
+  
+  "addTransaction": "Добавить транзакцию",
+  "@addTransaction": {
+    "description": "Add transaction title"
+  },
+  
+  "editTransaction": "Редактировать транзакцию",
+  "@editTransaction": {
+    "description": "Edit transaction title"
+  },
+  
+  "transactionName": "Название / описание",
+  "@transactionName": {
+    "description": "Transaction name placeholder"
+  },
+  
+  "deleteTransaction": "Удалить транзакцию",
+  "@deleteTransaction": {
+    "description": "Delete transaction button"
+  },
+  
+  "selectAccount": "Выберите счёт",
+  "@selectAccount": {
+    "description": "Select account dialog title"
+  },
+  
+  "appLocked": "Приложение заблокировано",
+  "@appLocked": {
+    "description": "App locked message"
+  },
+  
+  "confirmIdentity": "Подтвердите вашу личность",
+  "@confirmIdentity": {
+    "description": "Confirm identity message"
+  },
+  
+  "biometricUnavailable": "Биометрия недоступна или не настроена. Используйте PIN-код.",
+  "@biometricUnavailable": {
+    "description": "Biometric unavailable message"
+  },
+  
+  "faceId": "Face ID",
+  "@faceId": {
+    "description": "Face ID label"
+  },
+  
+  "touchId": "Touch ID",
+  "@touchId": {
+    "description": "Touch ID label"
+  },
+  
+  "faceIdTouchId": "Face ID / Touch ID",
+  "@faceIdTouchId": {
+    "description": "Face ID / Touch ID label"
+  },
+  
+  "confirmPinCode": "Подтвердите PIN-код",
+  "@confirmPinCode": {
+    "description": "Confirm PIN code title"
+  },
+  
+  "setupPinCode": "Установите PIN-код",
+  "@setupPinCode": {
+    "description": "Setup PIN code title"
+  },
+  
+  "pinCodeSaveError": "Ошибка сохранения PIN-кода",
+  "@pinCodeSaveError": {
+    "description": "PIN code save error message"
+  },
+  
+  "pinCodesDontMatch": "PIN-коды не совпадают",
+  "@pinCodesDontMatch": {
+    "description": "PIN codes don't match message"
+  },
+  
+  "incorrectPinCode": "Неверный PIN-код",
+  "@incorrectPinCode": {
+    "description": "Incorrect PIN code message"
+  }
+} 

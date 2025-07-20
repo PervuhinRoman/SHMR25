@@ -49,5 +49,7 @@
 		<true/>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
+		<key>NSFaceIDUsageDescription</key>
+		<string>Приложению требуется доступ к Face ID для безопасного входа</string>
 	</dict>
 </plist>
