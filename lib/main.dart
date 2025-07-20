@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
 import 'package:shmr_finance/domain/cubit/account/blur_cubit.dart';
@@ -25,7 +24,6 @@ import 'package:shmr_finance/data/services/locale_service.dart';
 import 'package:shmr_finance/presentation/services/app_blur_service.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() async {
   // Устанавливаем цвета для статус бара и навигационной панели
@@ -76,16 +74,16 @@ void main() async {
   // Инициализируем сервисы
   final themeService = ThemeService();
   await themeService.initialize();
-  
+
   final hapticService = HapticService();
   await hapticService.initialize();
-  
+
   final securityService = SecurityService();
   await securityService.initialize();
-  
+
   final appBlurService = AppBlurService();
   await appBlurService.initialize();
-  
+
   final localeService = LocaleService();
   await localeService.initialize();
 
@@ -126,7 +124,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _checkAuthentication() async {
-    final shouldShowSecurity = await SecurityService().shouldShowSecurityScreen();
+    final shouldShowSecurity =
+        await SecurityService().shouldShowSecurityScreen();
     if (!shouldShowSecurity) {
       setState(() {
         _isAuthenticated = true;
@@ -161,9 +160,10 @@ class _MyAppState extends State<MyApp> {
                 themeMode: themeService.getThemeMode(),
                 theme: themeService.getLightTheme(),
                 darkTheme: themeService.getDarkTheme(),
-                home: _isAuthenticated 
-                    ? AppBlurWrapper(child: const BaseScreen())
-                    : SecurityScreen(onAuthenticated: _onAuthenticated),
+                home:
+                    _isAuthenticated
+                        ? AppBlurWrapper(child: const BaseScreen())
+                        : SecurityScreen(onAuthenticated: _onAuthenticated),
               );
             },
           ),
@@ -187,7 +187,7 @@ class _BaseScreenState extends State<BaseScreen> {
   Widget build(BuildContext context) {
     final themeService = Provider.of<ThemeService>(context);
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
