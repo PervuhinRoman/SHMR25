@@ -393,12 +393,11 @@ class SettingsPage extends StatelessWidget {
                   return const SizedBox.shrink();
                 },
               ),
-              if (securityService.isPinCodeEnabled)
-                const Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: CustomAppTheme.figmaBgGrayColor,
-                ),
+              const Divider(
+                height: 1,
+                thickness: 1,
+                color: CustomAppTheme.figmaBgGrayColor,
+              ),
               StatefulBuilder(
                 builder: (context, setState) {
                   return ListTile(

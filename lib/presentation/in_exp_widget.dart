@@ -30,7 +30,7 @@ class _InExpWidgetState extends State<InExpWidget> {
     super.initState();
     final transactionCubit = context.read<TransactionCubit>();
     final accountState = context.read<MyAccountCubit>().state;
-    final accountId = accountState.accountId ?? 1;
+    final accountId = accountState.accountId ?? 730; // TODO: как я так?
     transactionCubit.fetchTransactions(
       accountId: accountId,
       startDate: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
