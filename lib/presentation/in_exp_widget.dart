@@ -14,7 +14,7 @@ import 'package:shmr_finance/domain/cubit/transactions/datepicker_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transactions/sort_type_cubit.dart';
 import 'in_exp_history_widget.dart';
 import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
-import 'package:shmr_finance/data/services/haptic_service.dart';
+import 'package:shmr_finance/presentation/services/haptic_service.dart';
 
 class InExpWidget extends StatefulWidget {
   final bool isIncome;

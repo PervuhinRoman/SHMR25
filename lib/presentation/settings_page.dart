@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
-import 'package:shmr_finance/data/services/theme_service.dart';
-import 'package:shmr_finance/data/services/haptic_service.dart';
-import 'package:shmr_finance/data/services/security_service.dart';
+import 'package:shmr_finance/presentation/services/theme_service.dart';
+import 'package:shmr_finance/presentation/services/haptic_service.dart';
+import 'package:shmr_finance/presentation/services/security_service.dart';
 import 'package:shmr_finance/data/services/locale_service.dart';
 import 'package:shmr_finance/presentation/services/app_blur_service.dart';
 import 'package:shmr_finance/app_theme.dart';

@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:shmr_finance/data/services/security_service.dart';
-import 'package:shmr_finance/data/services/haptic_service.dart';
+import 'package:shmr_finance/presentation/services/security_service.dart';
+import 'package:shmr_finance/presentation/services/haptic_service.dart';
 import 'package:shmr_finance/presentation/pin_code_screen.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SecurityScreen extends StatefulWidget {
   final VoidCallback onAuthenticated;
-  
-  const SecurityScreen({
-    super.key,
-    required this.onAuthenticated,
-  });
+
+  const SecurityScreen({super.key, required this.onAuthenticated});
 
   @override
   State<SecurityScreen> createState() => _SecurityScreenState();
@@ -20,19 +17,19 @@ class SecurityScreen extends StatefulWidget {
 class _SecurityScreenState extends State<SecurityScreen> {
   bool _isAuthenticating = false;
   bool _showAuthOptions = false;
-  
+
   @override
   void initState() {
     super.initState();
     _checkAuthOptions();
   }
-  
+
   Future<void> _checkAuthOptions() async {
     final securityService = SecurityService();
     final authMethods = await securityService.getAvailableAuthMethods();
     final hasPinCode = authMethods['pinCode'] ?? false;
     final hasBiometric = authMethods['biometric'] ?? false;
-    
+
     if (hasPinCode && hasBiometric) {
       // Если доступны оба способа, показываем выбор
       setState(() {
@@ -49,14 +46,14 @@ class _SecurityScreenState extends State<SecurityScreen> {
       widget.onAuthenticated();
     }
   }
-  
+
   Future<void> _authenticateWithBiometric() async {
     if (_isAuthenticating) return;
-    
+
     setState(() {
       _isAuthenticating = true;
     });
-    
+
     try {
       // Сначала проверяем доступность биометрии
       final isAvailable = await SecurityService().isBiometricAvailable();
@@ -65,9 +62,10 @@ class _SecurityScreenState extends State<SecurityScreen> {
         _showPinCodeScreen();
         return;
       }
-      
-      final isAuthenticated = await SecurityService().authenticateWithBiometrics();
-      
+
+      final isAuthenticated =
+          await SecurityService().authenticateWithBiometrics();
+
       if (isAuthenticated) {
         widget.onAuthenticated();
       } else {
@@ -84,7 +82,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
       });
     }
   }
-  
+
   void _showBiometricError() {
     final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -95,27 +93,28 @@ class _SecurityScreenState extends State<SecurityScreen> {
       ),
     );
   }
-  
+
   Future<void> _showPinCodeScreen() async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PinCodeScreen(
-          isSetup: false,
-          onBackToAuthOptions: () {
-            setState(() {
-              _showAuthOptions = true;
-            });
-          },
-        ),
+        builder:
+            (context) => PinCodeScreen(
+              isSetup: false,
+              onBackToAuthOptions: () {
+                setState(() {
+                  _showAuthOptions = true;
+                });
+              },
+            ),
       ),
     );
-    
+
     if (result == true) {
       widget.onAuthenticated();
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -133,18 +132,12 @@ class _SecurityScreenState extends State<SecurityScreen> {
             const SizedBox(height: 24),
             Text(
               l10n.appLocked,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Text(
               l10n.confirmIdentity,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 32),
             if (_isAuthenticating)
@@ -161,14 +154,14 @@ class _SecurityScreenState extends State<SecurityScreen> {
       ),
     );
   }
-  
+
   Widget _buildAuthOptions() {
     final l10n = AppLocalizations.of(context)!;
     return FutureBuilder<bool>(
       future: SecurityService().isBiometricAvailable(),
       builder: (context, snapshot) {
         final isBiometricAvailable = snapshot.data ?? false;
-        
+
         if (!isBiometricAvailable) {
           // Если биометрия недоступна, показываем только PIN-код
           return SizedBox(
@@ -188,14 +181,14 @@ class _SecurityScreenState extends State<SecurityScreen> {
             ),
           );
         }
-        
+
         // Если биометрия доступна, показываем оба варианта
         return FutureBuilder<List<BiometricType>>(
           future: SecurityService().getAvailableBiometrics(),
           builder: (context, biometricSnapshot) {
             String biometricLabel = l10n.faceIdTouchId;
             IconData biometricIcon = Icons.fingerprint;
-            
+
             if (biometricSnapshot.hasData) {
               final biometrics = biometricSnapshot.data!;
               if (biometrics.contains(BiometricType.face)) {
@@ -206,7 +199,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 biometricIcon = Icons.fingerprint;
               }
             }
-            
+
             return Column(
               children: [
                 SizedBox(
@@ -249,4 +242,4 @@ class _SecurityScreenState extends State<SecurityScreen> {
       },
     );
   }
-} 
+}
