@@ -29,11 +29,11 @@ jobs:
             /opt/hostedtoolcache/flutter
             .pub-cache
           key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
-      
-      - name: Clean dependencies
-        run: flutter clean
+
       - name: Install dependencies
         run: flutter pub get
+      - name: Generate localization files
+        run: flutter gen-l10n
 
 #      - name: Run tests
 #        run: flutter test
