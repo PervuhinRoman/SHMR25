@@ -60,7 +60,7 @@
     "description": "App blur when minimized"
   },
   
-  "appBlurDescription": "Размытие экрана в режиме мультизадачности",
+  "appBlurDescription": "Для теста!!! Размытие экрана в режиме мультизадачности",
   "@appBlurDescription": {
     "description": "App blur description"
   },
