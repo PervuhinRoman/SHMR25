@@ -17,23 +17,28 @@ import 'package:shmr_finance/presentation/security_screen.dart';
 import 'package:shmr_finance/presentation/widgets/app_blur_wrapper.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:shmr_finance/data/services/theme_service.dart';
-import 'package:shmr_finance/data/services/haptic_service.dart';
-import 'package:shmr_finance/data/services/security_service.dart';
+import 'package:shmr_finance/presentation/services/theme_service.dart';
+import 'package:shmr_finance/presentation/services/haptic_service.dart';
+import 'package:shmr_finance/presentation/services/security_service.dart';
 import 'package:shmr_finance/data/services/locale_service.dart';
 import 'package:shmr_finance/presentation/services/app_blur_service.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await ThemeService().initialize();
+
+  final primaryColor = ThemeService().primaryColor;
+
   // Устанавливаем цвета для статус бара и навигационной панели
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
       systemNavigationBarColor: CustomAppTheme.figmaNavBarColor,
-      statusBarColor: CustomAppTheme.figmaMainColor,
+      statusBarColor: primaryColor,
     ),
   );
-  WidgetsFlutterBinding.ensureInitialized();
 
   // Задержка для стабильности инициализации
   await Future.delayed(const Duration(milliseconds: 100));
@@ -185,7 +190,6 @@ class _BaseScreenState extends State<BaseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeService = Provider.of<ThemeService>(context);
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(

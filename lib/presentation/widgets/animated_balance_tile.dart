@@ -73,7 +73,7 @@ class _AnimatedBalanceTileState extends State<AnimatedBalanceTile>
       },
 
       child: Material(
-        color: CustomAppTheme.figmaMainLightColor,
+        color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
         child: InkWell(
           onTap: widget.onTap,
           child: Padding(

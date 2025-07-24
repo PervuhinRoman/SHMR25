@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:shmr_finance/data/services/security_service.dart';
-import 'package:shmr_finance/data/services/haptic_service.dart';
-import 'package:shmr_finance/app_theme.dart';
+import 'package:shmr_finance/presentation/services/security_service.dart';
+import 'package:shmr_finance/presentation/services/haptic_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PinCodeScreen extends StatefulWidget {
   final bool isSetup; // true - установка PIN, false - ввод PIN
   final VoidCallback? onSuccess;
   final VoidCallback? onCancel;
-  final VoidCallback? onBackToAuthOptions; // для возврата к выбору способа аутентификации
-  
+  final VoidCallback?
+  onBackToAuthOptions; // для возврата к выбору способа аутентификации
+
   const PinCodeScreen({
     super.key,
     required this.isSetup,
@@ -29,33 +28,36 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
   bool _isConfirming = false;
   bool _isError = false;
   String _errorMessage = '';
-  
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: widget.isSetup ? AppBar(
-        title: Text(l10n.pinCodeSetup),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            HapticService().lightImpact();
-            widget.onCancel?.call();
-            Navigator.of(context).pop();
-          },
-        ),
-      ) : AppBar(
-        title: Text(l10n.enterPinCode),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            HapticService().lightImpact();
-            widget.onBackToAuthOptions?.call();
-            Navigator.of(context).pop();
-          },
-        ),
-      ),
+      appBar:
+          widget.isSetup
+              ? AppBar(
+                title: Text(l10n.pinCodeSetup),
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    HapticService().lightImpact();
+                    widget.onCancel?.call();
+                    Navigator.of(context).pop();
+                  },
+                ),
+              )
+              : AppBar(
+                title: Text(l10n.enterPinCode),
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    HapticService().lightImpact();
+                    widget.onBackToAuthOptions?.call();
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
       body: SafeArea(
         child: Column(
           children: [
@@ -73,7 +75,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
       ),
     );
   }
-  
+
   Widget _buildTitle() {
     final l10n = AppLocalizations.of(context)!;
     String title;
@@ -82,20 +84,17 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
     } else {
       title = l10n.enterPinCode;
     }
-    
+
     return Text(
       title,
-      style: const TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-      ),
+      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
     );
   }
-  
+
   Widget _buildPinDots() {
     final currentPin = _isConfirming ? _confirmPinCode : _pinCode;
     final maxLength = 4;
-    
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(maxLength, (index) {
@@ -106,33 +105,31 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
           height: 20,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: _isError 
-                ? Colors.red 
-                : isFilled 
-                    ? Theme.of(context).primaryColor 
-                    : Colors.grey.withOpacity(0.3),
+            color:
+                _isError
+                    ? Colors.red
+                    : isFilled
+                    ? Theme.of(context).primaryColor
+                    : Colors.grey.withValues(alpha: 0.3),
           ),
         );
       }),
     );
   }
-  
+
   Widget _buildErrorMessage() {
     if (!_isError) return const SizedBox.shrink();
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Text(
         _errorMessage,
-        style: const TextStyle(
-          color: Colors.red,
-          fontSize: 14,
-        ),
+        style: const TextStyle(color: Colors.red, fontSize: 14),
         textAlign: TextAlign.center,
       ),
     );
   }
-  
+
   Widget _buildNumericKeypad() {
     return Column(
       children: [
@@ -150,24 +147,15 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildKeypadButton(
-              text: '',
-              onPressed: null,
-            ),
-            _buildKeypadButton(
-              text: '0',
-              onPressed: () => _addDigit('0'),
-            ),
-            _buildKeypadButton(
-              text: '⌫',
-              onPressed: _removeDigit,
-            ),
+            _buildKeypadButton(text: '', onPressed: null),
+            _buildKeypadButton(text: '0', onPressed: () => _addDigit('0')),
+            _buildKeypadButton(text: '⌫', onPressed: _removeDigit),
           ],
         ),
       ],
     );
   }
-  
+
   Widget _buildKeypadButton({
     required String text,
     required VoidCallback? onPressed,
@@ -184,9 +172,10 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
           child: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: onPressed != null 
-                  ? Colors.grey.withOpacity(0.1) 
-                  : Colors.transparent,
+              color:
+                  onPressed != null
+                      ? Colors.grey.withValues(alpha: 0.1)
+                      : Colors.transparent,
             ),
             child: Center(
               child: Text(
@@ -194,9 +183,10 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
                 style: TextStyle(
                   fontSize: text == '⌫' ? 20 : 24,
                   fontWeight: FontWeight.w500,
-                  color: onPressed != null 
-                      ? Theme.of(context).primaryColor 
-                      : Colors.grey,
+                  color:
+                      onPressed != null
+                          ? Theme.of(context).primaryColor
+                          : Colors.grey,
                 ),
               ),
             ),
@@ -205,23 +195,23 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
       ),
     );
   }
-  
+
   void _addDigit(String digit) {
     HapticService().lightImpact();
-    
+
     if (_isError) {
       setState(() {
         _isError = false;
         _errorMessage = '';
       });
     }
-    
+
     if (_isConfirming) {
       if (_confirmPinCode.length < 4) {
         setState(() {
           _confirmPinCode.add(digit);
         });
-        
+
         if (_confirmPinCode.length == 4) {
           _verifyConfirmPin();
         }
@@ -231,7 +221,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
         setState(() {
           _pinCode.add(digit);
         });
-        
+
         if (_pinCode.length == 4) {
           if (widget.isSetup) {
             _startConfirmPin();
@@ -242,17 +232,17 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
       }
     }
   }
-  
+
   void _removeDigit() {
     HapticService().lightImpact();
-    
+
     if (_isError) {
       setState(() {
         _isError = false;
         _errorMessage = '';
       });
     }
-    
+
     if (_isConfirming) {
       if (_confirmPinCode.isNotEmpty) {
         setState(() {
@@ -267,24 +257,26 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
       }
     }
   }
-  
+
   void _startConfirmPin() {
     setState(() {
       _isConfirming = true;
     });
   }
-  
+
   Future<void> _verifyConfirmPin() async {
     final l10n = AppLocalizations.of(context)!;
     final pin = _pinCode.join();
     final confirmPin = _confirmPinCode.join();
-    
+
     if (pin == confirmPin) {
       try {
         await SecurityService().setPinCode(pin);
         HapticService().mediumImpact();
         widget.onSuccess?.call();
-        Navigator.of(context).pop(true); // Возвращаем true для успешной установки
+        Navigator.of(
+          context,
+        ).pop(true); // Возвращаем true для успешной установки
       } catch (e) {
         setState(() {
           _isError = true;
@@ -300,16 +292,18 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
       HapticService().heavyImpact();
     }
   }
-  
+
   Future<void> _verifyPin() async {
     final l10n = AppLocalizations.of(context)!;
     final pin = _pinCode.join();
     final isValid = await SecurityService().verifyPinCode(pin);
-    
+
     if (isValid) {
       HapticService().mediumImpact();
       widget.onSuccess?.call();
-      Navigator.of(context).pop(true); // Возвращаем true для успешной аутентификации
+      Navigator.of(
+        context,
+      ).pop(true); // Возвращаем true для успешной аутентификации
     } else {
       setState(() {
         _isError = true;
@@ -319,4 +313,4 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
       HapticService().heavyImpact();
     }
   }
-} 
+}

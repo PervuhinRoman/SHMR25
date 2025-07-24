@@ -81,16 +81,19 @@ class _AccountPageState extends State<AccountPage> {
       final accounts = await _accountRepo.getAllAccounts();
       setState(() {
         _accounts = accounts;
-        _accountData = accounts.isNotEmpty ? AccountResponse(
-          id: accounts.first.id,
-          name: accounts.first.name,
-          balance: accounts.first.balance,
-          currency: accounts.first.currency,
-          incomeStats: [],
-          expenseStats: [],
-          createdAt: accounts.first.createdAt,
-          updatedAt: accounts.first.updatedAt,
-        ) : null;
+        _accountData =
+            accounts.isNotEmpty
+                ? AccountResponse(
+                  id: accounts.first.id,
+                  name: accounts.first.name,
+                  balance: accounts.first.balance,
+                  currency: accounts.first.currency,
+                  incomeStats: [],
+                  expenseStats: [],
+                  createdAt: accounts.first.createdAt,
+                  updatedAt: accounts.first.updatedAt,
+                )
+                : null;
         _isLoading = false;
       });
     } catch (e) {
@@ -155,7 +158,9 @@ class _AccountPageState extends State<AccountPage> {
                           isSelected
                               ? Icon(
                                 Icons.check,
-                                color: CustomAppTheme.figmaMainColor,
+                                color: Theme.of(
+                                  context,
+                                ).primaryColor.withValues(alpha: 0.3),
                               )
                               : null,
                       onTap: () {
@@ -269,7 +274,7 @@ class _AccountPageState extends State<AccountPage> {
           // Segmented Control
           Container(
             decoration: BoxDecoration(
-              color: CustomAppTheme.figmaBgGrayColor.withOpacity(0.3),
+              color: CustomAppTheme.figmaBgGrayColor.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -345,7 +350,7 @@ class _AccountPageState extends State<AccountPage> {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
           color:
-              isSelected ? CustomAppTheme.figmaMainColor : Colors.transparent,
+              isSelected ? Theme.of(context).primaryColor : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
@@ -470,8 +475,8 @@ class _AccountPageState extends State<AccountPage> {
           BarData.fromData(
             date: date,
             value: balance,
-            positiveColor: CustomAppTheme.figmaMainColor.value,
-            negativeColor: CustomAppTheme.figmaRedColor.value,
+            positiveColor: CustomAppTheme.figmaMainColor.toARGB32(),
+            negativeColor: CustomAppTheme.figmaRedColor.toARGB32(),
             dateFormat: 'dd.MM',
           ),
         );
@@ -511,8 +516,8 @@ class _AccountPageState extends State<AccountPage> {
           BarData.fromData(
             date: date,
             value: balance,
-            positiveColor: CustomAppTheme.figmaMainColor.value,
-            negativeColor: CustomAppTheme.figmaRedColor.value,
+            positiveColor: CustomAppTheme.figmaMainColor.toARGB32(),
+            negativeColor: CustomAppTheme.figmaRedColor.toARGB32(),
             dateFormat: 'MM.yy',
           ),
         );
@@ -550,7 +555,7 @@ class _AccountListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: CustomAppTheme.figmaMainLightColor,
+      color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
       child: InkWell(
         onTap: onTap,
         child: Padding(

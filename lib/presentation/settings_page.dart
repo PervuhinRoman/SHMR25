@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
-import 'package:shmr_finance/data/services/theme_service.dart';
-import 'package:shmr_finance/data/services/haptic_service.dart';
-import 'package:shmr_finance/data/services/security_service.dart';
+import 'package:shmr_finance/presentation/services/theme_service.dart';
+import 'package:shmr_finance/presentation/services/haptic_service.dart';
+import 'package:shmr_finance/presentation/services/security_service.dart';
 import 'package:shmr_finance/data/services/locale_service.dart';
 import 'package:shmr_finance/presentation/services/app_blur_service.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/presentation/pin_code_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:developer';
+
+import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -59,11 +61,7 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settings),
-        centerTitle: true,
-        toolbarHeight: 116,
-      ),
+      appBar: CustomAppBar(title: l10n.settings),
       body: Consumer3<ThemeService, SecurityService, LocaleService>(
         builder: (
           context,
@@ -395,12 +393,11 @@ class SettingsPage extends StatelessWidget {
                   return const SizedBox.shrink();
                 },
               ),
-              if (securityService.isPinCodeEnabled)
-                const Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: CustomAppTheme.figmaBgGrayColor,
-                ),
+              const Divider(
+                height: 1,
+                thickness: 1,
+                color: CustomAppTheme.figmaBgGrayColor,
+              ),
               StatefulBuilder(
                 builder: (context, setState) {
                   return ListTile(

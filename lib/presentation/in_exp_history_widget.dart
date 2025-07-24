@@ -30,14 +30,12 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
       final datePickerState = context.read<DatePickerCubit>().state;
       final accountState = context.read<MyAccountCubit>().state;
       final accountId = accountState.accountId ?? 1;
-      if (accountId != null) {
-        context.read<TransactionCubit>().fetchTransactions(
-          accountId: accountId,
-          startDate: datePickerState.startDate!,
-          endDate: datePickerState.endDate!,
-          isIncome: widget.isIncome,
-        );
-      }
+      context.read<TransactionCubit>().fetchTransactions(
+        accountId: accountId,
+        startDate: datePickerState.startDate!,
+        endDate: datePickerState.endDate!,
+        isIncome: widget.isIncome,
+      );
     });
   }
 
@@ -48,14 +46,12 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
       final datePickerState = context.read<DatePickerCubit>().state;
       final accountState = context.read<MyAccountCubit>().state;
       final accountId = accountState.accountId ?? 1;
-      if (accountId != null) {
-        context.read<TransactionCubit>().fetchTransactions(
-          accountId: accountId,
-          startDate: datePickerState.startDate!,
-          endDate: datePickerState.endDate!,
-          isIncome: widget.isIncome,
-        );
-      }
+      context.read<TransactionCubit>().fetchTransactions(
+        accountId: accountId,
+        startDate: datePickerState.startDate!,
+        endDate: datePickerState.endDate!,
+        isIncome: widget.isIncome,
+      );
     }
   }
 
@@ -127,18 +123,18 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                             final accountState =
                                 context.read<MyAccountCubit>().state;
                             final accountId = accountState.accountId ?? 1;
-                            if (accountId != null) {
-                              transactionCubit.fetchTransactions(
-                                accountId: accountId,
-                                startDate: resultStartDate,
-                                endDate: datePickerState.endDate,
-                                isIncome: widget.isIncome,
-                              );
-                            }
+                            transactionCubit.fetchTransactions(
+                              accountId: accountId,
+                              startDate: resultStartDate,
+                              endDate: datePickerState.endDate,
+                              isIncome: widget.isIncome,
+                            );
                           }
                         },
                         child: Container(
-                          color: CustomAppTheme.figmaMainLightColor,
+                          color: Theme.of(
+                            context,
+                          ).primaryColor.withValues(alpha: 0.3),
                           height: 56,
                           child: Row(
                             children: [
@@ -191,18 +187,18 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                             final accountState =
                                 context.read<MyAccountCubit>().state;
                             final accountId = accountState.accountId ?? 1;
-                            if (accountId != null) {
-                              transactionCubit.fetchTransactions(
-                                accountId: accountId,
-                                startDate: datePickerState.startDate,
-                                endDate: resultEndDate,
-                                isIncome: widget.isIncome,
-                              );
-                            }
+                            transactionCubit.fetchTransactions(
+                              accountId: accountId,
+                              startDate: datePickerState.startDate,
+                              endDate: resultEndDate,
+                              isIncome: widget.isIncome,
+                            );
                           }
                         },
                         child: Container(
-                          color: CustomAppTheme.figmaMainLightColor,
+                          color: Theme.of(
+                            context,
+                          ).primaryColor.withValues(alpha: 0.3),
                           height: 56,
                           child: Row(
                             children: [
@@ -272,7 +268,9 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                           );
                         },
                         child: Container(
-                          color: CustomAppTheme.figmaMainLightColor,
+                          color: Theme.of(
+                            context,
+                          ).primaryColor.withValues(alpha: 0.3),
                           height: 56,
                           child: Row(
                             children: [
@@ -307,7 +305,9 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                       ),
                       // Сумма
                       Container(
-                        color: CustomAppTheme.figmaMainLightColor,
+                        color: Theme.of(
+                          context,
+                        ).primaryColor.withValues(alpha: 0.3),
                         height: 56,
                         child: Row(
                           children: [

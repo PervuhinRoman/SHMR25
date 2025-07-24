@@ -14,7 +14,7 @@ import 'package:shmr_finance/domain/cubit/transactions/datepicker_cubit.dart';
 import 'package:shmr_finance/domain/cubit/transactions/sort_type_cubit.dart';
 import 'in_exp_history_widget.dart';
 import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
-import 'package:shmr_finance/data/services/haptic_service.dart';
+import 'package:shmr_finance/presentation/services/haptic_service.dart';
 
 class InExpWidget extends StatefulWidget {
   final bool isIncome;
@@ -30,15 +30,13 @@ class _InExpWidgetState extends State<InExpWidget> {
     super.initState();
     final transactionCubit = context.read<TransactionCubit>();
     final accountState = context.read<MyAccountCubit>().state;
-    final accountId = accountState.accountId ?? 1;
-    if (accountId != null) {
-      transactionCubit.fetchTransactions(
-        accountId: accountId,
-        startDate: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
-        endDate: DateTime.now().copyWith(hour: 23, minute: 59, second: 59),
-        isIncome: widget.isIncome,
-      );
-    }
+    final accountId = accountState.accountId ?? 730; // TODO: как я так?
+    transactionCubit.fetchTransactions(
+      accountId: accountId,
+      startDate: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
+      endDate: DateTime.now().copyWith(hour: 23, minute: 59, second: 59),
+      isIncome: widget.isIncome,
+    );
     log(
       '🚀 InExpWidget initState вызван для ${widget.isIncome ? "доходов" : "расходов"}',
       name: "InExpWidget",
@@ -57,14 +55,12 @@ class _InExpWidgetState extends State<InExpWidget> {
       final transactionCubit = context.read<TransactionCubit>();
       final accountState = context.read<MyAccountCubit>().state;
       final accountId = accountState.accountId ?? 1;
-      if (accountId != null) {
-        transactionCubit.fetchTransactions(
-          accountId: accountId,
-          startDate: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
-          endDate: DateTime.now().copyWith(hour: 23, minute: 59, second: 59),
-          isIncome: widget.isIncome,
-        );
-      }
+      transactionCubit.fetchTransactions(
+        accountId: accountId,
+        startDate: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
+        endDate: DateTime.now().copyWith(hour: 23, minute: 59, second: 59),
+        isIncome: widget.isIncome,
+      );
     });
   }
 
@@ -134,7 +130,7 @@ class _InExpWidgetState extends State<InExpWidget> {
           return Column(
             children: [
               Container(
-                color: CustomAppTheme.figmaMainLightColor,
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
                 height: 56,
                 child: Row(
                   children: [
