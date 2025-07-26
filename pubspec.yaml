@@ -71,12 +71,15 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
 
   freezed: ^3.0.6
   build_runner: ^2.4.15
   json_serializable: ^6.9.5
   flutter_dotenv: ^5.2.1
   drift_dev: ^2.26.1
+  mocktail: ^1.0.4
 
 
   # The "flutter_lints" package below contains a set of recommended lints to

@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shmr_finance/domain/models/currency/currency.dart';
@@ -22,6 +23,7 @@ class MyAccountCubit extends Cubit<MyAccountState> {
     _loadAccountData();
   }
 
+  @visibleForTesting
   Future<void> _loadAccountData() async {
     try {
       log(
@@ -128,4 +130,10 @@ class MyAccountCubit extends Cubit<MyAccountState> {
       log('❌ Ошибка при сохранении имени счета: $e', name: "Валюта");
     }
   }
+}
+
+// В файле account_cubit.dart добавить в конец:
+@visibleForTesting
+class TestableAccountCubit extends MyAccountCubit {
+  Future<void> exposedLoadAccountData() => _loadAccountData();
 }

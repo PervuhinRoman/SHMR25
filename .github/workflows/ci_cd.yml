@@ -37,8 +37,8 @@ jobs:
       - name: List generated l10n files
         run: ls -lR .dart_tool/flutter_gen/gen_l10n || true
 
-#      - name: Run tests
-#        run: flutter test
+      - name: Run tests
+        run: flutter test
 
       - name: Build APK (debug)
         run: flutter build apk --debug

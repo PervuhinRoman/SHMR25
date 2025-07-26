@@ -14,8 +14,8 @@ class ApiService {
 
   late final Dio _dio;
 
-  ApiService() {
-    _dio = Dio(
+  ApiService({Dio? dio}) {
+    _dio = dio ?? Dio(
       BaseOptions(
         baseUrl: _baseUrl,
         connectTimeout: const Duration(seconds: 10),
