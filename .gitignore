@@ -44,3 +44,11 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Ignore non-CI golden files and failures
+test/**/goldens/**/*.png
+test/**/failures/**/*.png
+!test/**/goldens/ci/*.png
+
+# FVM Version Cache
+.fvm/

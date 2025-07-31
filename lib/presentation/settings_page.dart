@@ -8,7 +8,7 @@ import 'package:shmr_finance/data/services/locale_service.dart';
 import 'package:shmr_finance/presentation/services/app_blur_service.dart';
 import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/presentation/pin_code_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shmr_finance/l10n/app_localizations.dart';
 import 'dart:developer';
 
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
@@ -25,26 +25,24 @@ class SettingsPage extends StatelessWidget {
           title: Text(l10n.language),
           content: Column(
             mainAxisSize: MainAxisSize.min,
-            children:
-                localeService.availableLocales.map((entry) {
-                  final locale = entry.key;
-                  final name = entry.value;
-                  final isSelected =
-                      locale.languageCode ==
-                      localeService.currentLocale.languageCode;
+            children: localeService.availableLocales.map((entry) {
+              final locale = entry.key;
+              final name = entry.value;
+              final isSelected =
+                  locale.languageCode ==
+                  localeService.currentLocale.languageCode;
 
-                  return ListTile(
-                    title: Text(name),
-                    trailing:
-                        isSelected
-                            ? const Icon(Icons.check, color: Colors.green)
-                            : null,
-                    onTap: () async {
-                      await localeService.setLocale(locale);
-                      Navigator.of(dialogContext).pop();
-                    },
-                  );
-                }).toList(),
+              return ListTile(
+                title: Text(name),
+                trailing: isSelected
+                    ? const Icon(Icons.check, color: Colors.green)
+                    : null,
+                onTap: () async {
+                  await localeService.setLocale(locale);
+                  Navigator.of(dialogContext).pop();
+                },
+              );
+            }).toList(),
           ),
           actions: [
             TextButton(
@@ -63,13 +61,7 @@ class SettingsPage extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(title: l10n.settings),
       body: Consumer3<ThemeService, SecurityService, LocaleService>(
-        builder: (
-          context,
-          themeService,
-          securityService,
-          localeService,
-          child,
-        ) {
+        builder: (context, themeService, securityService, localeService, child) {
           return ListView(
             children: [
               ListTile(
@@ -234,8 +226,8 @@ class SettingsPage extends StatelessWidget {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder:
-                              (context) => const PinCodeScreen(isSetup: true),
+                          builder: (context) =>
+                              const PinCodeScreen(isSetup: true),
                         ),
                       );
                       if (result == true) {
@@ -255,8 +247,8 @@ class SettingsPage extends StatelessWidget {
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder:
-                            (context) => const PinCodeScreen(isSetup: true),
+                        builder: (context) =>
+                            const PinCodeScreen(isSetup: true),
                       ),
                     );
                     if (result == true) {
@@ -271,8 +263,8 @@ class SettingsPage extends StatelessWidget {
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder:
-                            (context) => const PinCodeScreen(isSetup: true),
+                        builder: (context) =>
+                            const PinCodeScreen(isSetup: true),
                       ),
                     );
                     if (result == true) {
@@ -321,8 +313,9 @@ class SettingsPage extends StatelessWidget {
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext dialogContext) {
-                                    final dialogL10n =
-                                        AppLocalizations.of(dialogContext)!;
+                                    final dialogL10n = AppLocalizations.of(
+                                      dialogContext,
+                                    )!;
                                     return AlertDialog(
                                       title: Text(
                                         dialogL10n.biometricSetupRequired,
@@ -336,9 +329,8 @@ class SettingsPage extends StatelessWidget {
                                       ),
                                       actions: [
                                         TextButton(
-                                          onPressed:
-                                              () =>
-                                                  Navigator.pop(dialogContext),
+                                          onPressed: () =>
+                                              Navigator.pop(dialogContext),
                                           child: Text(dialogL10n.ok),
                                         ),
                                       ],

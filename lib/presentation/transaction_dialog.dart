@@ -9,7 +9,7 @@ import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
 import 'package:shmr_finance/domain/models/transaction/transaction.dart';
 import 'package:shmr_finance/data/repositories/account_repo_impl.dart';
 import 'package:shmr_finance/domain/models/account/account.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shmr_finance/l10n/app_localizations.dart';
 
 import '../app_theme.dart';
 
@@ -126,10 +126,9 @@ class _TransactionPageState extends State<TransactionPage> {
         if (categoryCubit.state.categories.isEmpty) {
           await categoryCubit.loadCategoriesByType(widget.isIncome);
         }
-        final categories =
-            categoryCubit.state.categories
-                .where((c) => c.isIncome == widget.isIncome)
-                .toList();
+        final categories = categoryCubit.state.categories
+            .where((c) => c.isIncome == widget.isIncome)
+            .toList();
         if (categories.isNotEmpty) {
           setState(() {
             _selectedCategoryInd = categories.first.id;
@@ -387,8 +386,7 @@ class _TransactionPageState extends State<TransactionPage> {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: CustomAppBar(
-        title:
-            widget.isAdd ? l10n.addTransaction : l10n.editTransaction,
+        title: widget.isAdd ? l10n.addTransaction : l10n.editTransaction,
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.check),
@@ -435,9 +433,7 @@ class _TransactionPageState extends State<TransactionPage> {
               ),
               onTap: () async {
                 if (_accountsLoading) return;
-                final selected = await showModalBottomSheet<
-                  Map<String, dynamic>
-                >(
+                final selected = await showModalBottomSheet<Map<String, dynamic>>(
                   context: context,
                   isScrollControlled: true,
                   shape: const RoundedRectangleBorder(
@@ -445,98 +441,85 @@ class _TransactionPageState extends State<TransactionPage> {
                       top: Radius.circular(20),
                     ),
                   ),
-                  builder:
-                      (context) => Padding(
-                        padding: MediaQuery.of(context).viewInsets,
-                        child:
-                            _accountsLoading
-                                ? const Center(
-                                  child: CircularProgressIndicator(),
-                                )
-                                : Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      width: 40,
-                                      height: 4,
-                                      margin: const EdgeInsets.only(
-                                        bottom: 16,
-                                        top: 16,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[300],
-                                        borderRadius: BorderRadius.circular(2),
-                                      ),
-                                    ),
-                                    Text(
-                                      l10n.selectAccount,
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    ListView.builder(
-                                      shrinkWrap: true,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      itemCount: _accounts.length,
-                                      itemBuilder: (context, index) {
-                                        final account = _accounts[index];
-                                        return Column(
+                  builder: (context) => Padding(
+                    padding: MediaQuery.of(context).viewInsets,
+                    child: _accountsLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 4,
+                                margin: const EdgeInsets.only(
+                                  bottom: 16,
+                                  top: 16,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                              Text(
+                                l10n.selectAccount,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: _accounts.length,
+                                itemBuilder: (context, index) {
+                                  final account = _accounts[index];
+                                  return Column(
+                                    children: [
+                                      ListTile(
+                                        title: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
-                                            ListTile(
-                                              title: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(account.name),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                          left: 8.0,
-                                                        ),
-                                                    child: Text(
-                                                      account.currency,
-                                                      style: TextStyle(
-                                                        fontSize: 24,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
+                                            Expanded(child: Text(account.name)),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                left: 8.0,
                                               ),
-                                              trailing:
-                                                  _selectedAccountInd ==
-                                                          account.id
-                                                      ? Icon(
-                                                        Icons.check,
-                                                        color:
-                                                            CustomAppTheme
-                                                                .figmaMainColor,
-                                                      )
-                                                      : null,
-                                              onTap: () {
-                                                log(
-                                                  'Пользователь выбрал счёт: ${account.name}',
-                                                  name: 'TransactionDialog',
-                                                );
-                                                Navigator.of(context).pop({
-                                                  'index': account.id,
-                                                  'name': account.name,
-                                                });
-                                              },
+                                              child: Text(
+                                                account.currency,
+                                                style: TextStyle(fontSize: 24),
+                                              ),
                                             ),
                                           ],
-                                        );
-                                      },
-                                    ),
-                                    const SizedBox(height: 24),
-                                  ],
-                                ),
-                      ),
+                                        ),
+                                        trailing:
+                                            _selectedAccountInd == account.id
+                                            ? Icon(
+                                                Icons.check,
+                                                color: CustomAppTheme
+                                                    .figmaMainColor,
+                                              )
+                                            : null,
+                                        onTap: () {
+                                          log(
+                                            'Пользователь выбрал счёт: ${account.name}',
+                                            name: 'TransactionDialog',
+                                          );
+                                          Navigator.of(context).pop({
+                                            'index': account.id,
+                                            'name': account.name,
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 24),
+                            ],
+                          ),
+                  ),
                 );
                 if (!context.mounted) return;
                 if (selected != null) {
@@ -574,9 +557,7 @@ class _TransactionPageState extends State<TransactionPage> {
                 color: Colors.grey,
               ),
               onTap: () async {
-                final selected = await showModalBottomSheet<
-                  Map<String, dynamic>
-                >(
+                final selected = await showModalBottomSheet<Map<String, dynamic>>(
                   context: context,
                   isScrollControlled: true,
                   shape: const RoundedRectangleBorder(
@@ -584,87 +565,82 @@ class _TransactionPageState extends State<TransactionPage> {
                       top: Radius.circular(20),
                     ),
                   ),
-                  builder:
-                      (context) => BlocBuilder<CategoryCubit, CategoryState>(
-                        builder: (context, state) {
-                          context.read<CategoryCubit>().loadCategoriesByType(
-                            widget.isIncome,
-                          );
-                          return SingleChildScrollView(
-                            child: Padding(
-                              padding: MediaQuery.of(context).viewInsets,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    width: 40,
-                                    height: 4,
-                                    margin: const EdgeInsets.only(
-                                      bottom: 16,
-                                      top: 16,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[300],
-                                      borderRadius: BorderRadius.circular(2),
-                                    ),
-                                  ),
-                                  const Text(
-                                    'Выберите категорию',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemCount: state.categories.length,
-                                    itemBuilder: (context, index) {
-                                      final category = state.categories[index];
-                                      return Column(
-                                        children: [
-                                          ListTile(
-                                            leading: Text(category.emoji),
-                                            title: Text(category.name),
-                                            trailing:
-                                                _selectedCategoryInd == index
-                                                    ? Icon(
-                                                      Icons.check,
-                                                      color:
-                                                          CustomAppTheme
-                                                              .figmaMainColor,
-                                                    )
-                                                    : null,
-                                            onTap: () {
-                                              log(
-                                                'Пользователь выбрал категорию: ${category.name}',
-                                                name: 'TransactionDialog',
-                                              );
-                                              Navigator.of(context).pop({
-                                                'index': index,
-                                                'name': category.name,
-                                              });
-                                            },
-                                          ),
-                                          const Divider(
-                                            height: 1,
-                                            thickness: 1,
-                                            color:
-                                                CustomAppTheme.figmaBgGrayColor,
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                  const SizedBox(height: 32),
-                                ],
+                  builder: (context) => BlocBuilder<CategoryCubit, CategoryState>(
+                    builder: (context, state) {
+                      context.read<CategoryCubit>().loadCategoriesByType(
+                        widget.isIncome,
+                      );
+                      return SingleChildScrollView(
+                        child: Padding(
+                          padding: MediaQuery.of(context).viewInsets,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 4,
+                                margin: const EdgeInsets.only(
+                                  bottom: 16,
+                                  top: 16,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
+                              const Text(
+                                'Выберите категорию',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: state.categories.length,
+                                itemBuilder: (context, index) {
+                                  final category = state.categories[index];
+                                  return Column(
+                                    children: [
+                                      ListTile(
+                                        leading: Text(category.emoji),
+                                        title: Text(category.name),
+                                        trailing: _selectedCategoryInd == index
+                                            ? Icon(
+                                                Icons.check,
+                                                color: CustomAppTheme
+                                                    .figmaMainColor,
+                                              )
+                                            : null,
+                                        onTap: () {
+                                          log(
+                                            'Пользователь выбрал категорию: ${category.name}',
+                                            name: 'TransactionDialog',
+                                          );
+                                          Navigator.of(context).pop({
+                                            'index': index,
+                                            'name': category.name,
+                                          });
+                                        },
+                                      ),
+                                      const Divider(
+                                        height: 1,
+                                        thickness: 1,
+                                        color: CustomAppTheme.figmaBgGrayColor,
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 32),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 );
                 if (selected != null) {
                   setState(() {

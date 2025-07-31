@@ -4,7 +4,7 @@ import 'package:shmr_finance/app_theme.dart';
 import 'package:shmr_finance/domain/cubit/categories/category_cubit.dart';
 import 'package:shmr_finance/presentation/widgets/item_category.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shmr_finance/l10n/app_localizations.dart';
 
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
@@ -59,16 +59,15 @@ class _CategoriesPageState extends State<CategoriesPage> {
                   },
                   decoration: InputDecoration(
                     hintText: l10n.findArticle,
-                    suffixIcon:
-                        _searchController.text.isNotEmpty
-                            ? IconButton(
-                              icon: const Icon(Icons.clear, color: Colors.grey),
-                              onPressed: () {
-                                _searchController.clear();
-                                context.read<CategoryCubit>().clearSearch();
-                              },
-                            )
-                            : const Icon(Icons.search, color: Colors.grey),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, color: Colors.grey),
+                            onPressed: () {
+                              _searchController.clear();
+                              context.read<CategoryCubit>().clearSearch();
+                            },
+                          )
+                        : const Icon(Icons.search, color: Colors.grey),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -84,47 +83,46 @@ class _CategoriesPageState extends State<CategoriesPage> {
                 color: CustomAppTheme.figmaBgGrayColor,
               ),
               Expanded(
-                child:
-                    state.filteredCategories.isEmpty
-                        ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.search_off,
-                                size: 64,
+                child: state.filteredCategories.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.search_off,
+                              size: 64,
+                              color: Colors.grey,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              l10n.articleNotFound,
+                              style: const TextStyle(
+                                fontSize: 18,
                                 color: Colors.grey,
                               ),
-                              const SizedBox(height: 16),
-                              Text(
-                                l10n.articleNotFound,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey,
-                                ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: state.filteredCategories.length,
+                        itemBuilder: (context, index) {
+                          final category = state.filteredCategories[index];
+                          return Column(
+                            children: [
+                              ItemCategory(
+                                icon: category.emoji,
+                                categoryTitle: category.name,
+                              ),
+                              const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: CustomAppTheme.figmaBgGrayColor,
                               ),
                             ],
-                          ),
-                        )
-                        : ListView.builder(
-                          itemCount: state.filteredCategories.length,
-                          itemBuilder: (context, index) {
-                            final category = state.filteredCategories[index];
-                            return Column(
-                              children: [
-                                ItemCategory(
-                                  icon: category.emoji,
-                                  categoryTitle: category.name,
-                                ),
-                                const Divider(
-                                  height: 1,
-                                  thickness: 1,
-                                  color: CustomAppTheme.figmaBgGrayColor,
-                                ),
-                              ],
-                            );
-                          },
-                        ),
+                          );
+                        },
+                      ),
               ),
             ],
           );

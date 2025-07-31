@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:shmr_finance/domain/cubit/transactions/transaction_cubit.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shmr_finance/l10n/app_localizations.dart';
 import 'package:shmr_finance/presentation/transaction_dialog.dart';
 
 import 'package:shmr_finance/app_theme.dart';
@@ -154,10 +154,9 @@ class _InExpWidgetState extends State<InExpWidget> {
               ),
               if (state.dataSource != null)
                 Container(
-                  color:
-                      state.dataSource == DataSource.cache
-                          ? Colors.orange.withValues(alpha: 0.1)
-                          : Colors.green.withValues(alpha: 0.1),
+                  color: state.dataSource == DataSource.cache
+                      ? Colors.orange.withValues(alpha: 0.1)
+                      : Colors.green.withValues(alpha: 0.1),
                   padding: const EdgeInsets.symmetric(
                     vertical: 8,
                     horizontal: 16,
@@ -169,10 +168,9 @@ class _InExpWidgetState extends State<InExpWidget> {
                             ? Icons.storage
                             : Icons.cloud_download,
                         size: 16,
-                        color:
-                            state.dataSource == DataSource.cache
-                                ? Colors.orange
-                                : Colors.green,
+                        color: state.dataSource == DataSource.cache
+                            ? Colors.orange
+                            : Colors.green,
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -181,10 +179,9 @@ class _InExpWidgetState extends State<InExpWidget> {
                             : l10n.dataFromNetwork,
                         style: TextStyle(
                           fontSize: 12,
-                          color:
-                              state.dataSource == DataSource.cache
-                                  ? Colors.orange
-                                  : Colors.green,
+                          color: state.dataSource == DataSource.cache
+                              ? Colors.orange
+                              : Colors.green,
                         ),
                       ),
                     ],
@@ -241,29 +238,25 @@ class _InExpWidgetState extends State<InExpWidget> {
                               HapticService().lightImpact();
                               showGeneralDialog(
                                 context: context,
-                                pageBuilder: (
-                                  context,
-                                  animation,
-                                  secondaryAnimation,
-                                ) {
-                                  return BlocProvider(
-                                    create: (context) => TransactionCubit(),
-                                    child: TransactionPage(
-                                      isAdd: false,
-                                      isIncome: widget.isIncome,
-                                      accountName: item.account.name,
-                                      categoryName: item.category.name,
-                                      categoryEmoji: item.category.emoji,
-                                      categoryIndex:
-                                          item
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) {
+                                      return BlocProvider(
+                                        create: (context) => TransactionCubit(),
+                                        child: TransactionPage(
+                                          isAdd: false,
+                                          isIncome: widget.isIncome,
+                                          accountName: item.account.name,
+                                          categoryName: item.category.name,
+                                          categoryEmoji: item.category.emoji,
+                                          categoryIndex: item
                                               .category
                                               .id, // Предполагаем, что id используется как индекс
-                                      amount: double.tryParse(item.amount),
-                                      dateTime: item.transactionDate,
-                                      title: item.comment,
-                                    ),
-                                  );
-                                },
+                                          amount: double.tryParse(item.amount),
+                                          dateTime: item.transactionDate,
+                                          title: item.comment,
+                                        ),
+                                      );
+                                    },
                               );
                             },
                           );

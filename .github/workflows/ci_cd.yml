@@ -20,7 +20,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2.20.0
         with:
-          flutter-version: '3.29.2'
+          flutter-version: '3.32.0'
 
       - name: Cache Flutter dependencies
         uses: actions/cache@v3
@@ -37,8 +37,10 @@ jobs:
       - name: List generated l10n files
         run: ls -lR .dart_tool/flutter_gen/gen_l10n || true
 
-#      - name: Run tests
-#        run: flutter test
+      - name: Generate goldens
+        run: flutter test --update-goldens --tags=golden
+      - name: Run tests
+        run: flutter test
 
       - name: Build APK (debug)
         run: flutter build apk --debug

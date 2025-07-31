@@ -64,14 +64,12 @@ _AccountResponse _$AccountResponseFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String,
       balance: json['balance'] as String,
       currency: json['currency'] as String,
-      incomeStats:
-          (json['incomeStats'] as List<dynamic>)
-              .map((e) => StatItem.fromJson(e as Map<String, dynamic>))
-              .toList(),
-      expenseStats:
-          (json['expenseStats'] as List<dynamic>)
-              .map((e) => StatItem.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      incomeStats: (json['incomeStats'] as List<dynamic>)
+          .map((e) => StatItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      expenseStats: (json['expenseStats'] as List<dynamic>)
+          .map((e) => StatItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
@@ -109,12 +107,11 @@ _AccountHistory _$AccountHistoryFromJson(Map<String, dynamic> json) =>
       id: (json['id'] as num).toInt(),
       accountId: (json['accountId'] as num).toInt(),
       changeType: json['changeType'] as String,
-      previousState:
-          json['previousState'] == null
-              ? null
-              : AccountState.fromJson(
-                json['previousState'] as Map<String, dynamic>,
-              ),
+      previousState: json['previousState'] == null
+          ? null
+          : AccountState.fromJson(
+              json['previousState'] as Map<String, dynamic>,
+            ),
       newState: AccountState.fromJson(json['newState'] as Map<String, dynamic>),
       changeTimestamp: DateTime.parse(json['changeTimestamp'] as String),
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -138,10 +135,9 @@ _AccountHistoryResponse _$AccountHistoryResponseFromJson(
   accountName: json['accountName'] as String,
   currency: json['currency'] as String,
   currentBalance: json['currentBalance'] as String,
-  history:
-      (json['history'] as List<dynamic>)
-          .map((e) => AccountHistory.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  history: (json['history'] as List<dynamic>)
+      .map((e) => AccountHistory.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$AccountHistoryResponseToJson(
