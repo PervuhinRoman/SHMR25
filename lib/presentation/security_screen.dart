@@ -3,7 +3,7 @@ import 'package:shmr_finance/presentation/services/security_service.dart';
 import 'package:shmr_finance/presentation/services/haptic_service.dart';
 import 'package:shmr_finance/presentation/pin_code_screen.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shmr_finance/l10n/app_localizations.dart';
 
 class SecurityScreen extends StatefulWidget {
   final VoidCallback onAuthenticated;
@@ -63,8 +63,8 @@ class _SecurityScreenState extends State<SecurityScreen> {
         return;
       }
 
-      final isAuthenticated =
-          await SecurityService().authenticateWithBiometrics();
+      final isAuthenticated = await SecurityService()
+          .authenticateWithBiometrics();
 
       if (isAuthenticated) {
         widget.onAuthenticated();
@@ -98,15 +98,14 @@ class _SecurityScreenState extends State<SecurityScreen> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder:
-            (context) => PinCodeScreen(
-              isSetup: false,
-              onBackToAuthOptions: () {
-                setState(() {
-                  _showAuthOptions = true;
-                });
-              },
-            ),
+        builder: (context) => PinCodeScreen(
+          isSetup: false,
+          onBackToAuthOptions: () {
+            setState(() {
+              _showAuthOptions = true;
+            });
+          },
+        ),
       ),
     );
 

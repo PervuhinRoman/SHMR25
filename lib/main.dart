@@ -16,7 +16,7 @@ import 'package:shmr_finance/presentation/settings_page.dart';
 import 'package:shmr_finance/presentation/security_screen.dart';
 import 'package:shmr_finance/presentation/widgets/app_blur_wrapper.dart';
 import 'package:shmr_finance/app_theme.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shmr_finance/l10n/app_localizations.dart';
 import 'package:shmr_finance/presentation/services/theme_service.dart';
 import 'package:shmr_finance/presentation/services/haptic_service.dart';
 import 'package:shmr_finance/presentation/services/security_service.dart';
@@ -129,8 +129,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _checkAuthentication() async {
-    final shouldShowSecurity =
-        await SecurityService().shouldShowSecurityScreen();
+    final shouldShowSecurity = await SecurityService()
+        .shouldShowSecurityScreen();
     if (!shouldShowSecurity) {
       setState(() {
         _isAuthenticated = true;
@@ -165,10 +165,9 @@ class _MyAppState extends State<MyApp> {
                 themeMode: themeService.getThemeMode(),
                 theme: themeService.getLightTheme(),
                 darkTheme: themeService.getDarkTheme(),
-                home:
-                    _isAuthenticated
-                        ? AppBlurWrapper(child: const BaseScreen())
-                        : SecurityScreen(onAuthenticated: _onAuthenticated),
+                home: _isAuthenticated
+                    ? AppBlurWrapper(child: const BaseScreen())
+                    : SecurityScreen(onAuthenticated: _onAuthenticated),
               );
             },
           ),
@@ -225,14 +224,13 @@ class _BaseScreenState extends State<BaseScreen> {
           ),
         ],
       ),
-      body:
-          [
-            InExpWidget(isIncome: false),
-            InExpWidget(isIncome: true),
-            AccountPage(),
-            CategoriesPage(),
-            SettingsPage(),
-          ][currentPageIndex],
+      body: [
+        InExpWidget(isIncome: false),
+        InExpWidget(isIncome: true),
+        AccountPage(),
+        CategoriesPage(),
+        SettingsPage(),
+      ][currentPageIndex],
     );
   }
 }

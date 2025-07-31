@@ -10,7 +10,7 @@ import 'package:shmr_finance/presentation/analyze_page.dart';
 import 'package:shmr_finance/presentation/transaction_dialog.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_inexp.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shmr_finance/l10n/app_localizations.dart';
 
 class InExpHistoryWidget extends StatefulWidget {
   final bool isIncome;
@@ -121,8 +121,9 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                               );
                           if (resultStartDate != null) {
                             datePickerCubit.setStartDate(resultStartDate);
-                            final accountState =
-                                context.read<MyAccountCubit>().state;
+                            final accountState = context
+                                .read<MyAccountCubit>()
+                                .state;
                             final accountId = accountState.accountId ?? 1;
                             transactionCubit.fetchTransactions(
                               accountId: accountId,
@@ -154,8 +155,8 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                                   child: Text(
                                     datePickerState.startDate != null
                                         ? DateFormat(
-                                          'dd.MM.yyyy',
-                                        ).format(datePickerState.startDate!)
+                                            'dd.MM.yyyy',
+                                          ).format(datePickerState.startDate!)
                                         : l10n.selectDate,
                                     textAlign: TextAlign.end,
                                   ),
@@ -185,8 +186,9 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                           );
                           if (resultEndDate != null) {
                             datePickerCubit.setEndDate(resultEndDate);
-                            final accountState =
-                                context.read<MyAccountCubit>().state;
+                            final accountState = context
+                                .read<MyAccountCubit>()
+                                .state;
                             final accountId = accountState.accountId ?? 1;
                             transactionCubit.fetchTransactions(
                               accountId: accountId,
@@ -218,8 +220,8 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                                   child: Text(
                                     datePickerState.endDate != null
                                         ? DateFormat(
-                                          'dd.MM.yyyy',
-                                        ).format(datePickerState.endDate!)
+                                            'dd.MM.yyyy',
+                                          ).format(datePickerState.endDate!)
                                         : l10n.selectDate,
                                     textAlign: TextAlign.end,
                                   ),
@@ -238,34 +240,31 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                         onTap: () async {
                           await showModalBottomSheet(
                             context: context,
-                            builder:
-                                (ctx) => Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ListTile(
-                                      title: Text(l10n.sortByDate),
-                                      trailing: const Icon(Icons.date_range),
-                                      onTap: () {
-                                        sortTypeCubit.changeSortType(
-                                          SortType.date,
-                                        );
-                                        transactionCubit.sort(SortType.date);
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                    ListTile(
-                                      title: Text(l10n.sortByAmount),
-                                      trailing: const Icon(Icons.attach_money),
-                                      onTap: () {
-                                        sortTypeCubit.changeSortType(
-                                          SortType.amount,
-                                        );
-                                        transactionCubit.sort(SortType.amount);
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ],
+                            builder: (ctx) => Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ListTile(
+                                  title: Text(l10n.sortByDate),
+                                  trailing: const Icon(Icons.date_range),
+                                  onTap: () {
+                                    sortTypeCubit.changeSortType(SortType.date);
+                                    transactionCubit.sort(SortType.date);
+                                    Navigator.pop(context);
+                                  },
                                 ),
+                                ListTile(
+                                  title: Text(l10n.sortByAmount),
+                                  trailing: const Icon(Icons.attach_money),
+                                  onTap: () {
+                                    sortTypeCubit.changeSortType(
+                                      SortType.amount,
+                                    );
+                                    transactionCubit.sort(SortType.amount);
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            ),
                           );
                         },
                         child: Container(
@@ -336,10 +335,9 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                       // Индикатор источника данных
                       if (transactionState.dataSource != null)
                         Container(
-                          color:
-                              transactionState.dataSource == DataSource.cache
-                                  ? Colors.orange.withValues(alpha: 0.1)
-                                  : Colors.green.withValues(alpha: 0.1),
+                          color: transactionState.dataSource == DataSource.cache
+                              ? Colors.orange.withValues(alpha: 0.1)
+                              : Colors.green.withValues(alpha: 0.1),
                           padding: const EdgeInsets.symmetric(
                             vertical: 8,
                             horizontal: 16,
@@ -353,9 +351,9 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                                 size: 16,
                                 color:
                                     transactionState.dataSource ==
-                                            DataSource.cache
-                                        ? Colors.orange
-                                        : Colors.green,
+                                        DataSource.cache
+                                    ? Colors.orange
+                                    : Colors.green,
                               ),
                               const SizedBox(width: 8),
                               Text(
@@ -366,9 +364,9 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                                   fontSize: 12,
                                   color:
                                       transactionState.dataSource ==
-                                              DataSource.cache
-                                          ? Colors.orange
-                                          : Colors.green,
+                                          DataSource.cache
+                                      ? Colors.orange
+                                      : Colors.green,
                                 ),
                               ),
                             ],
@@ -418,33 +416,36 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
                                     onTap: () {
                                       showGeneralDialog(
                                         context: context,
-                                        pageBuilder: (
-                                          context,
-                                          animation,
-                                          secondaryAnimation,
-                                        ) {
-                                          return BlocProvider(
-                                            create:
-                                                (context) => TransactionCubit(),
-                                            child: TransactionPage(
-                                              isAdd: false,
-                                              isIncome: widget.isIncome,
-                                              accountName: item.account.name,
-                                              categoryName: item.category.name,
-                                              categoryEmoji:
-                                                  item.category.emoji,
-                                              categoryIndex:
-                                                  item
+                                        pageBuilder:
+                                            (
+                                              context,
+                                              animation,
+                                              secondaryAnimation,
+                                            ) {
+                                              return BlocProvider(
+                                                create: (context) =>
+                                                    TransactionCubit(),
+                                                child: TransactionPage(
+                                                  isAdd: false,
+                                                  isIncome: widget.isIncome,
+                                                  accountName:
+                                                      item.account.name,
+                                                  categoryName:
+                                                      item.category.name,
+                                                  categoryEmoji:
+                                                      item.category.emoji,
+                                                  categoryIndex: item
                                                       .category
                                                       .id, // Предполагаем, что id используется как индекс
-                                              amount: double.tryParse(
-                                                item.amount,
-                                              ),
-                                              dateTime: item.transactionDate,
-                                              title: item.comment,
-                                            ),
-                                          );
-                                        },
+                                                  amount: double.tryParse(
+                                                    item.amount,
+                                                  ),
+                                                  dateTime:
+                                                      item.transactionDate,
+                                                  title: item.comment,
+                                                ),
+                                              );
+                                            },
                                       );
                                     },
                                   );
@@ -465,19 +466,15 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
       floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
         child: Icon(Icons.add),
-        onPressed:
-            () => showGeneralDialog(
-              context: context,
-              pageBuilder: (context, animation, secondaryAnimation) {
-                return BlocProvider(
-                  create: (context) => TransactionCubit(),
-                  child: TransactionPage(
-                    isAdd: true,
-                    isIncome: widget.isIncome,
-                  ),
-                );
-              },
-            ),
+        onPressed: () => showGeneralDialog(
+          context: context,
+          pageBuilder: (context, animation, secondaryAnimation) {
+            return BlocProvider(
+              create: (context) => TransactionCubit(),
+              child: TransactionPage(isAdd: true, isIncome: widget.isIncome),
+            );
+          },
+        ),
       ),
     );
   }

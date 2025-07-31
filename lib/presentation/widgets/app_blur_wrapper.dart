@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:shmr_finance/presentation/services/app_blur_service.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shmr_finance/l10n/app_localizations.dart';
 
 class AppBlurWrapper extends StatefulWidget {
   final Widget child;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shmr_finance/presentation/services/security_service.dart';
 import 'package:shmr_finance/presentation/services/haptic_service.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shmr_finance/l10n/app_localizations.dart';
 
 class PinCodeScreen extends StatefulWidget {
   final bool isSetup; // true - установка PIN, false - ввод PIN
@@ -34,30 +34,29 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar:
-          widget.isSetup
-              ? AppBar(
-                title: Text(l10n.pinCodeSetup),
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    HapticService().lightImpact();
-                    widget.onCancel?.call();
-                    Navigator.of(context).pop();
-                  },
-                ),
-              )
-              : AppBar(
-                title: Text(l10n.enterPinCode),
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    HapticService().lightImpact();
-                    widget.onBackToAuthOptions?.call();
-                    Navigator.of(context).pop();
-                  },
-                ),
+      appBar: widget.isSetup
+          ? AppBar(
+              title: Text(l10n.pinCodeSetup),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  HapticService().lightImpact();
+                  widget.onCancel?.call();
+                  Navigator.of(context).pop();
+                },
               ),
+            )
+          : AppBar(
+              title: Text(l10n.enterPinCode),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  HapticService().lightImpact();
+                  widget.onBackToAuthOptions?.call();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
       body: SafeArea(
         child: Column(
           children: [
@@ -105,12 +104,11 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
           height: 20,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color:
-                _isError
-                    ? Colors.red
-                    : isFilled
-                    ? Theme.of(context).primaryColor
-                    : Colors.grey.withValues(alpha: 0.3),
+            color: _isError
+                ? Colors.red
+                : isFilled
+                ? Theme.of(context).primaryColor
+                : Colors.grey.withValues(alpha: 0.3),
           ),
         );
       }),
@@ -172,10 +170,9 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
           child: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color:
-                  onPressed != null
-                      ? Colors.grey.withValues(alpha: 0.1)
-                      : Colors.transparent,
+              color: onPressed != null
+                  ? Colors.grey.withValues(alpha: 0.1)
+                  : Colors.transparent,
             ),
             child: Center(
               child: Text(
@@ -183,10 +180,9 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
                 style: TextStyle(
                   fontSize: text == '⌫' ? 20 : 24,
                   fontWeight: FontWeight.w500,
-                  color:
-                      onPressed != null
-                          ? Theme.of(context).primaryColor
-                          : Colors.grey,
+                  color: onPressed != null
+                      ? Theme.of(context).primaryColor
+                      : Colors.grey,
                 ),
               ),
             ),

@@ -195,45 +195,38 @@ class $TransactionResponseDBTable extends TransactionResponseDB
   }) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TransactionResponseDBData(
-      id:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.int,
-            data['${effectivePrefix}id'],
-          )!,
-      accountId:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.int,
-            data['${effectivePrefix}account_id'],
-          )!,
-      categoryId:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.int,
-            data['${effectivePrefix}category_id'],
-          )!,
-      amount:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}amount'],
-          )!,
-      transactionDate:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}transaction_date'],
-          )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      accountId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}account_id'],
+      )!,
+      categoryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}category_id'],
+      )!,
+      amount: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}amount'],
+      )!,
+      transactionDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}transaction_date'],
+      )!,
       comment: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}comment'],
       ),
-      createdAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}created_at'],
-          )!,
-      updatedAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}updated_at'],
-          )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
     );
   }
 
@@ -286,10 +279,9 @@ class TransactionResponseDBData extends DataClass
       categoryId: Value(categoryId),
       amount: Value(amount),
       transactionDate: Value(transactionDate),
-      comment:
-          comment == null && nullToAbsent
-              ? const Value.absent()
-              : Value(comment),
+      comment: comment == null && nullToAbsent
+          ? const Value.absent()
+          : Value(comment),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -351,13 +343,13 @@ class TransactionResponseDBData extends DataClass
     return TransactionResponseDBData(
       id: data.id.present ? data.id.value : this.id,
       accountId: data.accountId.present ? data.accountId.value : this.accountId,
-      categoryId:
-          data.categoryId.present ? data.categoryId.value : this.categoryId,
+      categoryId: data.categoryId.present
+          ? data.categoryId.value
+          : this.categoryId,
       amount: data.amount.present ? data.amount.value : this.amount,
-      transactionDate:
-          data.transactionDate.present
-              ? data.transactionDate.value
-              : this.transactionDate,
+      transactionDate: data.transactionDate.present
+          ? data.transactionDate.value
+          : this.transactionDate,
       comment: data.comment.present ? data.comment.value : this.comment,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -629,26 +621,22 @@ class $AccountBriefDBTable extends AccountBriefDB
   AccountBriefDBData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return AccountBriefDBData(
-      id:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.int,
-            data['${effectivePrefix}id'],
-          )!,
-      name:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}name'],
-          )!,
-      balance:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}balance'],
-          )!,
-      currency:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}currency'],
-          )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      balance: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}balance'],
+      )!,
+      currency: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}currency'],
+      )!,
     );
   }
 
@@ -933,26 +921,22 @@ class $CategoryDBTable extends CategoryDB
   CategoryDBData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return CategoryDBData(
-      id:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.int,
-            data['${effectivePrefix}id'],
-          )!,
-      name:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}name'],
-          )!,
-      emoji:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}emoji'],
-          )!,
-      isIncome:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.bool,
-            data['${effectivePrefix}is_income'],
-          )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      emoji: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}emoji'],
+      )!,
+      isIncome: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_income'],
+      )!,
     );
   }
 
@@ -1258,30 +1242,26 @@ class $TransactionDiffDBTable extends TransactionDiffDB
   TransactionDiffDBData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TransactionDiffDBData(
-      id:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.int,
-            data['${effectivePrefix}id'],
-          )!,
-      operation:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}operation'],
-          )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      operation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}operation'],
+      )!,
       transactionJson: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}transaction_json'],
       ),
-      timestamp:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}timestamp'],
-          )!,
-      syncStatus:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}sync_status'],
-          )!,
+      timestamp: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}timestamp'],
+      )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_status'],
+      )!,
     );
   }
 
@@ -1322,10 +1302,9 @@ class TransactionDiffDBData extends DataClass
     return TransactionDiffDBCompanion(
       id: Value(id),
       operation: Value(operation),
-      transactionJson:
-          transactionJson == null && nullToAbsent
-              ? const Value.absent()
-              : Value(transactionJson),
+      transactionJson: transactionJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(transactionJson),
       timestamp: Value(timestamp),
       syncStatus: Value(syncStatus),
     );
@@ -1365,8 +1344,9 @@ class TransactionDiffDBData extends DataClass
   }) => TransactionDiffDBData(
     id: id ?? this.id,
     operation: operation ?? this.operation,
-    transactionJson:
-        transactionJson.present ? transactionJson.value : this.transactionJson,
+    transactionJson: transactionJson.present
+        ? transactionJson.value
+        : this.transactionJson,
     timestamp: timestamp ?? this.timestamp,
     syncStatus: syncStatus ?? this.syncStatus,
   );
@@ -1374,13 +1354,13 @@ class TransactionDiffDBData extends DataClass
     return TransactionDiffDBData(
       id: data.id.present ? data.id.value : this.id,
       operation: data.operation.present ? data.operation.value : this.operation,
-      transactionJson:
-          data.transactionJson.present
-              ? data.transactionJson.value
-              : this.transactionJson,
+      transactionJson: data.transactionJson.present
+          ? data.transactionJson.value
+          : this.transactionJson,
       timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
-      syncStatus:
-          data.syncStatus.present ? data.syncStatus.value : this.syncStatus,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
     );
   }
 
@@ -1709,18 +1689,18 @@ class $$TransactionResponseDBTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer:
-              () => $$TransactionResponseDBTableFilterComposer(
+          createFilteringComposer: () =>
+              $$TransactionResponseDBTableFilterComposer(
                 $db: db,
                 $table: table,
               ),
-          createOrderingComposer:
-              () => $$TransactionResponseDBTableOrderingComposer(
+          createOrderingComposer: () =>
+              $$TransactionResponseDBTableOrderingComposer(
                 $db: db,
                 $table: table,
               ),
-          createComputedFieldComposer:
-              () => $$TransactionResponseDBTableAnnotationComposer(
+          createComputedFieldComposer: () =>
+              $$TransactionResponseDBTableAnnotationComposer(
                 $db: db,
                 $table: table,
               ),
@@ -1764,16 +1744,9 @@ class $$TransactionResponseDBTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),
-          withReferenceMapper:
-              (p0) =>
-                  p0
-                      .map(
-                        (e) => (
-                          e.readTable(table),
-                          BaseReferences(db, table, e),
-                        ),
-                      )
-                      .toList(),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -1926,16 +1899,12 @@ class $$AccountBriefDBTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer:
-              () => $$AccountBriefDBTableFilterComposer($db: db, $table: table),
-          createOrderingComposer:
-              () =>
-                  $$AccountBriefDBTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer:
-              () => $$AccountBriefDBTableAnnotationComposer(
-                $db: db,
-                $table: table,
-              ),
+          createFilteringComposer: () =>
+              $$AccountBriefDBTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AccountBriefDBTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AccountBriefDBTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
@@ -1960,16 +1929,9 @@ class $$AccountBriefDBTableTableManager
                 balance: balance,
                 currency: currency,
               ),
-          withReferenceMapper:
-              (p0) =>
-                  p0
-                      .map(
-                        (e) => (
-                          e.readTable(table),
-                          BaseReferences(db, table, e),
-                        ),
-                      )
-                      .toList(),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -2112,12 +2074,12 @@ class $$CategoryDBTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer:
-              () => $$CategoryDBTableFilterComposer($db: db, $table: table),
-          createOrderingComposer:
-              () => $$CategoryDBTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer:
-              () => $$CategoryDBTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$CategoryDBTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CategoryDBTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CategoryDBTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
@@ -2142,16 +2104,9 @@ class $$CategoryDBTableTableManager
                 emoji: emoji,
                 isIncome: isIncome,
               ),
-          withReferenceMapper:
-              (p0) =>
-                  p0
-                      .map(
-                        (e) => (
-                          e.readTable(table),
-                          BaseReferences(db, table, e),
-                        ),
-                      )
-                      .toList(),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -2319,18 +2274,12 @@ class $$TransactionDiffDBTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer:
-              () => $$TransactionDiffDBTableFilterComposer(
-                $db: db,
-                $table: table,
-              ),
-          createOrderingComposer:
-              () => $$TransactionDiffDBTableOrderingComposer(
-                $db: db,
-                $table: table,
-              ),
-          createComputedFieldComposer:
-              () => $$TransactionDiffDBTableAnnotationComposer(
+          createFilteringComposer: () =>
+              $$TransactionDiffDBTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TransactionDiffDBTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TransactionDiffDBTableAnnotationComposer(
                 $db: db,
                 $table: table,
               ),
@@ -2362,16 +2311,9 @@ class $$TransactionDiffDBTableTableManager
                 timestamp: timestamp,
                 syncStatus: syncStatus,
               ),
-          withReferenceMapper:
-              (p0) =>
-                  p0
-                      .map(
-                        (e) => (
-                          e.readTable(table),
-                          BaseReferences(db, table, e),
-                        ),
-                      )
-                      .toList(),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
         ),
       );

@@ -14,7 +14,7 @@ import 'package:shmr_finance/presentation/edit_account_page.dart';
 import 'package:shmr_finance/presentation/widgets/animated_balance_tile.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:bar_chart_widget/bar_chart_widget.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shmr_finance/l10n/app_localizations.dart';
 
 import '../domain/models/transaction/transaction.dart';
 import 'services/balance_visibility_service.dart';
@@ -81,19 +81,18 @@ class _AccountPageState extends State<AccountPage> {
       final accounts = await _accountRepo.getAllAccounts();
       setState(() {
         _accounts = accounts;
-        _accountData =
-            accounts.isNotEmpty
-                ? AccountResponse(
-                  id: accounts.first.id,
-                  name: accounts.first.name,
-                  balance: accounts.first.balance,
-                  currency: accounts.first.currency,
-                  incomeStats: [],
-                  expenseStats: [],
-                  createdAt: accounts.first.createdAt,
-                  updatedAt: accounts.first.updatedAt,
-                )
-                : null;
+        _accountData = accounts.isNotEmpty
+            ? AccountResponse(
+                id: accounts.first.id,
+                name: accounts.first.name,
+                balance: accounts.first.balance,
+                currency: accounts.first.currency,
+                incomeStats: [],
+                expenseStats: [],
+                createdAt: accounts.first.createdAt,
+                updatedAt: accounts.first.updatedAt,
+              )
+            : null;
         _isLoading = false;
       });
     } catch (e) {
@@ -154,15 +153,14 @@ class _AccountPageState extends State<AccountPage> {
                       ),
                       title: Text(currency.name),
                       subtitle: Text('${currency.code} ${currency.symbol}'),
-                      trailing:
-                          isSelected
-                              ? Icon(
-                                Icons.check,
-                                color: Theme.of(
-                                  context,
-                                ).primaryColor.withValues(alpha: 0.3),
-                              )
-                              : null,
+                      trailing: isSelected
+                          ? Icon(
+                              Icons.check,
+                              color: Theme.of(
+                                context,
+                              ).primaryColor.withValues(alpha: 0.3),
+                            )
+                          : null,
                       onTap: () {
                         context.read<MyAccountCubit>().setCurrency(currency);
                         Navigator.pop(context);
@@ -203,14 +201,13 @@ class _AccountPageState extends State<AccountPage> {
               ),
             ],
           ),
-          body:
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _error != null
-                  ? Center(child: Text('${l10n.error}: $_error'))
-                  : _accountData == null
-                  ? Center(child: Text(l10n.noAccounts))
-                  : _buildAccountContent(),
+          body: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _error != null
+              ? Center(child: Text('${l10n.error}: $_error'))
+              : _accountData == null
+              ? Center(child: Text(l10n.noAccounts))
+              : _buildAccountContent(),
         );
       },
     );
@@ -300,38 +297,35 @@ class _AccountPageState extends State<AccountPage> {
           // График
           SizedBox(
             height: 300,
-            child:
-                _isChartLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : _chartData.isEmpty
-                    ? Center(
-                      child: Text(
-                        l10n.noDataToDisplay,
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
-                      ),
-                    )
-                    : BarChartWidget(
-                      bars: _chartData,
-                      config: BarChartConfig(
-                        height: 250,
-                        barWidth: 8,
-                        positiveColor: CustomAppTheme.figmaMainColor,
-                        negativeColor: CustomAppTheme.figmaRedColor,
-                        textColor: CustomAppTheme.figmaDarkGrayColor,
-                        gridColor: CustomAppTheme.figmaBgGrayColor,
-                        labelFontSize: 8,
-                        enableTooltips: true,
-                        numberFormat: '#,##0',
-                        showGrid: false,
-                        onBoard: 1000.0, // Базовая линия на уровне 1000 рублей
-                      ),
-                      onBarTap: (bar) {
-                        // Обработка нажатия на столбец
-                        log(
-                          'Нажат столбец: ${bar.formattedDate} - ${bar.value}',
-                        );
-                      },
+            child: _isChartLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _chartData.isEmpty
+                ? Center(
+                    child: Text(
+                      l10n.noDataToDisplay,
+                      style: TextStyle(color: Colors.grey, fontSize: 16),
                     ),
+                  )
+                : BarChartWidget(
+                    bars: _chartData,
+                    config: BarChartConfig(
+                      height: 250,
+                      barWidth: 8,
+                      positiveColor: CustomAppTheme.figmaMainColor,
+                      negativeColor: CustomAppTheme.figmaRedColor,
+                      textColor: CustomAppTheme.figmaDarkGrayColor,
+                      gridColor: CustomAppTheme.figmaBgGrayColor,
+                      labelFontSize: 8,
+                      enableTooltips: true,
+                      numberFormat: '#,##0',
+                      showGrid: false,
+                      onBoard: 1000.0, // Базовая линия на уровне 1000 рублей
+                    ),
+                    onBarTap: (bar) {
+                      // Обработка нажатия на столбец
+                      log('Нажат столбец: ${bar.formattedDate} - ${bar.value}');
+                    },
+                  ),
           ),
         ],
       ),
@@ -349,8 +343,9 @@ class _AccountPageState extends State<AccountPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color:
-              isSelected ? Theme.of(context).primaryColor : Colors.transparent,
+          color: isSelected
+              ? Theme.of(context).primaryColor
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
@@ -359,8 +354,9 @@ class _AccountPageState extends State<AccountPage> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color:
-                isSelected ? Colors.white : CustomAppTheme.figmaDarkGrayColor,
+            color: isSelected
+                ? Colors.white
+                : CustomAppTheme.figmaDarkGrayColor,
           ),
         ),
       ),
@@ -382,10 +378,9 @@ class _AccountPageState extends State<AccountPage> {
 
     try {
       final endDate = DateTime.now();
-      final startDate =
-          _selectedPeriodIndex == 0
-              ? endDate.subtract(const Duration(days: 30)) // 30 дней
-              : DateTime(endDate.year - 1, endDate.month, 1); // 12 месяцев
+      final startDate = _selectedPeriodIndex == 0
+          ? endDate.subtract(const Duration(days: 30)) // 30 дней
+          : DateTime(endDate.year - 1, endDate.month, 1); // 12 месяцев
 
       final accountId = _accountData?.id;
       if (accountId == null) return;

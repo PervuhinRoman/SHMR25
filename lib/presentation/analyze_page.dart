@@ -10,7 +10,7 @@ import 'package:shmr_finance/domain/models/category/combine_category.dart';
 import 'package:shmr_finance/presentation/selected_category_page.dart';
 import 'package:shmr_finance/presentation/widgets/custom_appbar.dart';
 import 'package:shmr_finance/presentation/widgets/item_analyze_category.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shmr_finance/l10n/app_localizations.dart';
 import 'package:pie_chart_widget/pie_chart_widget.dart';
 import 'package:shmr_finance/domain/cubit/account/account_cubit.dart';
 
@@ -58,17 +58,16 @@ class _AnalyzePageState extends State<AnalyzePage> {
     }
 
     // Конвертируем данные в формат для пакета
-    final chartSections =
-        categories.map((category) {
-          return ChartSection.fromData(
-            id: category.category.id.toString(),
-            name: category.category.name,
-            emoji: category.category.emoji,
-            value: category.totalAmount.toDouble(),
-            totalValue: totalSum,
-            additionalInfo: category.lastTransaction?.comment,
-          );
-        }).toList();
+    final chartSections = categories.map((category) {
+      return ChartSection.fromData(
+        id: category.category.id.toString(),
+        name: category.category.name,
+        emoji: category.category.emoji,
+        value: category.totalAmount.toDouble(),
+        totalValue: totalSum,
+        additionalInfo: category.lastTransaction?.comment,
+      );
+    }).toList();
 
     // Конфигурация графика
     final config = PieChartConfig(
@@ -155,8 +154,8 @@ class _AnalyzePageState extends State<AnalyzePage> {
                             label: Text(
                               datePickerState.startDate != null
                                   ? DateFormat(
-                                    'dd.MM.yyyy',
-                                  ).format(datePickerState.startDate!)
+                                      'dd.MM.yyyy',
+                                    ).format(datePickerState.startDate!)
                                   : l10n.selectDate,
                               textAlign: TextAlign.end,
                             ),
@@ -206,8 +205,8 @@ class _AnalyzePageState extends State<AnalyzePage> {
                             label: Text(
                               datePickerState.endDate != null
                                   ? DateFormat(
-                                    'dd.MM.yyyy',
-                                  ).format(datePickerState.endDate!)
+                                      'dd.MM.yyyy',
+                                    ).format(datePickerState.endDate!)
                                   : l10n.selectDate,
                               textAlign: TextAlign.end,
                             ),
@@ -305,10 +304,9 @@ class _AnalyzePageState extends State<AnalyzePage> {
                                 return ItemAnalyzeCategory(
                                   categoryTitle: item.category.name,
                                   icon: item.category.emoji,
-                                  percent:
-                                      (item.totalAmount * 100 / totalSum)
-                                          .toStringAsFixed(2)
-                                          .toString(),
+                                  percent: (item.totalAmount * 100 / totalSum)
+                                      .toStringAsFixed(2)
+                                      .toString(),
                                   totalSum: item.totalAmount.toString(),
                                   lastTransaction:
                                       item.lastTransaction?.comment,
@@ -316,16 +314,14 @@ class _AnalyzePageState extends State<AnalyzePage> {
                                   onTapFunc: () {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
-                                        builder:
-                                            (context) => BlocProvider(
-                                              create:
-                                                  (context) =>
-                                                      DatePickerCubit(),
-                                              child: SelectedCategoryPage(
-                                                isIncome: widget.isIncome,
-                                                selectedCategory: item.category,
-                                              ),
-                                            ),
+                                        builder: (context) => BlocProvider(
+                                          create: (context) =>
+                                              DatePickerCubit(),
+                                          child: SelectedCategoryPage(
+                                            isIncome: widget.isIncome,
+                                            selectedCategory: item.category,
+                                          ),
+                                        ),
                                       ),
                                     );
                                   },
