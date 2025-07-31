@@ -29,7 +29,8 @@ class _InExpHistoryWidgetState extends State<InExpHistoryWidget> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final datePickerState = context.read<DatePickerCubit>().state;
       final accountState = context.read<MyAccountCubit>().state;
-      final accountId = accountState.accountId ?? 1;
+      // final accountId = accountState.accountId ?? 1;
+      final accountId = 1;
       context.read<TransactionCubit>().fetchTransactions(
         accountId: accountId,
         startDate: datePickerState.startDate!,

@@ -60,7 +60,7 @@ class TransactionCubit extends Cubit<TransactionState> {
       log('📡 Выполняем сетевой запрос...', name: 'Transaction');
       final List<TransactionResponse> rawResponses = await transactionRepo
           .getPeriodTransactionsByAccount(
-            accountId,
+            1, // TODO: hardcode accountID
             startDate: startDate,
             endDate: endDate,
           );
@@ -318,11 +318,17 @@ class TransactionCubit extends Cubit<TransactionState> {
       final categoryRepo = CategoryRepoImpl();
       final transactionRepo = TransactionRepoImp(accountRepo, categoryRepo);
       await transactionRepo.createTransaction(request);
-      log('TransactionCubit: транзакция успешно создана', name: 'TransactionCubit');
+      log(
+        'TransactionCubit: транзакция успешно создана',
+        name: 'TransactionCubit',
+      );
       // Можно обновить список транзакций, если нужно
       // await fetchTransactions(...);
     } catch (e) {
-      log('TransactionCubit: ошибка при создании транзакции: $e', name: 'TransactionCubit');
+      log(
+        'TransactionCubit: ошибка при создании транзакции: $e',
+        name: 'TransactionCubit',
+      );
       rethrow;
     }
   }
@@ -334,11 +340,17 @@ class TransactionCubit extends Cubit<TransactionState> {
       final categoryRepo = CategoryRepoImpl();
       final transactionRepo = TransactionRepoImp(accountRepo, categoryRepo);
       await transactionRepo.updateTransaction(id, request);
-      log('TransactionCubit: транзакция успешно обновлена', name: 'TransactionCubit');
+      log(
+        'TransactionCubit: транзакция успешно обновлена',
+        name: 'TransactionCubit',
+      );
       // Можно обновить список транзакций, если нужно
       // await fetchTransactions(...);
     } catch (e) {
-      log('TransactionCubit: ошибка при обновлении транзакции: $e', name: 'TransactionCubit');
+      log(
+        'TransactionCubit: ошибка при обновлении транзакции: $e',
+        name: 'TransactionCubit',
+      );
       rethrow;
     }
   }
@@ -350,11 +362,17 @@ class TransactionCubit extends Cubit<TransactionState> {
       final categoryRepo = CategoryRepoImpl();
       final transactionRepo = TransactionRepoImp(accountRepo, categoryRepo);
       await transactionRepo.deleteTransaction(id);
-      log('TransactionCubit: транзакция успешно удалена', name: 'TransactionCubit');
+      log(
+        'TransactionCubit: транзакция успешно удалена',
+        name: 'TransactionCubit',
+      );
       // Можно обновить список транзакций, если нужно
       // await fetchTransactions(...);
     } catch (e) {
-      log('TransactionCubit: ошибка при удалении транзакции: $e', name: 'TransactionCubit');
+      log(
+        'TransactionCubit: ошибка при удалении транзакции: $e',
+        name: 'TransactionCubit',
+      );
       rethrow;
     }
   }
