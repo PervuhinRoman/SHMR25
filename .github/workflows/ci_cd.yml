@@ -37,6 +37,8 @@ jobs:
       - name: List generated l10n files
         run: ls -lR .dart_tool/flutter_gen/gen_l10n || true
 
+      - name: Generate goldens
+        run: flutter test --update-goldens --tags=golden
       - name: Run tests
         run: flutter test
 
